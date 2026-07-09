@@ -1,0 +1,47 @@
+# Build artifacts
+debug/
+release/
+Makefile
+Makefile.Debug
+Makefile.Release
+.qmake.stash
+object_script.*
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.a
+*.exp
+*.pdb
+*.ilk
+*.manifest
+
+# Qt Creator / IDE
+*.pro.user
+*.pro.user.*
+*.user
+*.sln
+*.suo
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MOC / UI / QRC generated
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# Screenshots
+screenshot.png
+*.png
+*.jpg
+*.jpeg
+
+# OS files
+Thumbs.db
+.DS_Store
+Desktop.ini
