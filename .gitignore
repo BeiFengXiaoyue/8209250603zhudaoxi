@@ -1,0 +1,22 @@
+# ======== client build artifacts ========
+client/debug/
+client/release/
+client/Makefile
+client/Makefile.Debug
+client/Makefile.Release
+client/.qmake.stash
+client/*.o
+client/*.exe
+
+# ======== IDE files ========
+*.user
+*.pro.user*
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ======== OS files ========
+.DS_Store
+Thumbs.db
