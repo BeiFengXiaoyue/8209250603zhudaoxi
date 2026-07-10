@@ -10,6 +10,11 @@ client/build/
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+MyQtApp_autogen/
 
 # ============================
 # Python
@@ -35,6 +40,8 @@ server/database/*.db-shm
 # ============================
 server/uploads/avatars/*
 !server/uploads/avatars/.gitkeep
+server/uploads/resources/*
+!server/uploads/resources/.gitkeep
 
 # ============================
 # 虚拟环境
@@ -62,6 +69,11 @@ _*.vbs
 _test.txt
 run_client.bat
 spec.doc
+
+# ============================
+# 远程仓库克隆
+# ============================
+repo_remote/
 
 # ============================
 # 其他

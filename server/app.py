@@ -7,6 +7,7 @@ from modelA.user_data import user_bp
 from modelA.profile import profile_bp
 from modelA.questions import questions_bp
 from modelA.student_manage import student_bp
+from modelA.resources import resources_bp
 
 app = Flask(__name__)
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -16,6 +17,7 @@ app.register_blueprint(user_bp, url_prefix="/api/user")
 app.register_blueprint(profile_bp, url_prefix="/api/user")
 app.register_blueprint(questions_bp, url_prefix="/api")
 app.register_blueprint(student_bp, url_prefix="/api/teacher")
+app.register_blueprint(resources_bp, url_prefix="/api")
 
 
 @app.route('/')

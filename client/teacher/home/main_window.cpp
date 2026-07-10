@@ -3,6 +3,7 @@
 #include "content_area.h"
 #include "side_bar.h"
 #include "../../shared/profile_editor/edit_widget.h"
+#include "../../shared/material_upload/material_upload_page.h"
 #include "../../forum/main_window.h"
 #include "../../forum/teacher_sidebar.h"
 #include "../../teacher/student_management/manage_page.h"
@@ -69,6 +70,8 @@ QWidget* TeacherMainWindow::createHomePage()
             });
             connect(m_editWidget, &ProfileEditWidget::avatarUpdated, this, [this]() {
                 m_leftPanel->loadAvatar();
+                if (m_forumWindow) m_forumWindow->refreshAvatars();
+                if (m_materialPage) m_materialPage->refreshAvatars();
             });
         }
         m_stack->setCurrentWidget(m_editWidget);
@@ -84,6 +87,31 @@ QWidget* TeacherMainWindow::createHomePage()
                 connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
                     m_sidebar->setActiveItem(0);
                     m_stack->setCurrentIndex(0);
+                });
+                connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+                    if (!m_materialPage) {
+                        auto *matSidebar = new TeacherForumSidebar();
+                        m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 4);
+                        m_stack->addWidget(m_materialPage);
+                        connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                            m_sidebar->setActiveItem(0);
+                            m_stack->setCurrentIndex(0);
+                        });
+                        connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                            m_forumWindow->setUserData(m_username, m_classId);
+                            m_forumWindow->setSidebarActiveItem(2);
+                            m_stack->setCurrentWidget(m_forumWindow);
+                        });
+                        connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+                            if (!m_managePage) { /* will be created by sidebar */ }
+                            m_sidebar->setActiveItem(3);
+                            m_managePage->setSidebarActiveItem(3);
+                            m_stack->setCurrentWidget(m_managePage);
+                        });
+                    }
+                    m_materialPage->setUserData(m_username, m_classId);
+                    m_materialPage->setSidebarActiveItem(4);
+                    m_stack->setCurrentWidget(m_materialPage);
                 });
             }
             connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
@@ -105,6 +133,30 @@ QWidget* TeacherMainWindow::createHomePage()
                                 m_sidebar->setActiveItem(0);
                                 m_stack->setCurrentIndex(0);
                             });
+                            connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+                                if (!m_materialPage) {
+                                    auto *ms = new TeacherForumSidebar();
+                                    m_materialPage = new MaterialUploadPage(m_username, m_classId, ms, 4);
+                                    m_stack->addWidget(m_materialPage);
+                                    connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                                        m_sidebar->setActiveItem(0);
+                                        m_stack->setCurrentIndex(0);
+                                    });
+                                    connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                                        m_forumWindow->setUserData(m_username, m_classId);
+                                        m_forumWindow->setSidebarActiveItem(2);
+                                        m_stack->setCurrentWidget(m_forumWindow);
+                                    });
+                                    connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+                                        m_sidebar->setActiveItem(3);
+                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        m_stack->setCurrentWidget(m_managePage);
+                                    });
+                                }
+                                m_materialPage->setUserData(m_username, m_classId);
+                                m_materialPage->setSidebarActiveItem(4);
+                                m_stack->setCurrentWidget(m_materialPage);
+                            });
                             connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
                                 if (m_managePage) m_managePage->setSidebarActiveItem(3);
@@ -114,9 +166,33 @@ QWidget* TeacherMainWindow::createHomePage()
                         m_forumWindow->setUserData(m_username, m_classId);
                         m_forumWindow->setSidebarActiveItem(2);
                         m_stack->setCurrentWidget(m_forumWindow);
-                    });
-                }
-                m_sidebar->setActiveItem(3);
+	                    });
+	                    connect(m_managePage, &StudentManagePage::navigateToMaterials, this, [this]() {
+	                        if (!m_materialPage) {
+	                            auto *ms = new TeacherForumSidebar();
+	                            m_materialPage = new MaterialUploadPage(m_username, m_classId, ms, 4);
+	                            m_stack->addWidget(m_materialPage);
+	                            connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+	                                m_sidebar->setActiveItem(0);
+	                                m_stack->setCurrentIndex(0);
+	                            });
+	                            connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+	                                m_forumWindow->setUserData(m_username, m_classId);
+	                                m_forumWindow->setSidebarActiveItem(2);
+	                                m_stack->setCurrentWidget(m_forumWindow);
+	                            });
+	                            connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+	                                m_sidebar->setActiveItem(3);
+	                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+	                                m_stack->setCurrentWidget(m_managePage);
+	                            });
+	                        }
+	                        m_materialPage->setUserData(m_username, m_classId);
+	                        m_materialPage->setSidebarActiveItem(4);
+	                        m_stack->setCurrentWidget(m_materialPage);
+	                    });
+	                }
+	                m_sidebar->setActiveItem(3);
                 m_managePage->setSidebarActiveItem(3);
                 m_stack->setCurrentWidget(m_managePage);
             });
@@ -144,6 +220,101 @@ QWidget* TeacherMainWindow::createHomePage()
                             m_sidebar->setActiveItem(0);
                             m_stack->setCurrentIndex(0);
                         });
+                        connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+                            if (!m_materialPage) {
+                                auto *ms = new TeacherForumSidebar();
+                                m_materialPage = new MaterialUploadPage(m_username, m_classId, ms, 4);
+                                m_stack->addWidget(m_materialPage);
+                                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                                    m_sidebar->setActiveItem(0);
+                                    m_stack->setCurrentIndex(0);
+                                });
+                                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                                    if (m_forumWindow) {
+                                        m_forumWindow->setUserData(m_username, m_classId);
+                                        m_forumWindow->setSidebarActiveItem(2);
+                                        m_stack->setCurrentWidget(m_forumWindow);
+                                    }
+                                });
+                                connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+                                    m_sidebar->setActiveItem(3);
+                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    m_stack->setCurrentWidget(m_managePage);
+                                });
+                            }
+                            m_materialPage->setUserData(m_username, m_classId);
+                            m_materialPage->setSidebarActiveItem(4);
+                            m_stack->setCurrentWidget(m_materialPage);
+                        });
+                        connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
+                            m_sidebar->setActiveItem(3);
+                            if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                            m_stack->setCurrentWidget(m_managePage);
+                        });
+                    }
+                    m_forumWindow->setUserData(m_username, m_classId);
+                    m_forumWindow->setSidebarActiveItem(2);
+	                    m_stack->setCurrentWidget(m_forumWindow);
+	                });
+                    connect(m_managePage, &StudentManagePage::navigateToMaterials, this, [this]() {
+                        if (!m_materialPage) {
+                            auto *ms = new TeacherForumSidebar();
+                            m_materialPage = new MaterialUploadPage(m_username, m_classId, ms, 4);
+                            m_stack->addWidget(m_materialPage);
+                            connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                                m_sidebar->setActiveItem(0);
+                                m_stack->setCurrentIndex(0);
+                            });
+                            connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                                if (m_forumWindow) {
+                                    m_forumWindow->setUserData(m_username, m_classId);
+                                    m_forumWindow->setSidebarActiveItem(2);
+                                    m_stack->setCurrentWidget(m_forumWindow);
+                                }
+                            });
+                            connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+                                m_sidebar->setActiveItem(3);
+                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                m_stack->setCurrentWidget(m_managePage);
+                            });
+                        }
+                        m_materialPage->setUserData(m_username, m_classId);
+                        m_materialPage->setSidebarActiveItem(4);
+                        m_stack->setCurrentWidget(m_materialPage);
+                    });
+	            }
+	            m_managePage->setSidebarActiveItem(3);
+            m_sidebar->setActiveItem(3);
+            m_stack->setCurrentWidget(m_managePage);
+        } else if (index == 4) {
+            // 资料上传
+            if (!m_materialPage) {
+                auto *matSidebar = new TeacherForumSidebar();
+                m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 4);
+                m_stack->addWidget(m_materialPage);
+
+                auto navHome = [this]() {
+                    m_sidebar->setActiveItem(0);
+                    m_stack->setCurrentIndex(0);
+                };
+                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, navHome);
+
+                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                    if (!m_forumWindow) {
+                        auto *fs = new TeacherForumSidebar();
+                        m_forumWindow = new ForumMainWindow(m_username, m_classId, fs);
+                        m_stack->addWidget(m_forumWindow);
+                        connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
+                            m_sidebar->setActiveItem(0);
+                            m_stack->setCurrentIndex(0);
+                        });
+                        connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+                            if (m_materialPage) {
+                                m_materialPage->setUserData(m_username, m_classId);
+                                m_materialPage->setSidebarActiveItem(4);
+                                m_stack->setCurrentWidget(m_materialPage);
+                            }
+                        });
                         connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                             m_sidebar->setActiveItem(3);
                             if (m_managePage) m_managePage->setSidebarActiveItem(3);
@@ -154,10 +325,62 @@ QWidget* TeacherMainWindow::createHomePage()
                     m_forumWindow->setSidebarActiveItem(2);
                     m_stack->setCurrentWidget(m_forumWindow);
                 });
+
+                connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+	                    if (!m_managePage) {
+	                        QString classDisplay = QString("210%1班").arg(m_classId);
+	                        m_managePage = new StudentManagePage(m_username, m_classId, classDisplay);
+	                        m_stack->addWidget(m_managePage);
+	                        connect(m_managePage, &StudentManagePage::navigateToHome, this, [this]() {
+	                            m_sidebar->setActiveItem(0);
+	                            m_stack->setCurrentIndex(0);
+	                        });
+	                        connect(m_managePage, &StudentManagePage::navigateToForum, this, [this]() {
+	                            if (m_forumWindow) {
+	                                m_forumWindow->setUserData(m_username, m_classId);
+	                                m_forumWindow->setSidebarActiveItem(2);
+	                                m_stack->setCurrentWidget(m_forumWindow);
+	                            }
+	                        });
+	                        connect(m_managePage, &StudentManagePage::navigateToMaterials, this, [this]() {
+	                            if (!m_materialPage) {
+	                                auto *ms = new TeacherForumSidebar();
+	                                m_materialPage = new MaterialUploadPage(m_username, m_classId, ms, 4);
+	                                m_stack->addWidget(m_materialPage);
+	                                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+	                                    m_sidebar->setActiveItem(0);
+	                                    m_stack->setCurrentIndex(0);
+	                                });
+	                                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+	                                    if (m_forumWindow) {
+	                                        m_forumWindow->setUserData(m_username, m_classId);
+	                                        m_forumWindow->setSidebarActiveItem(2);
+	                                        m_stack->setCurrentWidget(m_forumWindow);
+	                                    }
+	                                });
+	                                connect(m_materialPage, &MaterialUploadPage::navigateToStudentManage, this, [this]() {
+	                                    m_sidebar->setActiveItem(3);
+	                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+	                                    m_stack->setCurrentWidget(m_managePage);
+	                                });
+	                            }
+	                            m_materialPage->setUserData(m_username, m_classId);
+	                            m_materialPage->setSidebarActiveItem(4);
+	                            m_stack->setCurrentWidget(m_materialPage);
+	                        });
+	                    }
+                    m_sidebar->setActiveItem(3);
+                    m_managePage->setSidebarActiveItem(3);
+                    m_stack->setCurrentWidget(m_managePage);
+                });
+
+                connect(m_materialPage, &MaterialUploadPage::navigateToVideo, this, [this]() {
+                    // 课程上传暂不实现
+                });
             }
-            m_managePage->setSidebarActiveItem(3);
-            m_sidebar->setActiveItem(3);
-            m_stack->setCurrentWidget(m_managePage);
+            m_materialPage->setUserData(m_username, m_classId);
+            m_materialPage->setSidebarActiveItem(4);
+            m_stack->setCurrentWidget(m_materialPage);
         }
     });
 

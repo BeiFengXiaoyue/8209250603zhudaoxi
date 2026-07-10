@@ -99,7 +99,7 @@ QLabel a:hover {
    ============================================================ */
 
 #logoPlaceholder {
-    background-color: #0071E3;
+    background-color: transparent;
     border-radius: 16px;
 }
 

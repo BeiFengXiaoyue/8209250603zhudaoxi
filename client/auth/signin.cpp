@@ -70,6 +70,8 @@ void SignInPage::initUI()
     m_logoPlaceholder->setObjectName("logoPlaceholder");
     m_logoPlaceholder->setFixedSize(72, 72);
     m_logoPlaceholder->setAlignment(Qt::AlignCenter);
+    m_logoPlaceholder->setPixmap(QPixmap(":/images/csu_logo")
+        .scaled(72, 72, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // 用户名
     m_usernameEdit = new QLineEdit(m_cardWidget);

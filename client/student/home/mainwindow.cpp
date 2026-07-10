@@ -3,6 +3,7 @@
 #include "contentarea.h"
 #include "sidebar.h"
 #include "../../shared/profile_editor/edit_widget.h"
+#include "../../shared/material_upload/material_upload_page.h"
 #include "../../forum/main_window.h"
 #include "../../forum/student_sidebar.h"
 
@@ -75,6 +76,8 @@ QWidget* StudentMainWindow::createHomePage()
             });
             connect(m_editWidget, &ProfileEditWidget::avatarUpdated, this, [this]() {
                 m_leftPanel->loadAvatar();
+                if (m_forumWindow) m_forumWindow->refreshAvatars();
+                if (m_materialPage) m_materialPage->refreshAvatars();
             });
         }
         m_stack->setCurrentWidget(m_editWidget);
@@ -91,10 +94,59 @@ QWidget* StudentMainWindow::createHomePage()
                     m_sidebar->setActiveItem(0);
                     m_stack->setCurrentIndex(0);
                 });
+                connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+                    if (!m_materialPage) {
+                        auto *matSidebar = new StudentForumSidebar();
+                        m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
+                        m_stack->addWidget(m_materialPage);
+                        connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                            m_sidebar->setActiveItem(0);
+                            m_stack->setCurrentIndex(0);
+                        });
+                        connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                            if (!m_forumWindow) { /* will be re-created by sidebar click */ }
+                            m_forumWindow->setUserData(m_username, m_classId);
+                            m_forumWindow->setSidebarActiveItem(2);
+                            m_stack->setCurrentWidget(m_forumWindow);
+                        });
+                    }
+                    m_materialPage->setUserData(m_username, m_classId);
+                    m_materialPage->setSidebarActiveItem(3);
+                    m_stack->setCurrentWidget(m_materialPage);
+                });
             }
             m_forumWindow->setUserData(m_username, m_classId);
             m_forumWindow->setSidebarActiveItem(2);
             m_stack->setCurrentWidget(m_forumWindow);
+        } else if (index == 3) {
+            // 资料上传
+            if (!m_materialPage) {
+                auto *matSidebar = new StudentForumSidebar();
+                m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
+                m_stack->addWidget(m_materialPage);
+                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                    m_sidebar->setActiveItem(0);
+                    m_stack->setCurrentIndex(0);
+                });
+                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                    // 跳转到论坛
+                    if (!m_forumWindow) {
+                        auto *forumSidebar = new StudentForumSidebar();
+                        m_forumWindow = new ForumMainWindow(m_username, m_classId, forumSidebar);
+                        m_stack->addWidget(m_forumWindow);
+                        connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
+                            m_sidebar->setActiveItem(0);
+                            m_stack->setCurrentIndex(0);
+                        });
+                    }
+                    m_forumWindow->setUserData(m_username, m_classId);
+                    m_forumWindow->setSidebarActiveItem(2);
+                    m_stack->setCurrentWidget(m_forumWindow);
+                });
+            }
+            m_materialPage->setUserData(m_username, m_classId);
+            m_materialPage->setSidebarActiveItem(3);
+            m_stack->setCurrentWidget(m_materialPage);
         }
         // 其他导航项暂不实现
     });

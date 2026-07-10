@@ -2,4 +2,7 @@
     <qresource prefix="/styles">
         <file alias="common.qss">common/style/common.qss</file>
     </qresource>
+    <qresource prefix="/images">
+        <file alias="csu_logo">auth/csu_logo.png</file>
+    </qresource>
 </RCC>

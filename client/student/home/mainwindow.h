@@ -10,6 +10,7 @@ class StudentContentArea;
 class StudentSidebar;
 class ProfileEditWidget;
 class ForumMainWindow;
+class MaterialUploadPage;
 
 class StudentMainWindow : public QMainWindow
 {
@@ -30,6 +31,7 @@ private:
     StudentSidebar   *m_sidebar      = nullptr;
     ProfileEditWidget *m_editWidget  = nullptr;
     ForumMainWindow   *m_forumWindow = nullptr;
+    MaterialUploadPage *m_materialPage = nullptr;
 
     QString m_username;
     QString m_role;

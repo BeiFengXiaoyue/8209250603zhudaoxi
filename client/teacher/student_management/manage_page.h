@@ -19,6 +19,7 @@ public:
 signals:
     void navigateToHome();
     void navigateToForum();
+    void navigateToMaterials();
 
 private:
     void setupUI();

@@ -24,7 +24,7 @@ private:
     void applyStyle();
     void drawIcon(QPainter &painter, const QRect &rect);
 
-    int m_iconType = 0;  // 0=person, 1=play, 2=chat, 3=star, 4=gear
+    int m_iconType = 0;  // 0=person, 1=play, 2=chat, 3=star, 4=gear, 6=cloud-arrow
     bool m_active = false;
 };
 

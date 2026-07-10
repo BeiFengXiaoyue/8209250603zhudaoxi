@@ -82,7 +82,7 @@ void TeacherForumNavButton::drawIcon(QPainter &painter, const QRect &rect)
         painter.drawPath(body2);
         break;
     }
-    case 5: { // 设置 — 齿轮（圆圈+小齿）
+    case 5: { // 齿轮（保留兼容，当前未被使用）
         painter.drawEllipse(QPoint(cx, cy), 5, 5);
         for (int i = 0; i < 6; ++i) {
             double angle = i * 60 * M_PI / 180.0;
@@ -92,6 +92,20 @@ void TeacherForumNavButton::drawIcon(QPainter &painter, const QRect &rect)
             double y2 = cy + 8 * qSin(angle);
             painter.drawLine(QPointF(x1, y1), QPointF(x2, y2));
         }
+        break;
+    }
+    case 6: { // 资料上传 — 云朵 + 向上箭头
+        QPainterPath cloud;
+        cloud.moveTo(cx - 5, cy + 3);
+        cloud.quadTo(cx - 8, cy, cx - 4, cy - 2);
+        cloud.quadTo(cx - 2, cy - 6, cx + 2, cy - 4);
+        cloud.quadTo(cx + 5, cy - 7, cx + 7, cy - 3);
+        cloud.quadTo(cx + 9, cy, cx + 5, cy + 3);
+        cloud.lineTo(cx - 5, cy + 3);
+        painter.drawPath(cloud);
+        painter.drawLine(cx, cy + 2, cx, cy - 5);
+        painter.drawLine(cx - 3, cy - 2, cx, cy - 5);
+        painter.drawLine(cx + 3, cy - 2, cx, cy - 5);
         break;
     }
     default:
@@ -112,7 +126,7 @@ TeacherForumSidebar::TeacherForumSidebar(QWidget *parent)
         {1, "课程上传"},
         {2, "论坛"},
         {4, "学生管理"},
-        {5, "设置"},
+        {6, "资料上传"},
     };
 
     setupItems(items, 2, "v1.0.0 · 教师主页");

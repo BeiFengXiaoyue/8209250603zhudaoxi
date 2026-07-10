@@ -138,6 +138,24 @@ def init_db():
 
     conn.commit()
     conn.close()
+    migrate()
+
+def migrate():
+    """数据库迁移：向 resources 表补充缺失字段"""
+    conn = sqlite3.connect(DB_PATH)
+    existing = [row[1] for row in conn.execute("PRAGMA table_info(resources)").fetchall()]
+    migrations = [
+        ("name", "ALTER TABLE resources ADD COLUMN name TEXT"),
+        ("file_format", "ALTER TABLE resources ADD COLUMN file_format TEXT"),
+        ("stage", "ALTER TABLE resources ADD COLUMN stage TEXT DEFAULT ''"),
+        ("file_size", "ALTER TABLE resources ADD COLUMN file_size INTEGER DEFAULT 0"),
+    ]
+    for col, sql in migrations:
+        if col not in existing:
+            conn.execute(sql)
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     init_db()
     print(f"数据库已初始化: {DB_PATH}")

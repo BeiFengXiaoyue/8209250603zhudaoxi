@@ -16,10 +16,12 @@ public:
                              QWidget *parent = nullptr);
     void setUserData(const QString &username, int classId);
     void setSidebarActiveItem(int index);
+    void refreshAvatars();
 
 signals:
     void navigateToHome();
     void navigateToStudentManage();
+    void navigateToMaterials();
 
 private:
     void setupUI();

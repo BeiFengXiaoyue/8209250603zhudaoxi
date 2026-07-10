@@ -6,7 +6,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QDateTime>
-#include <QTimer>
 #include <QMouseEvent>
 #include <algorithm>
 #include "../common/network_handler.h"
@@ -49,7 +48,9 @@ void SmallAvatar::setAvatarPixmap(const QPixmap &pixmap)
 void SmallAvatar::loadFromServer(const QString &username)
 {
     if (username.isEmpty()) return;
-    QString url = NetworkHandler::baseUrl() + "/api/user/avatar/" + username;
+    // ?t=timestamp 防止 QNetworkAccessManager 缓存旧头像
+    QString url = NetworkHandler::baseUrl() + "/api/user/avatar/" + username
+                  + "?t=" + QString::number(QDateTime::currentMSecsSinceEpoch());
     QNetworkRequest request{QUrl(url)};
     auto *reply = NetworkHandler::instance()->manager()->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
@@ -1023,6 +1024,17 @@ void CommentArea::rebuildCommentList()
 }
 
 // ============================================================
+// 上传头像后刷新所有头像
+// ============================================================
+void CommentArea::refreshAvatars()
+{
+    // 重新加载顶部头像
+    m_headerAvatar->loadFromServer(m_username);
+    // 重建评论列表（每个 CommentCard 会重新创建 SmallAvatar 并加载）
+    rebuildCommentList();
+}
+
+// ============================================================
 // 事件过滤器（处理头像/名称点击跳转个人主页）
 // ============================================================
 bool CommentArea::eventFilter(QObject *obj, QEvent *event)
@@ -1030,11 +1042,8 @@ bool CommentArea::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonRelease) {
         if (obj == m_headerAvatar || obj == m_headerName ||
             (obj->isWidgetType() && obj->parent() == m_headerWidget)) {
-            // 模拟跳转到个人主页
-            m_headerName->setText("→ ZCode 的个人主页");
-            QTimer::singleShot(2000, this, [this]() {
-                m_headerName->setText("ZCode");
-            });
+            // 点击顶部头像/用户名 → 导航回个人中心（首页）
+            emit navigateToHome();
             return true;
         }
     }

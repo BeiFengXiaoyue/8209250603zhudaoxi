@@ -8,7 +8,7 @@ StudentForumSidebar::StudentForumSidebar(QWidget *parent)
         {0, "个人中心"},
         {1, "视频区"},
         {2, "论坛"},
-        {4, "设置"},
+        {6, "资料上传"},
     };
 
     setupItems(items, 2, "v1.0.0 · 学生主页");

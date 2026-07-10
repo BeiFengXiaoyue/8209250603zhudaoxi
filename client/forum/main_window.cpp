@@ -26,6 +26,12 @@ void ForumMainWindow::setSidebarActiveItem(int index)
         m_sidebar->setActiveItem(index);
 }
 
+void ForumMainWindow::refreshAvatars()
+{
+    if (m_commentArea)
+        m_commentArea->refreshAvatars();
+}
+
 void ForumMainWindow::setupUI()
 {
     setMinimumSize(1200, 720);
@@ -41,14 +47,20 @@ void ForumMainWindow::setupUI()
     m_commentArea = new CommentArea(m_username, m_classId);
     mainLayout->addWidget(m_commentArea, 1);
 
+    // 点击评论区顶部头像/用户名 → 导航回个人中心
+    connect(m_commentArea, &CommentArea::navigateToHome,
+            this, &ForumMainWindow::navigateToHome);
+
     mainLayout->addWidget(m_sidebar);
 
     // 侧边栏导航
-    connect(m_sidebar, &ForumSidebarBase::itemClicked, this, [this](int index, const QString &) {
+    connect(m_sidebar, &ForumSidebarBase::itemClicked, this, [this](int index, const QString &name) {
         if (index == 0) {
             emit navigateToHome();
-        } else if (index == 3) {
+        } else if (index == 3 && name == "学生管理") {
             emit navigateToStudentManage();
+        } else if (name == "资料上传") {
+            emit navigateToMaterials();
         }
     });
 }

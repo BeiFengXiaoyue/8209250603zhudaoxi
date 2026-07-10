@@ -81,6 +81,8 @@ void SignUpPage::initUI()
     m_logoPlaceholder->setObjectName("logoPlaceholder");
     m_logoPlaceholder->setFixedSize(72, 72);
     m_logoPlaceholder->setAlignment(Qt::AlignCenter);
+    m_logoPlaceholder->setPixmap(QPixmap(":/images/csu_logo")
+        .scaled(72, 72, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // 用户名
     m_usernameEdit = new QLineEdit(m_cardWidget);
@@ -170,10 +172,10 @@ void SignUpPage::initUI()
 
     // 班级号与身份选择并排（容器与输入框等宽 320px）
     auto *classRoleContainer = new QWidget(m_cardWidget);
+    classRoleContainer->setObjectName("classRoleContainer");
     classRoleContainer->setFixedWidth(320);
     classRoleContainer->setStyleSheet(
-        "QWidget { background-color: transparent; "
-        "margin-bottom: 16px; }"
+        "QWidget#classRoleContainer { background-color: transparent; }"
     );
     auto *classRoleLayout = new QHBoxLayout(classRoleContainer);
     classRoleLayout->setContentsMargins(0, 0, 0, 0);

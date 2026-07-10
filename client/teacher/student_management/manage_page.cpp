@@ -110,8 +110,10 @@ void StudentManagePage::setupUI()
             emit navigateToHome();
         } else if (index == 2) {
             emit navigateToForum();
+        } else if (index == 4) {
+            emit navigateToMaterials();
         }
-        // index 3（本页）、1（课程上传）、4（设置）暂不处理
+        // index 3（本页）、1（课程上传）暂不处理
     });
 }
 

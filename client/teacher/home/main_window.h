@@ -11,6 +11,7 @@ class TeacherSidebar;
 class ProfileEditWidget;
 class ForumMainWindow;
 class StudentManagePage;
+class MaterialUploadPage;
 
 class TeacherMainWindow : public QMainWindow
 {
@@ -32,6 +33,7 @@ private:
     ProfileEditWidget  *m_editWidget  = nullptr;
     ForumMainWindow    *m_forumWindow = nullptr;
     StudentManagePage  *m_managePage  = nullptr;
+    MaterialUploadPage *m_materialPage = nullptr;
 
     QString m_username;
     QString m_role;

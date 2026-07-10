@@ -115,6 +115,12 @@ public:
     explicit CommentArea(const QString &username, int classId,
                          QWidget *parent = nullptr);
 
+    // 上传头像后刷新所有头像（顶部 + 评论列表）
+    void refreshAvatars();
+
+signals:
+    void navigateToHome();
+
 private:
     void setupUI();
     void setupHeader();
