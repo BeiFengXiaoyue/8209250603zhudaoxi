@@ -2,32 +2,53 @@
 debug/
 release/
 *.o
+*.obj
 moc_*.cpp
 moc_*.h
 moc_predefs.h
+qrc_*.cpp
+ui_*.h
 .qmake.stash
 Makefile
 Makefile.Debug
 Makefile.Release
 object_script.*
 
-# 可执行文件
+# ======== 可执行文件 ========
 *.exe
 *.app
+*.dll
 
-# ======== IDE files ========
+# ======== Qt Creator / IDE ========
 *.user
 *.pro.user*
+*.pro.user.*
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+*.autosave
 
-# ======== OS files ========
+# ======== 构建目录 ========
+build/
+Build/
+
+# ======== QtC Clangd 缓存 ========
+.qtc_clangd/
+
+# ======== OS 文件 ========
 .DS_Store
 Thumbs.db
 Desktop.ini
+*.lnk
 
-# ======== 截图/资源备份 ========
+# ======== 截图 / 资源备份 ========
+screenshot*.png
 *.bak
+*.backup
+
+# ======== 临时文件 ========
+*.log
+*.tmp
+*.temp
