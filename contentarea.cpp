@@ -57,25 +57,37 @@ void ContentArea::setupUI()
     m_viewStack = new QStackedWidget();
     m_viewStack->setStyleSheet("QStackedWidget { background-color: #F5F7FA; }");
 
-    // ---- Page 0: 正常视图（Tab栏 + 内容页 + 底部导航） ----
+    // ---- Page 0: 正常视图（标题 + 内容页 + 底部导航） ----
     auto *normalPage = new QWidget();
     auto *normalLayout = new QVBoxLayout(normalPage);
     normalLayout->setContentsMargins(0, 0, 0, 0);
     normalLayout->setSpacing(0);
 
-    // 1) Tab 栏
-    auto *tabContainer = createTabBar();
-    normalLayout->addWidget(tabContainer);
-
-    // 2) 内容页栈 + 内容容器
+    // 1) 标题 + 内容页栈（放在同一容器，保证"最近上传"与卡片自然对齐）
     auto *contentContainer = new QWidget();
     contentContainer->setStyleSheet("QWidget { background-color: #F5F7FA; }");
     auto *contLayout = new QVBoxLayout(contentContainer);
     contLayout->setContentsMargins(0, 0, 0, 0);
+    contLayout->setSpacing(0);
+
+    // 标题放在内容容器内，与卡片共享左对齐边距
+    auto *titleLabel = new QLabel("最近上传");
+    titleLabel->setStyleSheet(R"(
+        QLabel {
+            color: #2C3E50;
+            font-size: 40px;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            padding: 12px 0 0 20px;
+        }
+    )");
+    contLayout->addWidget(titleLabel);
+
     contLayout->addWidget(createContentStack(), 1);
     normalLayout->addWidget(contentContainer, 1);
 
-    // 3) 底部导航
+    // 2) 底部导航
     normalLayout->addWidget(createBottomNav());
 
     m_viewStack->addWidget(normalPage); // index 0
@@ -87,87 +99,6 @@ void ContentArea::setupUI()
     m_viewStack->setCurrentIndex(0);
 
     mainLayout->addWidget(m_viewStack, 1);
-}
-
-// ============================================================
-// 创建 Tab 栏
-// ============================================================
-QWidget* ContentArea::createTabBar()
-{
-    auto *tabBar = new QWidget();
-    tabBar->setFixedHeight(52);
-    tabBar->setStyleSheet("QWidget { background-color: transparent; }");
-
-    auto *tabLayout = new QHBoxLayout(tabBar);
-    tabLayout->setContentsMargins(0, 0, 0, 0);
-    tabLayout->setSpacing(2);
-
-    // 教师版 Tab: 最近上传
-    QStringList tabNames = {"最近上传"};
-
-    for (int i = 0; i < tabNames.size(); ++i) {
-        auto *btn = new QPushButton(tabNames[i]);
-        btn->setCursor(Qt::PointingHandCursor);
-        btn->setFixedHeight(40);
-        btn->setCheckable(true);
-
-        bool active = (i == 0);
-
-        QString style = R"(
-            QPushButton {
-                background-color: %1;
-                color: %2;
-                border: none;
-                border-bottom: 3px solid %3;
-                border-radius: 0px;
-                font-size: 14px;
-                font-weight: %4;
-                padding: 0 20px;
-            }
-            QPushButton:hover {
-                background-color: #F5F7FA;
-                border-bottom: 3px solid %5;
-            }
-        )";
-
-        if (active) {
-            btn->setStyleSheet(style.arg("transparent", "#3B5998", "#3B5998",
-                                         "bold", "#A0B4D0"));
-            btn->setChecked(true);
-        } else {
-            btn->setStyleSheet(style.arg("transparent", "#888888", "transparent",
-                                         "normal", "#CCD5E0"));
-        }
-
-        connect(btn, &QPushButton::clicked, this, [this, i]() {
-            switchTab(i);
-        });
-
-        m_tabButtons.append(btn);
-        tabLayout->addWidget(btn);
-    }
-
-    tabLayout->addStretch(1);
-
-    // 白底圆角容器
-    auto *container = new QWidget();
-    container->setStyleSheet(R"(
-        QWidget {
-            background-color: #FFFFFF;
-            border-radius: 15px 15px 0 0;
-        }
-    )");
-    auto *containerLayout = new QVBoxLayout(container);
-    containerLayout->setContentsMargins(20, 8, 20, 0);
-    containerLayout->addWidget(tabBar);
-
-    auto *shadow = new QGraphicsDropShadowEffect(container);
-    shadow->setBlurRadius(15);
-    shadow->setColor(QColor(0, 0, 0, 20));
-    shadow->setOffset(0, 1);
-    container->setGraphicsEffect(shadow);
-
-    return container;
 }
 
 // ============================================================
@@ -211,7 +142,7 @@ QWidget* ContentArea::createContentStack()
         int pages = (totalItems + 5) / 6; // 每页6张
 
         TabInfo info;
-        info.name = m_tabButtons[tab]->text();
+        info.name = "最近上传";
         info.startPage = globalPageIndex;
         info.pageCount = pages;
         m_tabInfos.append(info);
@@ -368,16 +299,9 @@ QWidget* ContentArea::createBottomNav()
     m_navWidget->setFixedHeight(50);
     m_navWidget->setStyleSheet(R"(
         QWidget {
-            background-color: #FFFFFF;
-            border-radius: 0 0 15px 15px;
+            background-color: #F5F7FA;
         }
     )");
-
-    auto *shadow = new QGraphicsDropShadowEffect(m_navWidget);
-    shadow->setBlurRadius(15);
-    shadow->setColor(QColor(0, 0, 0, 20));
-    shadow->setOffset(0, -1);
-    m_navWidget->setGraphicsEffect(shadow);
 
     auto *navLayout = new QHBoxLayout(m_navWidget);
     navLayout->setContentsMargins(30, 0, 30, 0);
@@ -546,7 +470,7 @@ void ContentArea::switchTab(int index)
                 border: none;
                 border-bottom: 3px solid %3;
                 border-radius: 0px;
-                font-size: 14px;
+                font-size: 18px;
                 font-weight: %4;
                 padding: 0 20px;
             }
