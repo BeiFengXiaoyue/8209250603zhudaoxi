@@ -1,0 +1,31 @@
+# Qt build files
+Makefile
+Makefile.Debug
+Makefile.Release
+.qmake.stash
+
+# Build output directories
+debug/
+release/
+
+# Object files
+*.o
+*.obj
+
+# Moc / rcc generated files
+moc_*.cpp
+qrc_*.cpp
+
+# Executables
+*.exe
+*.app
+
+# IDE files
+.vscode/
+.idea/
+*.user
+*.pro.user*
+
+# OS files
+Thumbs.db
+.DS_Store
