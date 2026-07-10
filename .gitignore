@@ -45,8 +45,12 @@ Desktop.ini
 
 # ======== 截图 / 资源备份 ========
 screenshot*.png
+result_*.png
 *.bak
 *.backup
+
+# ======== ZCode 工具目录 ========
+.zcode/
 
 # ======== 临时文件 ========
 *.log

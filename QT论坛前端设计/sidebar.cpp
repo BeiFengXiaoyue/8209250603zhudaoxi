@@ -154,6 +154,21 @@ void NavButton::drawIcon(QPainter &painter, const QRect &rect)
         }
         break;
     }
+    case 5: { // 资料上传 — 上箭头
+        // 垂直箭头杆
+        painter.drawLine(cx, 3, cx, s - 6);
+        // 箭头头部（三角形）
+        QPainterPath arrowHead;
+        arrowHead.moveTo(cx, 3);
+        arrowHead.lineTo(cx - 5, 9);
+        arrowHead.lineTo(cx + 5, 9);
+        arrowHead.closeSubpath();
+        painter.setBrush(color);
+        painter.drawPath(arrowHead);
+        // 底部水平线
+        painter.drawLine(cx - 6, s - 3, cx + 6, s - 3);
+        break;
+    }
     default:
         break;
     }
@@ -216,7 +231,7 @@ void Sidebar::setupUI()
         {0, "个人中心"},
         {1, "视频区"},
         {2, "论坛"},
-        {4, "设置"},
+        {5, "资料上传"},
     };
 
     for (int i = 0; i < items.size(); ++i) {
