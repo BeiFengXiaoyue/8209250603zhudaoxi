@@ -25,7 +25,6 @@ private:
     void setupUI();
 
     // 构建子视图的工厂方法
-    QWidget* createTabBar();
     QWidget* createContentStack();
     QWidget* createBottomNav();
     QWidget* createStudentManagementPage();

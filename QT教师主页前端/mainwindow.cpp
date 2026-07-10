@@ -44,14 +44,10 @@ void MainWindow::setupUI()
     mainLayout->addWidget(m_sidebar);
 
     // ---- 侧边栏导航 -> 内容区联动 ----
-    // 0=个人中心, 1=课程管理, 2=论坛, 3=学生管理(占位), 4=设置
+    // 0=个人中心, 1=课程上传, 2=论坛, 3=学生管理(占位), 4=设置
     connect(m_sidebar, &Sidebar::itemClicked, this, [this](int index, const QString &) {
         m_contentArea->showNormalView();
-        if (index == 0 || index == 1) {
-            m_contentArea->switchTab(0); // 课程管理
-        } else if (index == 2 || index == 4) {
-            m_contentArea->switchTab(2); // 论坛/设置->浏览历史
-        }
+        m_contentArea->switchTab(0); // 所有导航统一显示最近上传
         // index 3 (学生管理) 暂不实现逻辑，仅占位
     });
 }

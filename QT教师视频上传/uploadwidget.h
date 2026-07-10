@@ -13,6 +13,7 @@
 #include <QFileInfo>
 #include <QMouseEvent>
 #include <QLineEdit>
+#include <QTextEdit>
 
 // ============================================================
 // 视频信息数据结构
@@ -20,6 +21,7 @@
 struct VideoInfo {
     QString filePath;      // 完整路径
     QString customName;    // 用户自定义视频名称
+    QString description;   // 视频简介
     QStringList tags;      // 标签列表
     QString uploadDate;    // 上传日期
     qint64 fileSize;       // 文件大小（字节）
@@ -106,6 +108,7 @@ private:
     QLabel      *m_dropLabel    = nullptr;
     QLabel      *m_fileInfoLabel = nullptr;
     QLineEdit   *m_videoNameEdit = nullptr;
+    QTextEdit   *m_descriptionEdit = nullptr;
     QString      m_selectedFilePath;
     QStringList  m_allTags;          // 所有可用标签
     QStringList  m_selectedTags;     // 当前选中的标签

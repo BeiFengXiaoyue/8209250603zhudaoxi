@@ -6,12 +6,14 @@
 #include <QList>
 #include <QVBoxLayout>
 
+// 侧边栏导航按钮（纯黑灰几何图标）
 class NavButton : public QPushButton
 {
     Q_OBJECT
 public:
     explicit NavButton(int iconType, const QString &text,
                        bool active = false, QWidget *parent = nullptr);
+
     void setActive(bool active);
     bool isActive() const { return m_active; }
 
@@ -22,15 +24,17 @@ private:
     void applyStyle();
     void drawIcon(QPainter &painter, const QRect &rect);
 
-    int m_iconType = 0;
+    int m_iconType = 0;  // 0=person, 1=book, 2=chat, 3=group(学生管理), 4=gear
     bool m_active = false;
 };
 
+// 右侧导航侧边栏
 class Sidebar : public QWidget
 {
     Q_OBJECT
 public:
     explicit Sidebar(QWidget *parent = nullptr);
+
     void setActiveItem(int index);
 
 signals:
@@ -38,6 +42,7 @@ signals:
 
 private:
     void setupUI();
+
     QList<NavButton*> m_navButtons;
     int m_activeIndex = 0;
 };

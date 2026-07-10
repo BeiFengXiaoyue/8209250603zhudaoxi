@@ -57,25 +57,37 @@ void ContentArea::setupUI()
     m_viewStack = new QStackedWidget();
     m_viewStack->setStyleSheet("QStackedWidget { background-color: #F5F7FA; }");
 
-    // ---- Page 0: 正常视图（Tab栏 + 内容页 + 底部导航） ----
+    // ---- Page 0: 正常视图（标题 + 内容页 + 底部导航） ----
     auto *normalPage = new QWidget();
     auto *normalLayout = new QVBoxLayout(normalPage);
     normalLayout->setContentsMargins(0, 0, 0, 0);
     normalLayout->setSpacing(0);
 
-    // 1) Tab 栏
-    auto *tabContainer = createTabBar();
-    normalLayout->addWidget(tabContainer);
-
-    // 2) 内容页栈 + 内容容器
+    // 1) 标题 + 内容页栈（放在同一容器，保证"最近上传"与卡片自然对齐）
     auto *contentContainer = new QWidget();
     contentContainer->setStyleSheet("QWidget { background-color: #F5F7FA; }");
     auto *contLayout = new QVBoxLayout(contentContainer);
     contLayout->setContentsMargins(0, 0, 0, 0);
+    contLayout->setSpacing(0);
+
+    // 标题放在内容容器内，与卡片共享左对齐边距
+    auto *titleLabel = new QLabel("最近上传");
+    titleLabel->setStyleSheet(R"(
+        QLabel {
+            color: #2C3E50;
+            font-size: 40px;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+            padding: 12px 0 0 20px;
+        }
+    )");
+    contLayout->addWidget(titleLabel);
+
     contLayout->addWidget(createContentStack(), 1);
     normalLayout->addWidget(contentContainer, 1);
 
-    // 3) 底部导航
+    // 2) 底部导航
     normalLayout->addWidget(createBottomNav());
 
     m_viewStack->addWidget(normalPage); // index 0
@@ -90,87 +102,6 @@ void ContentArea::setupUI()
 }
 
 // ============================================================
-// 创建 Tab 栏
-// ============================================================
-QWidget* ContentArea::createTabBar()
-{
-    auto *tabBar = new QWidget();
-    tabBar->setFixedHeight(52);
-    tabBar->setStyleSheet("QWidget { background-color: transparent; }");
-
-    auto *tabLayout = new QHBoxLayout(tabBar);
-    tabLayout->setContentsMargins(0, 0, 0, 0);
-    tabLayout->setSpacing(2);
-
-    // 教师版 Tab: 课程管理 | 最近上传 | 浏览历史 | 我的收藏
-    QStringList tabNames = {"课程管理", "最近上传", "浏览历史", "我的收藏"};
-
-    for (int i = 0; i < tabNames.size(); ++i) {
-        auto *btn = new QPushButton(tabNames[i]);
-        btn->setCursor(Qt::PointingHandCursor);
-        btn->setFixedHeight(40);
-        btn->setCheckable(true);
-
-        bool active = (i == 0);
-
-        QString style = R"(
-            QPushButton {
-                background-color: %1;
-                color: %2;
-                border: none;
-                border-bottom: 3px solid %3;
-                border-radius: 0px;
-                font-size: 14px;
-                font-weight: %4;
-                padding: 0 20px;
-            }
-            QPushButton:hover {
-                background-color: #F5F7FA;
-                border-bottom: 3px solid %5;
-            }
-        )";
-
-        if (active) {
-            btn->setStyleSheet(style.arg("transparent", "#3B5998", "#3B5998",
-                                         "bold", "#A0B4D0"));
-            btn->setChecked(true);
-        } else {
-            btn->setStyleSheet(style.arg("transparent", "#888888", "transparent",
-                                         "normal", "#CCD5E0"));
-        }
-
-        connect(btn, &QPushButton::clicked, this, [this, i]() {
-            switchTab(i);
-        });
-
-        m_tabButtons.append(btn);
-        tabLayout->addWidget(btn);
-    }
-
-    tabLayout->addStretch(1);
-
-    // 白底圆角容器
-    auto *container = new QWidget();
-    container->setStyleSheet(R"(
-        QWidget {
-            background-color: #FFFFFF;
-            border-radius: 15px 15px 0 0;
-        }
-    )");
-    auto *containerLayout = new QVBoxLayout(container);
-    containerLayout->setContentsMargins(20, 8, 20, 0);
-    containerLayout->addWidget(tabBar);
-
-    auto *shadow = new QGraphicsDropShadowEffect(container);
-    shadow->setBlurRadius(15);
-    shadow->setColor(QColor(0, 0, 0, 20));
-    shadow->setOffset(0, 1);
-    container->setGraphicsEffect(shadow);
-
-    return container;
-}
-
-// ============================================================
 // 创建内容栈
 // ============================================================
 QWidget* ContentArea::createContentStack()
@@ -178,23 +109,7 @@ QWidget* ContentArea::createContentStack()
     m_stack = new QStackedWidget();
     m_stack->setStyleSheet("QStackedWidget { background-color: #F5F7FA; }");
 
-    // ========== Tab 0: 课程管理 (12 items → 2页) ==========
-    QStringList courseTitles = {
-        "高等数学A",       "数据结构与算法",   "操作系统原理",
-        "数据库系统",      "编译原理",         "软件工程",
-        "Web前端开发",     "计算机组成原理",    "人工智能导论",
-        "计算机网络",      "Python程序设计",   "算法设计与分析"
-    };
-    QStringList courseSubtitles = {
-        "周一 8:00 · 第3周",  "周二 10:00 · 第5节",  "周三 8:00 · 第2讲",
-        "周四 14:00 · 第4章", "周五 8:00 · 第1节",   "周一 16:00 · 第6讲",
-        "周二 8:00 · 第2章",  "周三 10:00 · 第7节",  "周四 8:00 · 第3讲",
-        "周五 14:00 · 第1章", "周一 10:00 · 第4节",  "周三 14:00 · 第5讲"
-    };
-    QList<QColor> courseColors;
-    for (int i = 0; i < 12; ++i) courseColors.append(cardColor(i));
-
-    // ========== Tab 1: 最近上传 (8 items → 2页) ==========
+    // ========== Tab 0: 最近上传 (8 items → 2页) ==========
     QStringList uploadTitles = {
         "课件-高等数学A",     "实验设计-数据结构",  "教学大纲-操作系统",
         "试卷-数据库系统",    "参考答案-编译原理",  "教学视频-软件工程",
@@ -207,35 +122,7 @@ QWidget* ContentArea::createContentStack()
         "DOCX · 1MB · 3天前",     "ZIP · 15MB · 5天前"
     };
     QList<QColor> uploadColors;
-    for (int i = 0; i < 8; ++i) uploadColors.append(cardColor(i + 3));
-
-    // ========== Tab 2: 浏览历史 (6 items → 1页) ==========
-    QStringList historyTitles = {
-        "教学研讨-AI赋能教育",       "在线课程-深度学习",  "学术论文-教育技术",
-        "名师讲堂-教学设计",         "学科前沿-计算机科学", "教材-离散数学"
-    };
-    QStringList historySubtitles = {
-        "1天前浏览",   "2天前浏览",   "3天前浏览",
-        "5天前浏览",   "1周前浏览",   "1周前浏览"
-    };
-    QList<QColor> historyColors;
-    for (int i = 0; i < 6; ++i) historyColors.append(cardColor(i + 7));
-
-    // ========== Tab 3: 我的收藏 (11 items → 2页) ==========
-    QStringList favTitles = {
-        "精品课件-算法设计",    "教学案例-系统架构",  "论文模板-IEEE",
-        "Vue3教学资源",         "SpringBoot教学",     "数据科学教学包",
-        "机器学习课件",         "网络安全实验手册",   "云计算教学资源",
-        "区块链教学参考",       "嵌入式实验平台"
-    };
-    QStringList favSubtitles = {
-        "收藏于 2026-06",    "收藏于 2026-06",    "收藏于 2026-05",
-        "收藏于 2026-05",    "收藏于 2026-05",    "收藏于 2026-04",
-        "收藏于 2026-04",    "收藏于 2026-03",    "收藏于 2026-03",
-        "收藏于 2026-02",    "收藏于 2026-02"
-    };
-    QList<QColor> favColors;
-    for (int i = 0; i < 11; ++i) favColors.append(cardColor(i + 1));
+    for (int i = 0; i < 8; ++i) uploadColors.append(cardColor(i));
 
     // 准备数据
     struct TabData {
@@ -244,10 +131,7 @@ QWidget* ContentArea::createContentStack()
         QList<QColor> colors;
     };
     QList<TabData> allData = {
-        {courseTitles, courseSubtitles, courseColors},
         {uploadTitles, uploadSubtitles, uploadColors},
-        {historyTitles, historySubtitles, historyColors},
-        {favTitles, favSubtitles, favColors}
     };
 
     int globalPageIndex = 0;
@@ -258,7 +142,7 @@ QWidget* ContentArea::createContentStack()
         int pages = (totalItems + 5) / 6; // 每页6张
 
         TabInfo info;
-        info.name = m_tabButtons[tab]->text();
+        info.name = "最近上传";
         info.startPage = globalPageIndex;
         info.pageCount = pages;
         m_tabInfos.append(info);
@@ -415,16 +299,9 @@ QWidget* ContentArea::createBottomNav()
     m_navWidget->setFixedHeight(50);
     m_navWidget->setStyleSheet(R"(
         QWidget {
-            background-color: #FFFFFF;
-            border-radius: 0 0 15px 15px;
+            background-color: #F5F7FA;
         }
     )");
-
-    auto *shadow = new QGraphicsDropShadowEffect(m_navWidget);
-    shadow->setBlurRadius(15);
-    shadow->setColor(QColor(0, 0, 0, 20));
-    shadow->setOffset(0, -1);
-    m_navWidget->setGraphicsEffect(shadow);
 
     auto *navLayout = new QHBoxLayout(m_navWidget);
     navLayout->setContentsMargins(30, 0, 30, 0);
@@ -593,7 +470,7 @@ void ContentArea::switchTab(int index)
                 border: none;
                 border-bottom: 3px solid %3;
                 border-radius: 0px;
-                font-size: 14px;
+                font-size: 18px;
                 font-weight: %4;
                 padding: 0 20px;
             }

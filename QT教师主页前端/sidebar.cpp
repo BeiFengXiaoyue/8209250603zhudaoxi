@@ -241,7 +241,7 @@ void Sidebar::setupUI()
     struct NavItem { int iconType; QString name; };
     QList<NavItem> items = {
         {0, "个人中心"},
-        {1, "课程管理"},
+        {1, "课程上传"},
         {2, "论坛"},
         {3, "学生管理"},
         {4, "设置"},

@@ -397,6 +397,62 @@ QWidget* UploadWidget::createUploadPage()
 
     contentLayout->addWidget(nameSection);
 
+    // ======== 1.8 视频简介输入 ========
+    auto *descSection = new QWidget();
+    descSection->setObjectName("descSection");
+    descSection->setStyleSheet(R"(
+        QWidget#descSection {
+            background-color: #FFFFFF;
+            border-radius: 16px;
+        }
+    )");
+    applyCardShadow(descSection, 15, 20);
+
+    auto *descLayout = new QVBoxLayout(descSection);
+    descLayout->setContentsMargins(24, 20, 24, 20);
+    descLayout->setSpacing(10);
+
+    auto *descTitle = new QLabel("视频简介");
+    descTitle->setStyleSheet(R"(
+        QLabel {
+            color: #2C3E50;
+            font-size: 18px;
+            font-weight: bold;
+            background: transparent;
+        }
+    )");
+    descLayout->addWidget(descTitle);
+
+    auto *descHint = new QLabel("简要描述视频内容（可选）");
+    descHint->setStyleSheet("color: #7F8C8D; font-size: 13px; background: transparent;");
+    descLayout->addWidget(descHint);
+
+    m_descriptionEdit = new QTextEdit();
+    m_descriptionEdit->setPlaceholderText("请输入视频简介...");
+    m_descriptionEdit->setFixedHeight(100);
+    m_descriptionEdit->setEnabled(false);
+    m_descriptionEdit->setStyleSheet(R"(
+        QTextEdit {
+            background-color: #F5F7FA;
+            color: #2C3E50;
+            border: 2px solid #E0E4E8;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+        QTextEdit:focus {
+            border-color: #3B5998;
+            background-color: #FFFFFF;
+        }
+        QTextEdit:disabled {
+            background-color: #F0F0F0;
+            color: #BDC3C7;
+        }
+    )");
+    descLayout->addWidget(m_descriptionEdit);
+
+    contentLayout->addWidget(descSection);
+
     // ======== 2. 标签选择区域 ========
     auto *tagSection = new QWidget();
     tagSection->setObjectName("tagSection");
@@ -689,6 +745,10 @@ void UploadWidget::onSelectVideo()
     m_videoNameEdit->setFocus();
     m_videoNameEdit->selectAll();
 
+    // 启用简介输入
+    m_descriptionEdit->setEnabled(true);
+    m_descriptionEdit->setFocusPolicy(Qt::StrongFocus);
+
     // 启用上传按钮
     m_uploadBtn->setEnabled(true);
 }
@@ -843,11 +903,12 @@ void UploadWidget::onUpload()
     QFileInfo fi(m_selectedFilePath);
 
     VideoInfo info;
-    info.filePath   = m_selectedFilePath;
-    info.customName = customName;
-    info.tags       = m_selectedTags;
-    info.uploadDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
-    info.fileSize   = fi.size();
+    info.filePath     = m_selectedFilePath;
+    info.customName   = customName;
+    info.description  = m_descriptionEdit->toPlainText().trimmed();
+    info.tags         = m_selectedTags;
+    info.uploadDate   = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
+    info.fileSize     = fi.size();
 
     // 添加到本地记录（后续需对接服务器 API）
     addUploadRecord(info);
@@ -874,6 +935,8 @@ void UploadWidget::onUpload()
     m_fileInfoLabel->hide();
     m_videoNameEdit->clear();
     m_videoNameEdit->setEnabled(false);
+    m_descriptionEdit->clear();
+    m_descriptionEdit->setEnabled(false);
     m_uploadBtn->setEnabled(false);
     updateSelectedTagsDisplay();
     updateAvailableTags();
