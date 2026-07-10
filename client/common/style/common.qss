@@ -1,0 +1,228 @@
+/* ============================================================
+   common.qss - 统一洁白风格样式表
+   设计语言：简洁、纯白、干净
+   ============================================================ */
+
+/* ============================================================
+   1. 全局基础设置
+   ============================================================ */
+
+QWidget {
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 14px;
+    color: #1d1d1f;
+    background-color: #FFFFFF;
+}
+
+QMainWindow {
+    min-width: 1024px;
+    min-height: 640px;
+}
+
+/* ============================================================
+   2. 输入框（QLineEdit）
+   ============================================================ */
+
+QLineEdit {
+    min-height: 42px;
+    padding: 8px 14px;
+    font-size: 14px;
+    border: 1px solid #D2D2D7;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #1D1D1F;
+    selection-background-color: #CCE4FF;
+    selection-color: #1D1D1F;
+    margin-bottom: 16px;
+}
+
+QLineEdit:focus {
+    border-color: #0071E3;
+    background-color: #FFFFFF;
+}
+
+QLineEdit:disabled {
+    background-color: #F5F5F7;
+    color: #86868B;
+}
+
+QLineEdit::placeholder {
+    color: #AEAEB2;
+}
+
+/* ============================================================
+   3. 按钮（QPushButton）
+   ============================================================ */
+
+QPushButton {
+    min-height: 44px;
+    padding: 8px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #FFFFFF;
+    background-color: #0071E3;
+    margin-bottom: 16px;
+}
+
+QPushButton:hover {
+    background-color: #006EDB;
+}
+
+QPushButton:pressed {
+    background-color: #005BBF;
+}
+
+QPushButton:disabled {
+    background-color: #F5F5F7;
+    color: #AEAEB2;
+}
+
+/* ============================================================
+   4. 超链接（QLabel <a> 标签）
+   ============================================================ */
+
+QLabel a {
+    color: #0071E3;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+QLabel a:hover {
+    color: #0062C4;
+    text-decoration: underline;
+}
+
+/* ============================================================
+   5. Logo 占位
+   ============================================================ */
+
+#logoPlaceholder {
+    background-color: #0071E3;
+    border-radius: 16px;
+}
+
+/* ============================================================
+   6. 下拉框（QComboBox）
+   ============================================================ */
+
+QComboBox {
+    min-height: 42px;
+    padding: 4px 14px;
+    font-size: 14px;
+    border: 1px solid #D2D2D7;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #1D1D1F;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 24px;
+}
+
+QComboBox::down-arrow {
+    width: 10px;
+    height: 10px;
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #86868B;
+}
+
+QComboBox:focus {
+    border-color: #0071E3;
+}
+
+/* 班级号输入框与角色下拉框水平并排 */
+QLineEdit#classEdit {
+    margin-bottom: 0px;
+}
+
+QComboBox#roleCombo {
+    padding: 8px 14px;
+    min-width: 80px;
+    margin-bottom: 0px;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #D2D2D7;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #1D1D1F;
+    selection-background-color: #F5F5F7;
+    selection-color: #1D1D1F;
+    padding: 4px;
+    outline: none;
+}
+
+QComboBox QAbstractItemView::item {
+    min-height: 36px;
+    padding: 4px 12px;
+    background-color: #FFFFFF;
+    color: #1D1D1F;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #F5F5F7;
+    color: #1D1D1F;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #E8F0FE;
+    color: #1D1D1F;
+}
+
+/* 强制下拉弹出层容器白色背景 */
+QComboBox QAbstractScrollArea {
+    background-color: #FFFFFF;
+}
+
+QComboBox QListView {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+}
+
+/* Windows 平台下拉弹窗外层容器 */
+QComboBox QFrame {
+    background-color: #FFFFFF;
+    border: 1px solid #D2D2D7;
+    border-radius: 8px;
+}
+
+/* ============================================================
+   7. 滚动条
+   ============================================================ */
+
+QScrollBar:vertical {
+    width: 6px;
+    background-color: transparent;
+    border-radius: 3px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #D2D2D7;
+    border-radius: 3px;
+    min-height: 40px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #AEAEB2;
+}
+
+QScrollBar:horizontal {
+    height: 6px;
+    background-color: transparent;
+    border-radius: 3px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #D2D2D7;
+    border-radius: 3px;
+    min-width: 40px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #AEAEB2;
+}
