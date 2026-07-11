@@ -171,3 +171,9 @@ void VideoMainWindow::setSidebarActive(int index)
     if (m_sidebar)
         m_sidebar->setActiveItem(index);
 }
+
+void VideoMainWindow::setUserData(const QString &username, int classId)
+{
+    if (m_player)
+        m_player->setUserData(username, classId);
+}

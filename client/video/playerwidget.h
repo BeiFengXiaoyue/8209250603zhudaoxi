@@ -135,6 +135,7 @@ public:
     int  videoId() const { return m_videoId; }
     void setCurrentPosition(qint64 ms) { m_currentPosition = ms; }
     qint64 currentPosition() const { return m_currentPosition; }
+    void setUserData(const QString &username, int classId) { m_username = username; m_classId = classId; }
 
     QCheckBox*  checkbox()  const { return m_checkbox; }
     QLineEdit*  input()     const { return m_input; }
@@ -149,6 +150,8 @@ private:
 
     int m_videoId = 0;
     qint64 m_currentPosition = 0;
+    QString m_username;
+    int m_classId = 0;
     QCheckBox      *m_checkbox = nullptr;
     QLineEdit      *m_input    = nullptr;
     QPushButton    *m_sendBtn  = nullptr;
@@ -254,6 +257,7 @@ public:
                     const QString &time, const QString &desc,
                     const QString &subject, const QString &func);
     void setVideoFile(const QString &filePath);
+    void setUserData(const QString &username, int classId);
     bool eventFilter(QObject *obj, QEvent *event) override;
 
     VideoCanvas*        canvas()      const { return m_canvas; }

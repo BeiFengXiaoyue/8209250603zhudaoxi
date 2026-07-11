@@ -514,10 +514,10 @@ void DanmakuInputBar::setupUI()
 
         QJsonObject body;
         body["video_id"] = m_videoId;
-        body["sender"] = "user";
+        body["sender"] = m_username;
         body["content"] = text;
         body["play_time"] = playTime;
-        body["class"] = 1;
+        body["class"] = m_classId;
 
         NetworkHandler::instance()->post(
             NetworkHandler::baseUrl() + "/api/danmaku/send",
@@ -1010,4 +1010,10 @@ void PlayerWidget::setVideoFile(const QString &filePath)
 {
     if (m_canvas)
         m_canvas->setFile(filePath);
+}
+
+void PlayerWidget::setUserData(const QString &username, int classId)
+{
+    if (m_danmakuBar)
+        m_danmakuBar->setUserData(username, classId);
 }

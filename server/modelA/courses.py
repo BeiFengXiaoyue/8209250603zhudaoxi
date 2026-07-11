@@ -29,7 +29,7 @@ def get_courses():
         return jsonify({"success": False, "message": "缺少班级参数"}), 400
 
     conn = get_db()
-    query = "SELECT id, course, teacher, time, file_path, class, subject, function FROM courses WHERE class = ?"
+    query = "SELECT id, course, teacher, time, file_path, class, subject, function, description FROM courses WHERE class = ?"
     params = [class_val]
 
     if teacher:
@@ -55,8 +55,39 @@ def get_courses():
             "class": row["class"],
             "subject": row["subject"],
             "function": row["function"],
+            "description": row["description"] or "",
         }
         for row in rows
     ]
 
     return jsonify({"success": True, "data": courses_list}), 200
+
+
+@courses_bp.route("/courses/<int:course_id>", methods=["GET"])
+def get_course(course_id):
+    """获取单个课程详情"""
+    conn = get_db()
+    row = conn.execute(
+        """SELECT id, course, teacher, time, file_path, class, subject, function, description
+           FROM courses WHERE id = ?""",
+        (course_id,),
+    ).fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({"success": False, "message": "课程不存在"}), 404
+
+    return jsonify({
+        "success": True,
+        "data": {
+            "id": row["id"],
+            "course": row["course"],
+            "teacher": row["teacher"],
+            "time": row["time"],
+            "file_path": row["file_path"],
+            "class": row["class"],
+            "subject": row["subject"],
+            "function": row["function"],
+            "description": row["description"] or "",
+        }
+    }), 200

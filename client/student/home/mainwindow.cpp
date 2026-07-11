@@ -56,6 +56,7 @@ VideoMainWindow* StudentMainWindow::ensureVideoWindow()
 {
     if (!m_videoWindow) {
         m_videoWindow = new VideoMainWindow();
+        m_videoWindow->setUserData(m_username, m_classId);
         m_stack->addWidget(m_videoWindow);
         connect(m_videoWindow, &VideoMainWindow::navigateToHome, this, [this]() {
             m_sidebar->setActiveItem(0);
