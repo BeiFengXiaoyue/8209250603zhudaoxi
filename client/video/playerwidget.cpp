@@ -225,7 +225,10 @@ VideoCanvas::VideoCanvas(QWidget *parent)
 void VideoCanvas::setFile(const QString &filePath)
 {
     if (!m_mediaPlayer) return;
-    m_mediaPlayer->setSource(QUrl::fromLocalFile(filePath));
+    if (filePath.startsWith("http://") || filePath.startsWith("https://"))
+        m_mediaPlayer->setSource(QUrl(filePath));
+    else
+        m_mediaPlayer->setSource(QUrl::fromLocalFile(filePath));
     m_playBtn->setText("▶");
     m_isPlaying = false;
 }

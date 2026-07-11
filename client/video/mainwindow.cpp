@@ -96,7 +96,7 @@ void VideoMainWindow::setupUI()
     connect(m_searchResultPage, &SearchResultPage::playVideoRequested, this, [this](int courseId) {
         // 获取课程数据并加载到播放器
         QString url = NetworkHandler::baseUrl() + "/api/courses/" + QString::number(courseId);
-        NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
+        NetworkHandler::instance()->get(url, [this, courseId](bool ok, const QJsonObject &json) {
             if (!ok) return;
             QJsonObject data = json["data"].toObject();
             m_player->loadCourse(
@@ -108,7 +108,10 @@ void VideoMainWindow::setupUI()
                 data["subject"].toString(),
                 data["function"].toString()
             );
-            m_player->setVideoFile(data["file_path"].toString());
+            // 通过 HTTP URL 播放服务端视频文件
+            QString fileUrl = NetworkHandler::baseUrl()
+                + "/api/courses/" + QString::number(courseId) + "/file";
+            m_player->setVideoFile(fileUrl);
         });
         m_contentStack->setCurrentIndex(0);
     });

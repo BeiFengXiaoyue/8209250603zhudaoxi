@@ -128,4 +128,4 @@ def download_course_file(course_id):
         return jsonify({"success": False, "message": "文件不存在"}), 404
 
     download_name = row["course"]
-    return send_file(filepath, as_attachment=True, download_name=download_name)
+    return send_file(filepath, as_attachment=False, download_name=download_name)
