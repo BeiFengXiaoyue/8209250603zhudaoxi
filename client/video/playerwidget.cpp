@@ -996,6 +996,7 @@ void PlayerWidget::loadCourse(int courseId,
                                const QString &time, const QString &desc,
                                const QString &subject, const QString &func)
 {
+    m_courseId = courseId;
     m_infoPanel->setCourseInfo(courseName, teacher, time);
     m_infoPanel->setDescription(desc);
     m_infoPanel->setSubject(subject);
@@ -1004,6 +1005,60 @@ void PlayerWidget::loadCourse(int courseId,
         m_danmakuBar->setVideoId(courseId);
     if (m_danmakuOverlay)
         m_danmakuOverlay->loadDanmaku(courseId);
+
+    // 检查当前视频是否已收藏
+    auto *favBtn = m_infoPanel->favBtn();
+    favBtn->setFavorited(false);
+
+    if (!m_username.isEmpty()) {
+        QString url = NetworkHandler::baseUrl()
+            + "/api/user/favorites?username=" + m_username;
+        NetworkHandler::instance()->get(url, [this, courseId, favBtn](bool ok, const QJsonObject &json) {
+            if (!ok) return;
+            QJsonArray arr = json["data"].toArray();
+            for (const auto &val : arr) {
+                QJsonObject item = val.toObject();
+                if (item["item_type"].toString() == "video" &&
+                    item["item_id"].toInt() == courseId) {
+                    favBtn->setFavorited(true);
+                    favBtn->setProperty("favId", item["id"].toInt());
+                    return;
+                }
+            }
+        });
+    }
+
+    // 收藏按钮 → API
+    disconnect(favBtn, &FavoriteButton::favoritedChanged, nullptr, nullptr);
+    connect(favBtn, &FavoriteButton::favoritedChanged, this, [this, courseId, courseName](bool fav) {
+        if (m_username.isEmpty()) return;
+        auto *btn = m_infoPanel->favBtn();
+        if (fav) {
+            QJsonObject body;
+            body["username"] = m_username;
+            body["item_type"] = "video";
+            body["item_id"] = courseId;
+            body["item_title"] = courseName;
+            body["class"] = m_classId;
+            NetworkHandler::instance()->post(
+                NetworkHandler::baseUrl() + "/api/user/favorites",
+                body,
+                [btn](bool ok, const QJsonObject &resp) {
+                    if (ok)
+                        btn->setProperty("favId", resp["favorite_id"].toInt());
+                }
+            );
+        } else {
+            int favId = btn->property("favId").toInt();
+            if (favId <= 0) return;
+            NetworkHandler::instance()->del(
+                NetworkHandler::baseUrl() +
+                    "/api/user/favorites/" + QString::number(favId) +
+                    "?username=" + m_username,
+                [](bool, const QJsonObject &) {}
+            );
+        }
+    });
 }
 
 void PlayerWidget::setVideoFile(const QString &filePath)
@@ -1014,6 +1069,8 @@ void PlayerWidget::setVideoFile(const QString &filePath)
 
 void PlayerWidget::setUserData(const QString &username, int classId)
 {
+    m_username = username;
+    m_classId = classId;
     if (m_danmakuBar)
         m_danmakuBar->setUserData(username, classId);
 }

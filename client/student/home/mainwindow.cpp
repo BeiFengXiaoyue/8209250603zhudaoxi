@@ -177,6 +177,15 @@ QWidget* StudentMainWindow::createHomePage()
         m_stack->setCurrentWidget(m_editWidget);
     });
 
+    // 从左侧收藏列表播放视频
+    connect(m_leftPanel, &StudentLeftPanel::playFavoriteRequested, this, [this](int courseId) {
+        m_sidebar->setActiveItem(1);
+        auto *videoWin = ensureVideoWindow();
+        videoWin->playCourse(courseId);
+        m_stack->setCurrentWidget(videoWin);
+        videoWin->setSidebarActive(1);
+    });
+
     // Sidebar 导航：首页(0) | 视频区(1) | 论坛(2) | 资料上传(3)
     connect(m_sidebar, &StudentSidebar::itemClicked, this, [this](int index, const QString &) {
         // 如果当前在视频区，点击任何 sidebar 项都先切回主页

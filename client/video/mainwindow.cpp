@@ -177,3 +177,25 @@ void VideoMainWindow::setUserData(const QString &username, int classId)
     if (m_player)
         m_player->setUserData(username, classId);
 }
+
+void VideoMainWindow::playCourse(int courseId)
+{
+    QString url = NetworkHandler::baseUrl() + "/api/courses/" + QString::number(courseId);
+    NetworkHandler::instance()->get(url, [this, courseId](bool ok, const QJsonObject &json) {
+        if (!ok) return;
+        QJsonObject data = json["data"].toObject();
+        m_player->loadCourse(
+            data["id"].toInt(),
+            data["course"].toString(),
+            data["teacher"].toString(),
+            data["time"].toString(),
+            data["description"].toString(),
+            data["subject"].toString(),
+            data["function"].toString()
+        );
+        QString fileUrl = NetworkHandler::baseUrl()
+            + "/api/courses/" + QString::number(courseId) + "/file";
+        m_player->setVideoFile(fileUrl);
+    });
+    m_contentStack->setCurrentIndex(0);
+}

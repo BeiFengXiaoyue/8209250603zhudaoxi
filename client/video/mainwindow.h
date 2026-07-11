@@ -19,6 +19,7 @@ public:
     explicit VideoMainWindow(QWidget *parent = nullptr);
     void setSidebarActive(int index);
     void setUserData(const QString &username, int classId);
+    void playCourse(int courseId);
 
 signals:
     void navigateToHome();

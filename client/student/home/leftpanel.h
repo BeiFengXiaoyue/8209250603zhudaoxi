@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPushButton>
+#include <QTableWidget>
 
 // 圆形头像控件 - 自定义绘制
 class StudentAvatarWidget : public QLabel
@@ -41,15 +42,18 @@ public:
 
 signals:
     void editProfileClicked();
+    void playFavoriteRequested(int courseId);
 
 private:
     void setupUI();
+    void refreshFavorites();
 
     StudentAvatarWidget *m_avatar;
     QLabel *m_userLabel;
     QLabel *m_classLabel;
     QLabel *m_roleLabel;
     QPushButton *m_editBtn;
+    QTableWidget *m_favTable = nullptr;
     QString m_username;
 };
 

@@ -273,6 +273,10 @@ private:
     VideoInfoPanel      *m_infoPanel    = nullptr;
     DanmakuHistoryPanel *m_historyPanel = nullptr;
     DanmakuOverlay      *m_danmakuOverlay = nullptr;
+
+    QString m_username;
+    int m_classId = 0;
+    int m_courseId = 0;
 };
 
 #endif // PLAYERWIDGET_H

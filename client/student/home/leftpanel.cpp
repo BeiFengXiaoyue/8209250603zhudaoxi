@@ -1,6 +1,9 @@
 #include "leftpanel.h"
 #include "../../common/network_handler.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QPainter>
 #include <QPainter>
 #include <QPainterPath>
 #include <QFont>
@@ -167,6 +170,48 @@ void StudentLeftPanel::setupUI()
 
     mainLayout->addWidget(infoWidget);
 
+    // ---- 我的收藏 ----
+    auto *favTitle = new QLabel("我的收藏");
+    favTitle->setStyleSheet(R"(
+        QLabel {
+            color: #333333;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 12px 0 6px 0;
+        }
+    )");
+    mainLayout->addWidget(favTitle);
+
+    m_favTable = new QTableWidget(0, 2);
+    m_favTable->setHorizontalHeaderLabels({"名称", "操作"});
+    m_favTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_favTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Fixed);
+    m_favTable->setColumnWidth(1, 50);
+    m_favTable->verticalHeader()->setVisible(false);
+    m_favTable->setShowGrid(false);
+    m_favTable->setSelectionMode(QAbstractItemView::NoSelection);
+    m_favTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_favTable->setMaximumHeight(200);
+    m_favTable->setStyleSheet(R"(
+        QTableWidget {
+            border: none;
+            background-color: transparent;
+            font-size: 12px;
+        }
+        QHeaderView::section {
+            background-color: transparent;
+            color: #999999;
+            font-size: 11px;
+            border: none;
+            padding: 4px 0;
+        }
+        QTableWidget::item {
+            padding: 4px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+    )");
+    mainLayout->addWidget(m_favTable);
+
     // 弹性空间
     mainLayout->addStretch(1);
 
@@ -209,6 +254,7 @@ void StudentLeftPanel::setUserData(const QString &username, const QString &userC
         m_avatar->setInitials(username.left(1).toUpper());
     }
     loadAvatar();
+    refreshFavorites();
 }
 
 void StudentLeftPanel::loadAvatar()
@@ -227,5 +273,52 @@ void StudentLeftPanel::loadAvatar()
         if (pixmap.loadFromData(data)) {
             m_avatar->setAvatarPixmap(pixmap);
         }
-    });
-}
+	    });
+	}
+
+	void StudentLeftPanel::refreshFavorites()
+	{
+	    if (m_username.isEmpty() || !m_favTable) return;
+
+	    QString url = NetworkHandler::baseUrl()
+	        + "/api/user/favorites?username=" + m_username;
+
+	    NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
+	        m_favTable->setRowCount(0);
+	        if (!ok) return;
+	        QJsonArray arr = json["data"].toArray();
+	        for (const auto &val : arr) {
+	            QJsonObject item = val.toObject();
+	            if (item["item_type"].toString() != "video") continue;
+
+	            int row = m_favTable->rowCount();
+	            m_favTable->insertRow(row);
+
+	            m_favTable->setItem(row, 0,
+	                new QTableWidgetItem(item["item_title"].toString()));
+
+	            int courseId = item["item_id"].toInt();
+	            auto *playBtn = new QPushButton("▶");
+	            playBtn->setFixedSize(30, 22);
+	            playBtn->setCursor(Qt::PointingHandCursor);
+	            playBtn->setStyleSheet(R"(
+	                QPushButton {
+	                    background-color: #3B5998; color: #FFF;
+	                    border: none; border-radius: 4px; font-size: 11px;
+	                }
+	                QPushButton:hover { background-color: #2D4373; }
+	            )");
+	            connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
+	                emit playFavoriteRequested(courseId);
+	            });
+
+	            auto *container = new QWidget();
+	            auto *lay = new QHBoxLayout(container);
+	            lay->setContentsMargins(0, 0, 0, 0);
+	            lay->setAlignment(Qt::AlignCenter);
+	            lay->addWidget(playBtn);
+	            m_favTable->setCellWidget(row, 1, container);
+	        }
+	    });
+	}
+	
