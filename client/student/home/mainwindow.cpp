@@ -6,6 +6,7 @@
 #include "../../shared/material_upload/material_upload_page.h"
 #include "../../forum/main_window.h"
 #include "../../forum/student_sidebar.h"
+#include "../../video/mainwindow.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -43,11 +44,100 @@ void StudentMainWindow::setupUI()
     // Page 0: 主页
     m_stack->addWidget(createHomePage());
 
-    // Page 1: 编辑资料（延迟创建）
-    m_editWidget = nullptr;
+    // 子页面（延迟创建）
+    m_editWidget   = nullptr;
+    m_forumWindow  = nullptr;
+    m_videoWindow  = nullptr;
+    m_materialPage = nullptr;
+}
 
-    // Page 2: 论坛（延迟创建）
-    m_forumWindow = nullptr;
+/// 创建 / 获取视频窗口
+VideoMainWindow* StudentMainWindow::ensureVideoWindow()
+{
+    if (!m_videoWindow) {
+        m_videoWindow = new VideoMainWindow();
+        m_stack->addWidget(m_videoWindow);
+        connect(m_videoWindow, &VideoMainWindow::navigateToHome, this, [this]() {
+            m_sidebar->setActiveItem(0);
+            m_stack->setCurrentIndex(0);
+        });
+        connect(m_videoWindow, &VideoMainWindow::navigateToForum, this, [this]() {
+            m_sidebar->setActiveItem(2);
+            // 触发论坛导航
+            navigateToForum();
+        });
+        connect(m_videoWindow, &VideoMainWindow::navigateToMaterials, this, [this]() {
+            m_sidebar->setActiveItem(3);
+            navigateToMaterials();
+        });
+    }
+    return m_videoWindow;
+}
+
+/// 创建 / 获取论坛窗口
+void StudentMainWindow::navigateToForum()
+{
+    if (!m_forumWindow) {
+        auto *forumSidebar = new StudentForumSidebar();
+        m_forumWindow = new ForumMainWindow(m_username, m_classId, forumSidebar);
+        m_stack->addWidget(m_forumWindow);
+        connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
+            m_sidebar->setActiveItem(0);
+            m_stack->setCurrentIndex(0);
+        });
+        connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
+            m_sidebar->setActiveItem(1);
+            m_stack->setCurrentWidget(ensureVideoWindow());
+            m_videoWindow->setSidebarActive(1);
+        });
+        connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
+            if (!m_materialPage) {
+                auto *matSidebar = new StudentForumSidebar();
+                m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
+                m_stack->addWidget(m_materialPage);
+                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+                    m_sidebar->setActiveItem(0);
+                    m_stack->setCurrentIndex(0);
+                });
+                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+                    m_forumWindow->setUserData(m_username, m_classId);
+                    m_forumWindow->setSidebarActiveItem(2);
+                    m_stack->setCurrentWidget(m_forumWindow);
+                });
+            }
+            m_materialPage->setUserData(m_username, m_classId);
+            m_materialPage->setSidebarActiveItem(3);
+            m_stack->setCurrentWidget(m_materialPage);
+        });
+    }
+    m_forumWindow->setUserData(m_username, m_classId);
+    m_forumWindow->setSidebarActiveItem(2);
+    m_stack->setCurrentWidget(m_forumWindow);
+}
+
+/// 创建 / 获取资料上传窗口
+void StudentMainWindow::navigateToMaterials()
+{
+    if (!m_materialPage) {
+        auto *matSidebar = new StudentForumSidebar();
+        m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
+        m_stack->addWidget(m_materialPage);
+        connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
+            m_sidebar->setActiveItem(0);
+            m_stack->setCurrentIndex(0);
+        });
+        connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
+            navigateToForum();
+        });
+        connect(m_materialPage, &MaterialUploadPage::navigateToVideo, this, [this]() {
+            m_sidebar->setActiveItem(1);
+            m_stack->setCurrentWidget(ensureVideoWindow());
+            m_videoWindow->setSidebarActive(1);
+        });
+    }
+    m_materialPage->setUserData(m_username, m_classId);
+    m_materialPage->setSidebarActiveItem(3);
+    m_stack->setCurrentWidget(m_materialPage);
 }
 
 QWidget* StudentMainWindow::createHomePage()
@@ -76,79 +166,43 @@ QWidget* StudentMainWindow::createHomePage()
             });
             connect(m_editWidget, &ProfileEditWidget::avatarUpdated, this, [this]() {
                 m_leftPanel->loadAvatar();
-                if (m_forumWindow) m_forumWindow->refreshAvatars();
-                if (m_materialPage) m_materialPage->refreshAvatars();
             });
         }
         m_stack->setCurrentWidget(m_editWidget);
     });
 
-    // Sidebar "论坛" → 跳转到论坛页
+    // Sidebar 导航：首页(0) | 视频区(1) | 论坛(2) | 资料上传(3)
     connect(m_sidebar, &StudentSidebar::itemClicked, this, [this](int index, const QString &) {
-        if (index == 2) {
-            if (!m_forumWindow) {
-                auto *forumSidebar = new StudentForumSidebar();
-                m_forumWindow = new ForumMainWindow(m_username, m_classId, forumSidebar);
-                m_stack->addWidget(m_forumWindow);
-                connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
-                    m_sidebar->setActiveItem(0);
-                    m_stack->setCurrentIndex(0);
-                });
-                connect(m_forumWindow, &ForumMainWindow::navigateToMaterials, this, [this]() {
-                    if (!m_materialPage) {
-                        auto *matSidebar = new StudentForumSidebar();
-                        m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
-                        m_stack->addWidget(m_materialPage);
-                        connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
-                            m_sidebar->setActiveItem(0);
-                            m_stack->setCurrentIndex(0);
-                        });
-                        connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
-                            if (!m_forumWindow) { /* will be re-created by sidebar click */ }
-                            m_forumWindow->setUserData(m_username, m_classId);
-                            m_forumWindow->setSidebarActiveItem(2);
-                            m_stack->setCurrentWidget(m_forumWindow);
-                        });
-                    }
-                    m_materialPage->setUserData(m_username, m_classId);
-                    m_materialPage->setSidebarActiveItem(3);
-                    m_stack->setCurrentWidget(m_materialPage);
-                });
-            }
-            m_forumWindow->setUserData(m_username, m_classId);
-            m_forumWindow->setSidebarActiveItem(2);
-            m_stack->setCurrentWidget(m_forumWindow);
-        } else if (index == 3) {
-            // 资料上传
-            if (!m_materialPage) {
-                auto *matSidebar = new StudentForumSidebar();
-                m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 3);
-                m_stack->addWidget(m_materialPage);
-                connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
-                    m_sidebar->setActiveItem(0);
-                    m_stack->setCurrentIndex(0);
-                });
-                connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
-                    // 跳转到论坛
-                    if (!m_forumWindow) {
-                        auto *forumSidebar = new StudentForumSidebar();
-                        m_forumWindow = new ForumMainWindow(m_username, m_classId, forumSidebar);
-                        m_stack->addWidget(m_forumWindow);
-                        connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
-                            m_sidebar->setActiveItem(0);
-                            m_stack->setCurrentIndex(0);
-                        });
-                    }
-                    m_forumWindow->setUserData(m_username, m_classId);
-                    m_forumWindow->setSidebarActiveItem(2);
-                    m_stack->setCurrentWidget(m_forumWindow);
-                });
-            }
-            m_materialPage->setUserData(m_username, m_classId);
-            m_materialPage->setSidebarActiveItem(3);
-            m_stack->setCurrentWidget(m_materialPage);
+        // 如果当前在视频区，点击任何 sidebar 项都先切回主页
+        if (m_videoWindow && m_stack->currentWidget() == m_videoWindow) {
+            m_stack->setCurrentIndex(0);
+            m_sidebar->setActiveItem(index);
+            // 如果是视频区本身，停在主页即可
+            if (index == 1) return;
         }
-        // 其他导航项暂不实现
+
+        switch (index) {
+        case 0: // 个人中心（首页）
+            m_stack->setCurrentIndex(0);
+            break;
+
+        case 1: // 视频区
+            m_sidebar->setActiveItem(1);
+            m_stack->setCurrentWidget(ensureVideoWindow());
+            m_videoWindow->setSidebarActive(1);
+            break;
+
+        case 2: // 论坛
+            navigateToForum();
+            break;
+
+        case 3: // 资料上传
+            navigateToMaterials();
+            break;
+
+        default:
+            break;
+        }
     });
 
     return page;

@@ -37,9 +37,25 @@ def init_db():
             teacher TEXT NOT NULL,
             time TEXT NOT NULL,
             file_path TEXT NOT NULL,
-            class INTEGER NOT NULL
+            class INTEGER NOT NULL,
+            duration INTEGER NOT NULL DEFAULT 0,
+            description TEXT DEFAULT '',
+            subject TEXT NOT NULL DEFAULT '',
+            function TEXT NOT NULL DEFAULT ''
         )"""
     )
+
+    # 兼容迁移：为已有数据库补充新列（逐条 ADD，忽略已存在列的错误）
+    for col in [
+        "duration INTEGER NOT NULL DEFAULT 0",
+        "description TEXT DEFAULT ''",
+        "subject TEXT NOT NULL DEFAULT ''",
+        "function TEXT NOT NULL DEFAULT ''",
+    ]:
+        try:
+            conn.execute(f"ALTER TABLE courses ADD COLUMN {col}")
+        except Exception:
+            pass
 
     # 数据库（C）——资源表
     conn.execute(

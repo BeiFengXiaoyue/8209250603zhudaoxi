@@ -108,12 +108,14 @@ void StudentManagePage::setupUI()
     connect(m_sidebar, &TeacherSidebar::itemClicked, this, [this](int index, const QString &) {
         if (index == 0) {
             emit navigateToHome();
+        } else if (index == 1) {
+            emit navigateToCourseUpload();
         } else if (index == 2) {
             emit navigateToForum();
         } else if (index == 4) {
             emit navigateToMaterials();
         }
-        // index 3（本页）、1（课程上传）暂不处理
+        // index 3（本页）暂不处理
     });
 }
 

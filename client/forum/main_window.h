@@ -22,6 +22,7 @@ signals:
     void navigateToHome();
     void navigateToStudentManage();
     void navigateToMaterials();
+    void navigateToVideo();
 
 private:
     void setupUI();

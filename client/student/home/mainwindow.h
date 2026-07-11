@@ -11,6 +11,7 @@ class StudentSidebar;
 class ProfileEditWidget;
 class ForumMainWindow;
 class MaterialUploadPage;
+class VideoMainWindow;
 
 class StudentMainWindow : public QMainWindow
 {
@@ -24,6 +25,9 @@ public:
 private:
     void setupUI();
     QWidget* createHomePage();
+    VideoMainWindow* ensureVideoWindow();
+    void navigateToForum();
+    void navigateToMaterials();
 
     QStackedWidget   *m_stack        = nullptr;
     StudentLeftPanel *m_leftPanel    = nullptr;
@@ -32,6 +36,7 @@ private:
     ProfileEditWidget *m_editWidget  = nullptr;
     ForumMainWindow   *m_forumWindow = nullptr;
     MaterialUploadPage *m_materialPage = nullptr;
+    VideoMainWindow   *m_videoWindow = nullptr;
 
     QString m_username;
     QString m_role;

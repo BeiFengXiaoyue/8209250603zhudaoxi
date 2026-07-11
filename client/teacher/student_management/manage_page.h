@@ -20,6 +20,7 @@ signals:
     void navigateToHome();
     void navigateToForum();
     void navigateToMaterials();
+    void navigateToCourseUpload();
 
 private:
     void setupUI();

@@ -57,6 +57,8 @@ void ForumMainWindow::setupUI()
     connect(m_sidebar, &ForumSidebarBase::itemClicked, this, [this](int index, const QString &name) {
         if (index == 0) {
             emit navigateToHome();
+        } else if (index == 1 && (name == "视频区" || name == "课程上传")) {
+            emit navigateToVideo();
         } else if (index == 3 && name == "学生管理") {
             emit navigateToStudentManage();
         } else if (name == "资料上传") {
