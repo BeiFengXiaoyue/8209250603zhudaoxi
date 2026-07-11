@@ -29,7 +29,7 @@ def get_courses():
         return jsonify({"success": False, "message": "缺少班级参数"}), 400
 
     conn = get_db()
-    query = "SELECT id, course, teacher, time, file_path, class FROM courses WHERE class = ?"
+    query = "SELECT id, course, teacher, time, file_path, class, subject, function FROM courses WHERE class = ?"
     params = [class_val]
 
     if teacher:
@@ -53,6 +53,8 @@ def get_courses():
             "time": row["time"],
             "file_path": row["file_path"],
             "class": row["class"],
+            "subject": row["subject"],
+            "function": row["function"],
         }
         for row in rows
     ]
