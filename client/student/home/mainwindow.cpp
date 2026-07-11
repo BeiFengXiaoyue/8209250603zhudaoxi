@@ -104,6 +104,11 @@ void StudentMainWindow::navigateToForum()
                     m_forumWindow->setSidebarActiveItem(2);
                     m_stack->setCurrentWidget(m_forumWindow);
                 });
+                connect(m_materialPage, &MaterialUploadPage::navigateToVideo, this, [this]() {
+                    m_sidebar->setActiveItem(1);
+                    m_stack->setCurrentWidget(ensureVideoWindow());
+                    m_videoWindow->setSidebarActive(1);
+                });
             }
             m_materialPage->setUserData(m_username, m_classId);
             m_materialPage->setSidebarActiveItem(3);
