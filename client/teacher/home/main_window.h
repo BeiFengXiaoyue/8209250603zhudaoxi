@@ -26,6 +26,7 @@ public:
 private:
     void setupUI();
     QWidget* createHomePage();
+    void ensureMaterialPage();
 
     QStackedWidget    *m_stack        = nullptr;
     TeacherLeftPanel  *m_leftPanel   = nullptr;
