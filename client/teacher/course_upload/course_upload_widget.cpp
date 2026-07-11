@@ -25,14 +25,14 @@
 // ============================================================
 // 样式常量
 // ============================================================
-static const QString kTagNormal =
-    "QPushButton { background-color: #F0F2F5; color: #666666; border: none; "
-    "border-radius: 15px; padding: 6px 18px; font-size: 13px; }"
-    "QPushButton:hover { background-color: #E4E6EB; }";
-
-static const QString kTagActive =
-    "QPushButton { background-color: #0071E3; color: #FFFFFF; border: none; "
-    "border-radius: 15px; padding: 6px 18px; font-size: 13px; font-weight: bold; }";
+	static const QString kTagNormal =
+	    "QPushButton { background-color: #F0F2F5; color: #666666; border: none; "
+	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; }"
+	    "QPushButton:hover { background-color: #E4E6EB; }";
+	
+	static const QString kTagActive =
+	    "QPushButton { background-color: #0071E3; color: #FFFFFF; border: none; "
+	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; font-weight: bold; }";
 
 static const QString kPrimaryBtn =
     "QPushButton { background-color: #0071E3; color: white; border: none; "
@@ -330,7 +330,7 @@ QWidget* CourseUploadWidget::createTagGroup(const QString &title,
         auto *btn = new QPushButton(tag);
         btn->setStyleSheet(kTagNormal);
         btn->setCursor(Qt::PointingHandCursor);
-        btn->setFixedHeight(30);
+        btn->setFixedHeight(26);
 
         connect(btn, &QPushButton::clicked, this, [this, btn, &selected]() {
             if (selected == btn) {
