@@ -27,12 +27,12 @@
 // ============================================================
 	static const QString kTagNormal =
 	    "QPushButton { background-color: #F0F2F5; color: #666666; border: none; "
-	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; }"
+	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; min-height: 0px; }"
 	    "QPushButton:hover { background-color: #E4E6EB; }";
 	
 	static const QString kTagActive =
 	    "QPushButton { background-color: #0071E3; color: #FFFFFF; border: none; "
-	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; font-weight: bold; }";
+	    "border-radius: 12px; padding: 4px 14px; font-size: 12px; font-weight: bold; min-height: 0px; }";
 
 static const QString kPrimaryBtn =
     "QPushButton { background-color: #0071E3; color: white; border: none; "
