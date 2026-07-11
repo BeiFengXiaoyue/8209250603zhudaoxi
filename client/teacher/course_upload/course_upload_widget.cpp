@@ -330,7 +330,7 @@ QWidget* CourseUploadWidget::createTagGroup(const QString &title,
         auto *btn = new QPushButton(tag);
         btn->setStyleSheet(kTagNormal);
         btn->setCursor(Qt::PointingHandCursor);
-        btn->setFixedHeight(26);
+        btn->setFixedHeight(22);
 
         connect(btn, &QPushButton::clicked, this, [this, btn, &selected]() {
             if (selected == btn) {
