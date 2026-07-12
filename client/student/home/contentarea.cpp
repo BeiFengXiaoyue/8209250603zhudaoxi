@@ -440,8 +440,10 @@ void StudentContentArea::loadTabData(int tabIndex)
                         break;
                     case 1: // 最近下载 - download_history
                         titles.append(item["file_name"].toString());
-                        subtitles.append(item["file_type"].toString() + QString(" · ") +
-                                         QString::number(item["file_size"].toInt() / 1024) + "KB");
+                        info.titles.append(item["file_name"].toString());
+                        info.subjects.append(item["file_type"].toString());
+                        info.functions.append(QString::number(item["file_size"].toInt() / 1024) + " KB");
+                        info.times.append(item["download_time"].toString().left(10));
                         break;
                     case 2: { // 最近上传 - courses + resources
                         QString type = item["item_type"].toString();
@@ -473,7 +475,76 @@ void StudentContentArea::loadTabData(int tabIndex)
 
             info.pageCount = pages;
 
-            if (tabIndex == 3) {
+	            if (tabIndex == 1) {
+	                // 最近下载 → 表格视图（仿收藏样式，4列，无操作按钮）
+	                auto *page = new QWidget();
+	                page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
+
+	                auto *scrollArea = new QScrollArea(page);
+	                scrollArea->setWidgetResizable(true);
+	                scrollArea->setFrameShape(QFrame::NoFrame);
+	                scrollArea->setStyleSheet("QScrollArea { background-color: #F5F7FA; border: none; }"
+	                    "QScrollBar:vertical { width: 6px; background: transparent; }"
+	                    "QScrollBar::handle:vertical { background: #D0D5DD; border-radius: 3px; }"
+	                    "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }");
+
+	                auto *scrollContent = new QWidget();
+	                scrollContent->setStyleSheet("background-color: #F5F7FA;");
+	                auto *sLayout = new QVBoxLayout(scrollContent);
+	                sLayout->setContentsMargins(20, 20, 20, 20);
+
+	                auto *tableCard = new QWidget();
+	                tableCard->setStyleSheet("QWidget { background-color: #FFFFFF; border-radius: 16px; }");
+	                auto *tcLayout = new QVBoxLayout(tableCard);
+	                tcLayout->setContentsMargins(0, 0, 0, 0);
+
+	                auto *table = new QTableWidget(0, 4);
+	                table->setHorizontalHeaderLabels({"文件名", "类型", "大小", "下载时间"});
+	                table->setSelectionBehavior(QAbstractItemView::SelectRows);
+	                table->setSelectionMode(QAbstractItemView::SingleSelection);
+	                table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	                table->verticalHeader()->setVisible(false);
+	                table->setShowGrid(false);
+	                table->setAlternatingRowColors(true);
+	                table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	                table->horizontalHeader()->setHighlightSections(false);
+	                table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	                table->setStyleSheet(
+	                    "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
+	                    "font-size:13px; color:#2C3E50; }"
+	                    "QTableWidget::item { padding:6px 16px; border-bottom:1px solid #ECF0F1; }"
+	                    "QTableWidget::item:selected { background-color:#EBF0FA; color:#2C3E50; }"
+	                    "QHeaderView::section { background-color:#F5F7FA; color:#7F8C8D; "
+	                    "font-weight:bold; font-size:12px; border:none; text-align:left; "
+	                    "border-bottom:2px solid #ECF0F1; padding:8px 16px; }");
+
+	                for (int i = 0; i < totalItems; ++i) {
+	                    int row = table->rowCount();
+	                    table->insertRow(row);
+	                    table->setItem(row, 0, new QTableWidgetItem(info.titles.value(i)));
+	                    table->setItem(row, 1, new QTableWidgetItem(info.subjects.value(i)));
+	                    table->setItem(row, 2, new QTableWidgetItem(info.functions.value(i)));
+	                    table->setItem(row, 3, new QTableWidgetItem(info.times.value(i)));
+	                    table->setRowHeight(row, 46);
+	                }
+
+	                auto *shadow = new QGraphicsDropShadowEffect(tableCard);
+	                shadow->setBlurRadius(20);
+	                shadow->setColor(QColor(0, 0, 0, 30));
+	                shadow->setOffset(0, 2);
+	                tableCard->setGraphicsEffect(shadow);
+
+	                tcLayout->addWidget(table);
+	                sLayout->addWidget(tableCard);
+	                sLayout->addStretch(1);
+	                scrollArea->setWidget(scrollContent);
+
+	                auto *pLayout = new QVBoxLayout(page);
+	                pLayout->setContentsMargins(0, 0, 0, 0);
+	                pLayout->addWidget(scrollArea);
+	                m_stack->addWidget(page);
+	                info.pages.append(page);
+	            } else if (tabIndex == 3) {
                 // 我的收藏 → 表格视图
                 auto *page = new QWidget();
                 page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
