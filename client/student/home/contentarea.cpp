@@ -407,6 +407,10 @@ void StudentContentArea::loadTabData(int tabIndex)
                 // 最近播放按 video_id 去重
                 if (tabIndex == 0 && seenIds.contains(vid)) continue;
                 if (tabIndex == 0) seenIds.insert(vid);
+                // 最近下载按 id 去重
+                int did = item["id"].toInt();
+                if (tabIndex == 1 && seenIds.contains(did)) continue;
+                if (tabIndex == 1) seenIds.insert(did);
 
                 colors.append(cardColor(i));
 
@@ -621,6 +625,14 @@ void StudentContentArea::loadTabData(int tabIndex)
             updateNavigation();
             if (m_navWidget) m_navWidget->show();
             m_reloadingTab = -1;
+        } else if (tabIndex == 1 && info.pageCount > 0) {
+            // 独立重新加载「最近下载」
+            m_currentTab = 1;
+            m_currentSubPage = 0;
+            m_stack->setCurrentIndex(info.startPage);
+            updateNavigation();
+            if (m_navWidget) m_navWidget->show();
+            m_reloadingTab = -1;
         }
     });
 }
@@ -803,10 +815,10 @@ void StudentContentArea::switchTab(int index)
     if (index >= m_tabInfos.size())
         return;
 
-    // 点击「最近播放」且已有数据时重新加载（即时效果）
-    if (index == 0 && !m_initialLoad && m_tabInfos[0].pageCount > 0) {
-        m_reloadingTab = 0;
-        loadTabData(0);
+    // 点击「最近播放」或「最近下载」时重新加载数据（即时效果）
+    if ((index == 0 || index == 1) && !m_initialLoad && m_tabInfos[index].pageCount > 0) {
+        m_reloadingTab = index;
+        loadTabData(index);
         return;
     }
 
