@@ -9,6 +9,8 @@
 #include <QParallelAnimationGroup>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTableWidget>
+#include <QHeaderView>
 
 static QColor cardColor(int index)
 {
@@ -68,18 +70,84 @@ void TeacherContentArea::setUserData(const QString &username, int classId)
             info.pageCount = 1; m_stack->addWidget(createEmptyPage("暂无上传记录"));
             m_tabInfos.append(info); switchTab(0); return;
         }
-        QStringList t, s; QList<QColor> c;
+
+        // 表格视图
+        auto *page = new QWidget();
+        page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
+
+        auto *scrollArea = new QScrollArea(page);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setFrameShape(QFrame::NoFrame);
+        scrollArea->setStyleSheet("QScrollArea { background-color: #F5F7FA; border: none; }"
+            "QScrollBar:vertical { width: 6px; background: transparent; }"
+            "QScrollBar::handle:vertical { background: #D0D5DD; border-radius: 3px; }"
+            "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }");
+
+        auto *scrollContent = new QWidget();
+        scrollContent->setStyleSheet("background-color: #F5F7FA;");
+        auto *sLayout = new QVBoxLayout(scrollContent);
+        sLayout->setContentsMargins(20, 20, 20, 20);
+
+        auto *tableCard = new QWidget();
+        tableCard->setStyleSheet("QWidget { background-color: #FFFFFF; border-radius: 16px; }");
+        auto *tcLayout = new QVBoxLayout(tableCard);
+        tcLayout->setContentsMargins(0, 0, 0, 0);
+
+        auto *table = new QTableWidget(0, 3);
+        table->setHorizontalHeaderLabels({"标题", "类型", "上传时间"});
+        table->setSelectionBehavior(QAbstractItemView::SelectRows);
+        table->setSelectionMode(QAbstractItemView::SingleSelection);
+        table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        table->verticalHeader()->setVisible(false);
+        table->setShowGrid(false);
+        table->setAlternatingRowColors(true);
+        table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        table->horizontalHeader()->setHighlightSections(false);
+        table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        table->setStyleSheet(
+            "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
+            "font-size:13px; color:#2C3E50; }"
+            "QTableWidget::item { padding:6px 16px; border-bottom:1px solid #ECF0F1; }"
+            "QTableWidget::item:selected { background-color:#EBF0FA; color:#2C3E50; }"
+            "QHeaderView::section { background-color:#F5F7FA; color:#7F8C8D; "
+            "font-weight:bold; font-size:12px; border:none; text-align:left; "
+            "border-bottom:2px solid #ECF0F1; padding:8px 16px; }");
+
         for (int i = 0; i < data.size(); ++i) {
-            auto item = data[i].toObject(); c.append(cardColor(i));
-            t.append(item["title"].toString());
-            s.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
-                     QString(" · ") + item["time"].toString());
+            auto item = data[i].toObject();
+            int row = table->rowCount();
+            table->insertRow(row);
+            table->setItem(row, 0, new QTableWidgetItem(item["title"].toString()));
+            table->setItem(row, 1, new QTableWidgetItem(
+                item["item_type"].toString() == "video" ? "视频" : "资源"));
+            // 格式化时间
+            QString ts = item["time"].toString();
+            QString date = ts.left(10).replace('-', '/');
+            table->setItem(row, 2, new QTableWidgetItem(
+                ts.length() >= 16 ? date + ts.mid(10, 6) : date));
+            table->setRowHeight(row, 46);
         }
-        int pages = (t.size()+5)/6; if (pages<1) pages=1;
-        info.startPage = m_stack->count()-1; info.pageCount = pages;
-        for (int p = 0; p < pages; ++p)
-            m_stack->addWidget(createPageWidget(t, s, c, p*6, qMin(6, t.size()-p*6)));
-        m_tabInfos.append(info); switchTab(0);
+
+        auto *shadow = new QGraphicsDropShadowEffect(tableCard);
+        shadow->setBlurRadius(20);
+        shadow->setColor(QColor(0, 0, 0, 30));
+        shadow->setOffset(0, 2);
+        tableCard->setGraphicsEffect(shadow);
+
+        tcLayout->addWidget(table);
+        sLayout->addWidget(tableCard);
+        sLayout->addStretch(1);
+        scrollArea->setWidget(scrollContent);
+
+        auto *pLayout = new QVBoxLayout(page);
+        pLayout->setContentsMargins(0, 0, 0, 0);
+        pLayout->addWidget(scrollArea);
+
+        info.startPage = m_stack->count();
+        info.pageCount = 1;
+        m_stack->addWidget(page);
+        m_tabInfos.append(info);
+        switchTab(0);
     });
 }
 
