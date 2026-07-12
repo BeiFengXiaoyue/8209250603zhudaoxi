@@ -12,6 +12,12 @@
 VideoCard::VideoCard(QWidget *parent)
     : QWidget(parent)
 {
+}
+
+void VideoCard::init()
+{
+    if (m_initialized) return;
+    m_initialized = true;
     setupUI();
 }
 
@@ -183,6 +189,7 @@ void VideoCard::setData(int courseId, const QString &title,
                         const QString &subject, const QString &func,
                         const QString &desc, const QString &thumbUrl)
 {
+    if (!m_initialized) init();
     m_courseId = courseId;
     m_titleLabel->setText(title);
     m_metaLabel->setText(teacher + " · " + time);

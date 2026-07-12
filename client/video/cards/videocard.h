@@ -13,6 +13,9 @@ class VideoCard : public QWidget
 public:
     explicit VideoCard(QWidget *parent = nullptr);
 
+    /// 初始化 UI（必须在加入父级控件后调用，延迟构造避免崩溃）
+    void init();
+
     void setData(int courseId, const QString &title,
                  const QString &teacher, const QString &time,
                  const QString &subject, const QString &func,
@@ -29,6 +32,7 @@ private:
     void setupUI();
 
     int m_courseId = 0;
+    bool m_initialized = false;
 
     QLabel      *m_thumbLabel    = nullptr;
     QLabel      *m_titleLabel    = nullptr;
