@@ -63,7 +63,10 @@ void TeacherContentArea::setUserData(const QString &username, int classId)
     m_username = username; m_classId = classId; m_dataLoaded = true; m_tabInfos.clear();
     QString url = NetworkHandler::baseUrl() + "/api/user/uploads?username=" + username;
     NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
-        if (!ok) return;
+        if (!ok) {
+            qWarning() << "TeacherContentArea: 获取上传数据失败" << json["message"].toString();
+            return;
+        }
         QJsonArray data = json["data"].toArray();
         TabInfo info; info.name = "最近上传"; info.startPage = 0;
         if (data.isEmpty()) {
