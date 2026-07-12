@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QHttpMultiPart>
 #include <QMimeDatabase>
+#include "../../common/network_handler.h"
 #include <QPainterPath>
 #include <QMouseEvent>
 #include <QApplication>
@@ -1055,11 +1056,16 @@ void MaterialWidget::onDownloadMaterial(int row)
 
     if (savePath.isEmpty()) return;
 
+    // 提前拷贝所需字段，避免 lambda 中引用失效
+    QString fileName = m.name + "." + m.fileFormat.toLower();
+    QString fileType = m.fileFormat;
+    qint64 fileSize = m.fileSize;
+
     QString url = NetworkHandler::baseUrl() + "/api/files/" + QString::number(m.id);
     QNetworkRequest request{QUrl(url)};
     auto *reply = NetworkHandler::instance()->manager()->get(request);
 
-    connect(reply, &QNetworkReply::finished, this, [reply, savePath]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, savePath, fileName, fileType, fileSize]() {
         reply->deleteLater();
         if (reply->error() != QNetworkReply::NoError) {
             QMessageBox::critical(nullptr, "下载失败", reply->errorString());
@@ -1071,6 +1077,20 @@ void MaterialWidget::onDownloadMaterial(int row)
             file.write(data);
             file.close();
             QMessageBox::information(nullptr, "下载完成", "文件已保存至:\n" + savePath);
+        }
+
+        // 记录下载历史
+        if (!m_username.isEmpty()) {
+            QJsonObject body;
+            body["username"] = m_username;
+            body["file_name"] = fileName;
+            body["file_type"] = fileType;
+            body["file_size"] = fileSize;
+            body["class"] = m_classId;
+            NetworkHandler::instance()->post(
+                NetworkHandler::baseUrl() + "/api/user/downloads", body,
+                [](bool, const QJsonObject &) {}
+            );
         }
     });
 }
