@@ -67,7 +67,9 @@ void TeacherContentArea::setUserData(const QString &username, int classId)
         QJsonArray data = json["data"].toArray();
         TabInfo info; info.name = "最近上传"; info.startPage = 0;
         if (data.isEmpty()) {
-            info.pageCount = 1; m_stack->addWidget(createEmptyPage("暂无上传记录"));
+            info.startPage = m_stack->count();
+            info.pageCount = 1;
+            m_stack->addWidget(createEmptyPage("暂无上传记录"));
             m_tabInfos.append(info); switchTab(0); return;
         }
 
