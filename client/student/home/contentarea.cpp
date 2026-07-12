@@ -471,11 +471,11 @@ void StudentContentArea::loadTabData(int tabIndex)
 
                     int courseId = info.courseIds[i];
                     auto *playBtn = new QPushButton("播放");
-                    playBtn->setFixedSize(60, 26);
+                    playBtn->setFixedSize(60, 30);
                     playBtn->setCursor(Qt::PointingHandCursor);
                     playBtn->setStyleSheet(
                         "QPushButton { background-color:#3B5998; color:#FFF; "
-                        "border:none; border-radius:6px; font-size:12px; min-height:0px; }"
+                        "border:none; border-radius:6px; font-size:12px; padding:6px 0; min-height:0px; }"
                         "QPushButton:hover { background-color:#2D4373; }");
 
                     connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
@@ -483,7 +483,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                     });
 
                     table->setCellWidget(row, 5, playBtn);
-                    table->setRowHeight(row, 32);
+                    table->setRowHeight(row, 34);
                 }
 
                 auto *shadow = new QGraphicsDropShadowEffect(tableCard);
