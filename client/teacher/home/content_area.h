@@ -47,7 +47,7 @@ private:
     QStackedWidget *m_viewStack = nullptr;
 
     QList<QPushButton*> m_tabButtons;
-    int m_currentTab = 0;
+    int m_currentTab = -1;
 
     QStackedWidget *m_stack = nullptr;
     QList<TabInfo> m_tabInfos;
