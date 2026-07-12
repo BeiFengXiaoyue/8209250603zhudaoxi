@@ -466,15 +466,15 @@ void StudentContentArea::loadTabData(int tabIndex)
                     table->setItem(row, 1, new QTableWidgetItem(info.subjects[i]));
                     table->setItem(row, 2, new QTableWidgetItem(info.functions[i]));
                     table->setItem(row, 3, new QTableWidgetItem(info.teachers[i]));
-                    table->setItem(row, 4, new QTableWidgetItem(info.times[i]));
+                    table->setItem(row, 4, new QTableWidgetItem(info.times[i].left(10)));
 
                     int courseId = info.courseIds[i];
                     auto *playBtn = new QPushButton("播放");
-                    playBtn->setFixedHeight(26);
+                    playBtn->setFixedHeight(28);
                     playBtn->setCursor(Qt::PointingHandCursor);
                     playBtn->setStyleSheet(
                         "QPushButton { background-color:#3B5998; color:#FFF; "
-                        "border:none; border-radius:6px; font-size:12px; padding:0 12px; }"
+                        "border:none; border-radius:6px; font-size:12px; padding:4px 12px; min-height:0px; }"
                         "QPushButton:hover { background-color:#2D4373; }");
 
                     connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {

@@ -226,18 +226,35 @@ def get_favorites():
 
     conn = get_db()
     rows = conn.execute(
-        """SELECT id, item_type, item_id, item_title, class, added_time
-           FROM favorites
-           WHERE username = ?
-           ORDER BY added_time DESC
+        """SELECT f.id, f.item_type, f.item_id, f.item_title, f.class, f.added_time,
+                  c.subject, c.function, c.teacher, c.time AS course_time
+           FROM favorites f
+           LEFT JOIN courses c ON f.item_type = 'video' AND f.item_id = c.id
+           WHERE f.username = ?
+           ORDER BY f.added_time DESC
            LIMIT 100""",
         (username,),
     ).fetchall()
     conn.close()
 
+    data = []
+    for row in rows:
+        d = dict(row)
+        if d["item_type"] == "resource":
+            d["subject"] = ""
+            d["function"] = ""
+            d["teacher"] = ""
+            d["course_time"] = ""
+        else:
+            d["subject"] = d["subject"] or ""
+            d["function"] = d["function"] or ""
+            d["teacher"] = d["teacher"] or ""
+            d["course_time"] = d["course_time"] or ""
+        data.append(d)
+
     return jsonify({
         "success": True,
-        "data": [dict(row) for row in rows],
+        "data": data,
     }), 200
 
 
