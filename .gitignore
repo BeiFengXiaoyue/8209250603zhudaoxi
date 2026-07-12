@@ -2,6 +2,8 @@
 # Qt / C++ 构建
 # ============================
 client/build/
+client_build/
+build/
 *.exe
 *.obj
 *.o
@@ -42,6 +44,10 @@ server/uploads/avatars/*
 !server/uploads/avatars/.gitkeep
 server/uploads/resources/*
 !server/uploads/resources/.gitkeep
+server/uploads/courses/*.mp4
+server/uploads/courses/*.avi
+server/uploads/courses/*.mov
+server/uploads/courses/*.mkv
 
 # ============================
 # 虚拟环境
