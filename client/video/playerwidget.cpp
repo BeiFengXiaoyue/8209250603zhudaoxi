@@ -6,6 +6,7 @@
 #include <QScrollArea>
 #include <QWidgetAction>
 #include <QApplication>
+#include <QStyle>
 #include <QMediaPlayer>
 #include <QVideoWidget>
 #include <QAudioOutput>
@@ -301,8 +302,9 @@ void VideoCanvas::setupUI()
     ctrlLayout->setContentsMargins(12, 0, 12, 0);
     ctrlLayout->setSpacing(8);
 
-    // 播放/暂停
-    m_playBtn = new QPushButton("▶");
+    // 播放/暂停（使用 Qt 内置媒体图标，统一风格）
+    m_playBtn = new QPushButton();
+    m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     m_playBtn->setFixedSize(70, 28);
     m_playBtn->setCursor(Qt::PointingHandCursor);
     m_playBtn->setStyleSheet(
@@ -313,10 +315,10 @@ void VideoCanvas::setupUI()
     // 根据播放器实际状态同步按钮图标（适配外部 pauseVideo 调用）
     connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, [this](QMediaPlayer::PlaybackState state) {
         if (state == QMediaPlayer::PlayingState) {
-            m_playBtn->setText("⏸");
+            m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
             m_isPlaying = true;
         } else {
-            m_playBtn->setText("▶");
+            m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
             m_isPlaying = false;
         }
     });
