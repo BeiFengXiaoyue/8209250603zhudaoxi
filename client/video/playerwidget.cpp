@@ -336,7 +336,7 @@ void VideoCanvas::setupUI()
 
     // 进度条
     m_progressSlider = new QSlider(Qt::Horizontal);
-    m_progressSlider->setFixedHeight(4);
+    m_progressSlider->setFixedHeight(14);
     m_progressSlider->setRange(0, 10000);
     m_progressSlider->setSingleStep(1);
     m_progressSlider->setPageStep(1);
@@ -346,6 +346,7 @@ void VideoCanvas::setupUI()
         QSlider::groove:horizontal { height: 10px; background: rgba(255,255,255,0.25); border-radius: 5px; }
         QSlider::handle:horizontal { width: 14px; height: 14px; margin: -2px 0; background: #FFF; border-radius: 7px; }
         QSlider::sub-page:horizontal { background: #3B5998; border-radius: 5px; }
+        QSlider::add-page:horizontal { background: rgba(255,255,255,0.25); border-radius: 5px; }
     )");
     connect(m_progressSlider, &QSlider::sliderReleased, this, [this]() {
         if (m_mediaPlayer->duration() > 0)
