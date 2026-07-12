@@ -450,6 +450,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                 table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
                 table->horizontalHeader()->setHighlightSections(false);
                 table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+                table->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
                 table->setStyleSheet(
                     "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
                     "font-size:13px; color:#2C3E50; }"
@@ -470,11 +471,10 @@ void StudentContentArea::loadTabData(int tabIndex)
 
                     int courseId = info.courseIds[i];
                     auto *playBtn = new QPushButton("播放");
-                    playBtn->setFixedHeight(28);
                     playBtn->setCursor(Qt::PointingHandCursor);
                     playBtn->setStyleSheet(
                         "QPushButton { background-color:#3B5998; color:#FFF; "
-                        "border:none; border-radius:6px; font-size:12px; padding:4px 12px; min-height:0px; }"
+                        "border:none; border-radius:6px; font-size:12px; padding:4px 12px; }"
                         "QPushButton:hover { background-color:#2D4373; }");
 
                     connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
@@ -487,7 +487,6 @@ void StudentContentArea::loadTabData(int tabIndex)
                     clay->addWidget(playBtn);
                     clay->setAlignment(Qt::AlignCenter);
                     table->setCellWidget(row, 5, container);
-                    table->setRowHeight(row, 42);
                 }
 
                 auto *shadow = new QGraphicsDropShadowEffect(tableCard);
