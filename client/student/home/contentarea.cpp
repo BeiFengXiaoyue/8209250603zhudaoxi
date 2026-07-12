@@ -448,8 +448,10 @@ void StudentContentArea::loadTabData(int tabIndex)
                     case 2: { // 最近上传 - courses + resources
                         QString type = item["item_type"].toString();
                         titles.append(item["title"].toString());
-                        subtitles.append((type == "video" ? QString("视频") : QString("资源")) + QString(" · ") +
-                                         item["time"].toString());
+                        info.titles.append(item["title"].toString());
+                        info.subjects.append(type == "video" ? "视频" : "资源");
+                        info.times.append(item["time"].toString());
+                        info.courseIds.append(type == "video" ? item["id"].toInt() : 0);
                         break;
                     }
                     case 3: { // 我的收藏 - favorites
@@ -525,6 +527,90 @@ void StudentContentArea::loadTabData(int tabIndex)
 	                    table->setItem(row, 1, new QTableWidgetItem(info.subjects.value(i)));
 	                    table->setItem(row, 2, new QTableWidgetItem(info.functions.value(i)));
 	                    table->setItem(row, 3, new QTableWidgetItem(info.times.value(i)));
+	                    table->setRowHeight(row, 46);
+	                }
+
+	                auto *shadow = new QGraphicsDropShadowEffect(tableCard);
+	                shadow->setBlurRadius(20);
+	                shadow->setColor(QColor(0, 0, 0, 30));
+	                shadow->setOffset(0, 2);
+	                tableCard->setGraphicsEffect(shadow);
+
+	                tcLayout->addWidget(table);
+	                sLayout->addWidget(tableCard);
+	                sLayout->addStretch(1);
+	                scrollArea->setWidget(scrollContent);
+
+	                auto *pLayout = new QVBoxLayout(page);
+	                pLayout->setContentsMargins(0, 0, 0, 0);
+	                pLayout->addWidget(scrollArea);
+	                m_stack->addWidget(page);
+	                info.pages.append(page);
+	            } else if (tabIndex == 2) {
+	                // 最近上传 → 表格视图
+	                auto *page = new QWidget();
+	                page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
+
+	                auto *scrollArea = new QScrollArea(page);
+	                scrollArea->setWidgetResizable(true);
+	                scrollArea->setFrameShape(QFrame::NoFrame);
+	                scrollArea->setStyleSheet("QScrollArea { background-color: #F5F7FA; border: none; }"
+	                    "QScrollBar:vertical { width: 6px; background: transparent; }"
+	                    "QScrollBar::handle:vertical { background: #D0D5DD; border-radius: 3px; }"
+	                    "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }");
+
+	                auto *scrollContent = new QWidget();
+	                scrollContent->setStyleSheet("background-color: #F5F7FA;");
+	                auto *sLayout = new QVBoxLayout(scrollContent);
+	                sLayout->setContentsMargins(20, 20, 20, 20);
+
+	                auto *tableCard = new QWidget();
+	                tableCard->setStyleSheet("QWidget { background-color: #FFFFFF; border-radius: 16px; }");
+	                auto *tcLayout = new QVBoxLayout(tableCard);
+	                tcLayout->setContentsMargins(0, 0, 0, 0);
+
+	                auto *table = new QTableWidget(0, 4);
+	                table->setHorizontalHeaderLabels({"标题", "类型", "上传时间", "操作"});
+	                table->setSelectionBehavior(QAbstractItemView::SelectRows);
+	                table->setSelectionMode(QAbstractItemView::SingleSelection);
+	                table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	                table->verticalHeader()->setVisible(false);
+	                table->setShowGrid(false);
+	                table->setAlternatingRowColors(true);
+	                table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	                table->horizontalHeader()->setHighlightSections(false);
+	                table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	                table->setStyleSheet(
+	                    "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
+	                    "font-size:13px; color:#2C3E50; }"
+	                    "QTableWidget::item { padding:6px 16px; border-bottom:1px solid #ECF0F1; }"
+	                    "QTableWidget::item:selected { background-color:#EBF0FA; color:#2C3E50; }"
+	                    "QHeaderView::section { background-color:#F5F7FA; color:#7F8C8D; "
+	                    "font-weight:bold; font-size:12px; border:none; text-align:left; "
+	                    "border-bottom:2px solid #ECF0F1; padding:8px 16px; }");
+
+	                for (int i = 0; i < totalItems; ++i) {
+	                    int row = table->rowCount();
+	                    table->insertRow(row);
+	                    table->setItem(row, 0, new QTableWidgetItem(info.titles.value(i)));
+	                    table->setItem(row, 1, new QTableWidgetItem(info.subjects.value(i)));
+	                    table->setItem(row, 2, new QTableWidgetItem(info.times.value(i)));
+
+	                    // 视频类型加播放按钮
+	                    int courseId = info.courseIds.value(i);
+	                    if (courseId > 0) {
+	                        auto *playBtn = new QPushButton("播放");
+	                        playBtn->setCursor(Qt::PointingHandCursor);
+	                        playBtn->setStyleSheet(
+	                            "QPushButton { background-color:#3B5998; color:#FFF; "
+	                            "border:none; border-radius:6px; font-size:12px; padding:0px; "
+	                            "min-height:0px; qproperty-fixedHeight:30; }"
+	                            "QPushButton:hover { background-color:#2D4373; }");
+	                        connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
+	                            emit playVideoRequested(courseId);
+	                        });
+	                        table->setCellWidget(row, 3, playBtn);
+	                    }
 	                    table->setRowHeight(row, 46);
 	                }
 
@@ -663,7 +749,8 @@ void StudentContentArea::loadTabData(int tabIndex)
                             (idx < info.functions.size()) ? info.functions[idx] : "",
                             "",
                             NetworkHandler::baseUrl() + "/api/courses/"
-                                + QString::number(cid) + "/thumbnail");
+                                + QString::number(cid) + "/thumbnail",
+                            0);
                         connect(card, &VideoCard::playRequested, this, [this](int cid) {
                             emit playVideoRequested(cid);
                         });

@@ -47,6 +47,7 @@ def upload_course():
     safe_filename = f"{ts}_{file.filename}"
     filepath = os.path.join(UPLOAD_DIR, safe_filename)
     file.save(filepath)
+    file_size = os.path.getsize(filepath)
 
     # 生成缩略图（首帧 JPEG）
     thumbnail_path = ""
@@ -61,9 +62,9 @@ def upload_course():
 
     conn = get_db()
     cursor = conn.execute(
-        """INSERT INTO courses (course, teacher, time, file_path, class, description, subject, function, thumbnail_path)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (name, teacher, upload_time, safe_filename, class_val, description, subject, function, thumbnail_path),
+        """INSERT INTO courses (course, teacher, time, file_path, class, description, subject, function, thumbnail_path, file_size)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (name, teacher, upload_time, safe_filename, class_val, description, subject, function, thumbnail_path, file_size),
     )
     course_id = cursor.lastrowid
     conn.commit()
@@ -82,6 +83,7 @@ def upload_course():
             "subject": subject,
             "function": function,
             "thumbnail_path": thumbnail_path,
+            "file_size": file_size,
         }
     }), 201
 
@@ -98,7 +100,7 @@ def list_courses():
 
     conn = get_db()
     rows = conn.execute(
-        """SELECT id, course, teacher, time, file_path, class, description, subject, function
+        """SELECT id, course, teacher, time, file_path, class, description, subject, function, file_size
            FROM courses WHERE class = ?
            ORDER BY time DESC""",
         (class_val,),
@@ -116,6 +118,7 @@ def list_courses():
             "description": row["description"] or "",
             "subject": row["subject"] or "",
             "function": row["function"] or "",
+            "file_size": row["file_size"] or 0,
         }
         for row in rows
     ]

@@ -25,7 +25,8 @@ public:
     void setData(int courseId, const QString &title,
                  const QString &teacher, const QString &time,
                  const QString &subject, const QString &func,
-                 const QString &desc, const QString &thumbUrl);
+                 const QString &desc, const QString &thumbUrl,
+                 int fileSize = 0);
 
     void setThumbnail(const QPixmap &pixmap);
     void setThumbnailPlaceholder();
@@ -38,6 +39,7 @@ private:
     void setupUI();
 
     int m_courseId = 0;
+    int m_fileSize = 0;
     bool m_initialized = false;
     double m_scale = 1.0;
     QString m_username;

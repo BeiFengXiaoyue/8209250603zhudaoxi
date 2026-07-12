@@ -163,7 +163,8 @@ void SearchResultPage::populateCards(const QJsonArray &data)
             obj["subject"].toString(),
             obj["function"].toString(),
             obj["description"].toString(),
-            NetworkHandler::baseUrl() + "/api/courses/" + QString::number(obj["id"].toInt()) + "/thumbnail"
+            NetworkHandler::baseUrl() + "/api/courses/" + QString::number(obj["id"].toInt()) + "/thumbnail",
+            obj["file_size"].toInt()
         );
 
         connect(card, &VideoCard::playRequested, this, [this](int courseId) {

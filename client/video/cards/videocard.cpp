@@ -221,7 +221,7 @@ void VideoCard::setupUI()
                 body["username"] = m_username;
                 body["file_name"] = m_titleLabel->text();
                 body["file_type"] = "video";
-                body["file_size"] = 0;
+                body["file_size"] = m_fileSize;
                 body["class"] = m_classId;
                 NetworkHandler::instance()->post(
                     NetworkHandler::baseUrl() + "/api/user/downloads", body,
@@ -235,10 +235,12 @@ void VideoCard::setupUI()
 void VideoCard::setData(int courseId, const QString &title,
                         const QString &teacher, const QString &time,
                         const QString &subject, const QString &func,
-                        const QString &desc, const QString &thumbUrl)
+                        const QString &desc, const QString &thumbUrl,
+                        int fileSize)
 {
     if (!m_initialized) init();
     m_courseId = courseId;
+    m_fileSize = fileSize;
     m_titleLabel->setText(title);
     m_metaLabel->setText(teacher + " · " + time);
 
