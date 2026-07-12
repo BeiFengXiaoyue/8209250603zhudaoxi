@@ -201,6 +201,7 @@ void StudentCard::mousePressEvent(QMouseEvent *event)
             msgBox.setStyleSheet(R"(
                 QMessageBox { background-color: #FFFFFF; }
                 QMessageBox QLabel { color: #2C3E50; background: transparent; }
+                QMessageBox QDialogButtonBox { background: transparent; }
                 QMessageBox QPushButton {
                     color: #444444;
                     background-color: #F5F7FA;
@@ -231,6 +232,7 @@ void StudentCard::mousePressEvent(QMouseEvent *event)
             msgBox.setStyleSheet(R"(
                 QMessageBox { background-color: #FFFFFF; }
                 QMessageBox QLabel { color: #2C3E50; background: transparent; }
+                QMessageBox QDialogButtonBox { background: transparent; }
                 QMessageBox QPushButton {
                     color: #444444;
                     background-color: #F5F7FA;
