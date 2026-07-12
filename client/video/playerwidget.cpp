@@ -343,9 +343,9 @@ void VideoCanvas::setupUI()
     m_progressSlider->setValue(0);
     m_progressSlider->setStyleSheet(R"(
         QSlider { background: transparent; }
-        QSlider::groove:horizontal { height: 6px; background: rgba(255,255,255,0.25); border-radius: 3px; }
-        QSlider::handle:horizontal { width: 22px; height: 22px; margin: -8px 0; background: #FFF; border-radius: 11px; }
-        QSlider::sub-page:horizontal { background: #3B5998; border-radius: 3px; }
+        QSlider::groove:horizontal { height: 10px; background: rgba(255,255,255,0.25); border-radius: 5px; }
+        QSlider::handle:horizontal { width: 14px; height: 14px; margin: -2px 0; background: #FFF; border-radius: 7px; }
+        QSlider::sub-page:horizontal { background: #3B5998; border-radius: 5px; }
     )");
     connect(m_progressSlider, &QSlider::sliderReleased, this, [this]() {
         if (m_mediaPlayer->duration() > 0)
