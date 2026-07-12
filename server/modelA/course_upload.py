@@ -1,6 +1,6 @@
 import os
 import time
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, Response
 
 course_upload_bp = Blueprint("course_upload", __name__)
 
@@ -113,7 +113,7 @@ def list_courses():
 
 @course_upload_bp.route("/courses/<int:course_id>/file", methods=["GET"])
 def download_course_file(course_id):
-    """下载课程视频文件"""
+    """视频流播放（支持 HTTP Range 请求，用于 QMediaPlayer 进度拖动）"""
     conn = get_db()
     row = conn.execute(
         "SELECT course, file_path FROM courses WHERE id = ?", (course_id,)
@@ -127,5 +127,61 @@ def download_course_file(course_id):
     if not os.path.exists(filepath):
         return jsonify({"success": False, "message": "文件不存在"}), 404
 
+    file_size = os.path.getsize(filepath)
+
+    # MIME 类型映射
+    ext = os.path.splitext(row["file_path"])[1].lower()
+    mime_map = {
+        ".mp4": "video/mp4",
+        ".mkv": "video/x-matroska",
+        ".webm": "video/webm",
+        ".avi": "video/x-msvideo",
+        ".mov": "video/quicktime",
+        ".wmv": "video/x-ms-wmv",
+        ".flv": "video/x-flv",
+        ".ts": "video/mp2t",
+        ".m4v": "video/mp4",
+        ".3gp": "video/3gpp",
+    }
+    content_type = mime_map.get(ext, "application/octet-stream")
+
+    range_header = request.headers.get("Range", "")
+    if range_header and range_header.startswith("bytes="):
+        # 解析 Range: bytes=start-end
+        try:
+            range_str = range_header[6:]  # 去掉 "bytes="
+            if "-" in range_str:
+                parts = range_str.split("-", 1)
+                start = int(parts[0]) if parts[0] else 0
+                end = int(parts[1]) if parts[1] else file_size - 1
+            else:
+                start = int(range_str)
+                end = file_size - 1
+
+            if start >= file_size:
+                return jsonify({"success": False, "message": "范围超出文件大小"}), 416
+
+            end = min(end, file_size - 1)
+            length = end - start + 1
+
+            with open(filepath, "rb") as f:
+                f.seek(start)
+                data = f.read(length)
+
+            response = Response(
+                data,
+                206,
+                headers={
+                    "Content-Range": f"bytes {start}-{end}/{file_size}",
+                    "Content-Type": content_type,
+                    "Content-Length": str(length),
+                    "Accept-Ranges": "bytes",
+                },
+            )
+            return response
+        except (ValueError, OSError):
+            pass
+
+    # 无 Range 头 → 返回完整文件
     download_name = row["course"]
-    return send_file(filepath, as_attachment=False, download_name=download_name)
+    return send_file(filepath, as_attachment=False, download_name=download_name, mimetype=content_type)

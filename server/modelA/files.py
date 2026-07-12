@@ -3,6 +3,8 @@ from flask import Blueprint, send_file, jsonify, abort
 
 files_bp = Blueprint("files", __name__)
 
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads", "courses")
+
 
 def get_db():
     from database.init import get_db_path, init_db
@@ -33,9 +35,8 @@ def download_course(course_id):
 
     file_path = row["file_path"]
     if not file_path or not os.path.exists(file_path):
-        # 如果路径不存在，尝试从 server 相对路径查找
-        base = os.path.dirname(os.path.abspath(__file__))
-        alt_path = os.path.join(base, "..", file_path)
+        # 如果路径不存在，从 uploads/courses 目录查找
+        alt_path = os.path.join(UPLOAD_DIR, file_path)
         if os.path.exists(alt_path):
             file_path = alt_path
         else:

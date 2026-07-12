@@ -101,6 +101,7 @@ private:
 
     bool m_isPlaying = false;
     qreal m_currentSpeed = 1.0;
+    QString m_statusText = "播放器就绪\n点击搜索结果中的「播放」按钮";
 };
 
 // ============================================================

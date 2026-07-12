@@ -225,17 +225,24 @@ VideoCanvas::VideoCanvas(QWidget *parent)
 void VideoCanvas::setFile(const QString &filePath)
 {
     if (!m_mediaPlayer) return;
+    m_statusText = "加载中...";
     if (filePath.startsWith("http://") || filePath.startsWith("https://"))
         m_mediaPlayer->setSource(QUrl(filePath));
     else
         m_mediaPlayer->setSource(QUrl::fromLocalFile(filePath));
-    m_playBtn->setText("▶");
-    m_isPlaying = false;
+    m_playBtn->setText("⏸");
+    m_isPlaying = true;
+    m_mediaPlayer->play();
 }
 
 void VideoCanvas::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
+    // 调试：直接在画布上画状态文字（确保不被遮挡）
+    QPainter p(this);
+    p.setPen(Qt::yellow);
+    p.setFont(QFont("Arial", 16, QFont::Bold));
+    p.drawText(rect(), Qt::AlignCenter, m_statusText);
 }
 
 void VideoCanvas::resizeEvent(QResizeEvent *event)
@@ -261,6 +268,27 @@ void VideoCanvas::setupUI()
     m_videoWidget = new QVideoWidget(this);
     m_videoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
     m_mediaPlayer->setVideoOutput(m_videoWidget);
+
+    // 状态文字直接在 paintEvent 中绘制（避免被 QVideoWidget 遮盖）
+    // 错误和状态更新会修改 m_statusText 并触发 repaint
+    connect(m_mediaPlayer, &QMediaPlayer::errorOccurred, this, [this](QMediaPlayer::Error err, const QString &str) {
+        qDebug() << "QMediaPlayer ERROR:" << err << str;
+        m_statusText = "错误: " + str;
+        update();
+    });
+    connect(m_mediaPlayer, &QMediaPlayer::mediaStatusChanged, this, [this](QMediaPlayer::MediaStatus status) {
+        QStringList names = {"NoMedia", "Loading", "Loaded", "Stalled", "Buffering", "Buffered", "EndOfMedia", "InvalidMedia"};
+        int idx = static_cast<int>(status);
+        QString name = (idx >= 0 && idx < names.size()) ? names[idx] : "Unknown";
+        qDebug() << "QMediaPlayer STATUS:" << idx << name;
+        m_statusText = "状态: " + name;
+        if (status == QMediaPlayer::InvalidMedia)
+            m_statusText = "错误: 不支持的媒体格式\n可能缺少视频解码器";
+        update();
+    });
+    connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, [this](qint64 dur) {
+        qDebug() << "QMediaPlayer DURATION:" << dur;
+    });
 
     // ---- 底部控制栏 ----
     m_bottomControls = new QWidget(this);
