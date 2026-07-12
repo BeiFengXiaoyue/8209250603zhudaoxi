@@ -65,7 +65,7 @@ void StudentContentArea::setupTabBar()
     tabLayout->setContentsMargins(0, 0, 0, 0);
     tabLayout->setSpacing(2);
 
-    QStringList tabNames = {"最近播放", "最近下载", "最近上传", "浏览历史", "我的收藏"};
+    QStringList tabNames = {"最近播放", "最近下载", "最近上传", "我的收藏"};
 
     for (int i = 0; i < tabNames.size(); ++i) {
         auto *btn = new QPushButton(tabNames[i]);
@@ -324,16 +324,15 @@ void StudentContentArea::setUserData(const QString &username, int classId)
     m_classId = classId;
     m_dataLoaded = true;
 
-    // 清空旧的 tab 信息（预分配5个空位，按 tabIndex 写入，避免异步回调顺序错乱）
+    // 清空旧的 tab 信息（预分配4个空位，按 tabIndex 写入，避免异步回调顺序错乱）
     m_tabInfos.clear();
-    m_tabInfos.resize(5);
+    m_tabInfos.resize(4);
 
-    // 并行加载5个 tab 的数据
+    // 并行加载4个 tab 的数据
     loadTabData(0); // 最近播放
     loadTabData(1); // 最近下载
     loadTabData(2); // 最近上传
-    loadTabData(3); // 浏览历史
-    loadTabData(4); // 我的收藏
+    loadTabData(3); // 我的收藏
 }
 
 // ============================================================
@@ -345,7 +344,6 @@ void StudentContentArea::loadTabData(int tabIndex)
         "/api/user/history?days=7&username=",
         "/api/user/downloads?username=",
         "/api/user/uploads?username=",
-        "/api/user/history?username=",
         "/api/user/favorites?username=",
     };
 
@@ -388,8 +386,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                 case 0: hint = "暂无最近播放记录"; break;
                 case 1: hint = "暂无下载记录"; break;
                 case 2: hint = "暂无上传记录"; break;
-                case 3: hint = "暂无浏览历史"; break;
-                case 4: hint = "暂无收藏内容"; break;
+                case 3: hint = "暂无收藏内容"; break;
             }
             auto *emptyPage = createEmptyPage(hint);
             m_stack->addWidget(emptyPage);
@@ -437,12 +434,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                                          item["time"].toString());
                         break;
                     }
-                    case 3: // 浏览历史 - view_history
-                        titles.append(item["video_title"].toString());
-                        subtitles.append(item["teacher"].toString() + QString(" · ") +
-                                         item["view_time"].toString().left(10));
-                        break;
-                    case 4: { // 我的收藏 - favorites
+                    case 3: { // 我的收藏 - favorites
                         titles.append(item["item_title"].toString());
                         subtitles.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
                                          QString(" · ") + item["added_time"].toString().left(10));
@@ -465,7 +457,7 @@ void StudentContentArea::loadTabData(int tabIndex)
 
             info.pageCount = pages;
 
-            if (tabIndex == 4) {
+            if (tabIndex == 3) {
                 // 我的收藏 → 表格视图
                 auto *page = new QWidget();
                 page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
@@ -611,7 +603,7 @@ void StudentContentArea::loadTabData(int tabIndex)
 
         // 如果所有 tab 都加载完毕，切换到第一个 tab
         //（独立重新加载时不走此路径，避免死循环）
-        bool allLoaded = (m_reloadingTab < 0) && (m_tabInfos.size() == 5);
+        bool allLoaded = (m_reloadingTab < 0) && (m_tabInfos.size() == 4);
         if (allLoaded) {
             for (auto &ti : m_tabInfos) {
                 if (ti.name.isEmpty()) { allLoaded = false; break; }
