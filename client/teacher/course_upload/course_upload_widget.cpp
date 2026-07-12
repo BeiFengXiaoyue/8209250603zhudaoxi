@@ -463,8 +463,9 @@ QWidget* CourseUploadWidget::createUploadPage()
     m_courseTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_courseTable->setShowGrid(false);
     m_courseTable->verticalHeader()->setVisible(false);
-    m_courseTable->horizontalHeader()->setStretchLastSection(true);
     m_courseTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_courseTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    m_courseTable->setColumnWidth(4, 60);
     m_courseTable->setAlternatingRowColors(true);
     m_courseTable->setStyleSheet(R"(
         QTableWidget {
