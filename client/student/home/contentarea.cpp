@@ -811,17 +811,7 @@ void StudentContentArea::switchTab(int index)
     if (index >= m_tabInfos.size())
         return;
 
-    // 点击「最近播放」或「最近下载」时重新加载数据（即时效果）
-    if ((index == 0 || index == 1) && !m_initialLoad && m_tabInfos[index].pageCount > 0) {
-        m_reloadingTab = index;
-        loadTabData(index);
-        return;
-    }
-
-    if (index == m_currentTab && !m_initialLoad)
-        return;
-
-    // 更新按钮样式
+    // 先更新按钮样式（确保聚焦变化）
     for (int i = 0; i < m_tabButtons.size(); ++i) {
         bool active = (i == index);
         m_tabButtons[i]->setChecked(active);
@@ -851,6 +841,16 @@ void StudentContentArea::switchTab(int index)
                                                       "transparent", "normal", "#CCD5E0"));
         }
     }
+
+    // 点击「最近播放」或「最近下载」且已有数据时重新加载（即时效果）
+    if ((index == 0 || index == 1) && !m_initialLoad && m_tabInfos[index].pageCount > 0) {
+        m_reloadingTab = index;
+        loadTabData(index);
+        return;
+    }
+
+    if (index == m_currentTab && !m_initialLoad)
+        return;
 
     m_currentTab = index;
     m_currentSubPage = 0;
