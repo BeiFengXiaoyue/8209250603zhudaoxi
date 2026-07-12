@@ -16,6 +16,9 @@ public:
     /// 初始化 UI（必须在加入父级控件后调用，延迟构造避免崩溃）
     void init();
 
+    /// 设置缩放比例（必须在 init/setData 之前调用）
+    void setScale(double factor);
+
     void setData(int courseId, const QString &title,
                  const QString &teacher, const QString &time,
                  const QString &subject, const QString &func,
@@ -33,6 +36,7 @@ private:
 
     int m_courseId = 0;
     bool m_initialized = false;
+    double m_scale = 1.0;
 
     QLabel      *m_thumbLabel    = nullptr;
     QLabel      *m_titleLabel    = nullptr;

@@ -14,6 +14,7 @@
 #include <QJsonArray>
 #include <QPushButton>
 #include <QDebug>
+#include <QSet>
 
 // ============================================================
 // 辅助函数：统一的柔和配色（基于索引微调，保持整体简洁）
@@ -398,9 +399,15 @@ void StudentContentArea::loadTabData(int tabIndex)
             // 解析数据
             QStringList titles, subtitles;
             QList<QColor> colors;
+            QSet<int> seenIds;  // 去重
 
             for (int i = 0; i < data.size(); ++i) {
                 QJsonObject item = data[i].toObject();
+                int vid = item["video_id"].toInt();
+                // 最近播放按 video_id 去重
+                if (tabIndex == 0 && seenIds.contains(vid)) continue;
+                if (tabIndex == 0) seenIds.insert(vid);
+
                 colors.append(cardColor(i));
 
                 switch (tabIndex) {
@@ -541,10 +548,12 @@ void StudentContentArea::loadTabData(int tabIndex)
                 pLayout->addWidget(scrollArea);
                 m_stack->addWidget(page);
             } else if (tabIndex == 0) {
-                // 「最近播放」测试 VideoCard
+                // 「最近播放」使用 VideoCard 卡片（缩小至 0.7x，4列布局）
+                int cols = 4;
+                double scale = 0.7;
                 for (int p = 0; p < pages; ++p) {
-                    int start = p * 6;
-                    int count = qMin(6, totalItems - start);
+                    int start = p * cols;
+                    int count = qMin(cols * 2, totalItems - start);
                     auto *page = new QWidget();
                     page->setStyleSheet("background:#F5F7FA;");
                     auto *scroll = new QScrollArea(page);
@@ -552,17 +561,19 @@ void StudentContentArea::loadTabData(int tabIndex)
                     scroll->setFrameShape(QFrame::NoFrame);
                     auto *sc = new QWidget();
                     auto *grid = new QGridLayout(sc);
-                    grid->setSpacing(20);
+                    grid->setSpacing(qRound(12 * scale));
+                    grid->setContentsMargins(16, 16, 16, 16);
+                    grid->setAlignment(Qt::AlignTop | Qt::AlignLeft);
                     for (int i = 0; i < count; ++i) {
                         int idx = start + i;
-                        // 安全检查：防止数组越界
                         int cid = (idx < info.courseIds.size()) ? info.courseIds[idx] : 0;
                         QString t = (idx < info.titles.size()) ? info.titles[idx] : "";
                         QString te = (idx < info.teachers.size()) ? info.teachers[idx] : "";
                         QString ti = (idx < info.times.size()) ? info.times[idx] : "";
                         if (cid <= 0) continue;
                         auto *card = new VideoCard();
-                        grid->addWidget(card, i / 3, i % 3);
+                        card->setScale(scale);
+                        grid->addWidget(card, i / cols, i % cols);
                         card->setData(cid, t, te, ti,
                             (idx < info.subjects.size()) ? info.subjects[idx] : "",
                             (idx < info.functions.size()) ? info.functions[idx] : "",
