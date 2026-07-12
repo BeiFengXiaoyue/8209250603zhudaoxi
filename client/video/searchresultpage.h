@@ -21,6 +21,7 @@ public:
     explicit SearchResultPage(QWidget *parent = nullptr);
 
     void search(const QString &keyword, const QStringList &tags);
+    void setUserData(const QString &username, int classId);
 
 signals:
     void backClicked();
@@ -34,6 +35,8 @@ private:
     QLabel      *m_countLabel    = nullptr;
     QWidget     *m_cardGrid      = nullptr;
     QGridLayout *m_gridLayout    = nullptr;
+    QString m_username;
+    int m_classId = 0;
 };
 
 #endif // SEARCHRESULTPAGE_H

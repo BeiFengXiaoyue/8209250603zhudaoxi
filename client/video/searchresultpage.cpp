@@ -110,6 +110,12 @@ void SearchResultPage::setupUI()
     mainLayout->addWidget(scrollArea, 1);
 }
 
+void SearchResultPage::setUserData(const QString &username, int classId)
+{
+    m_username = username;
+    m_classId = classId;
+}
+
 void SearchResultPage::search(const QString &keyword, const QStringList &tags)
 {
     m_searchEdit->setText(keyword);
@@ -148,6 +154,7 @@ void SearchResultPage::populateCards(const QJsonArray &data)
         QJsonObject obj = data[i].toObject();
 
         auto *card = new VideoCard();
+        card->setUserData(m_username, m_classId);
         card->setData(
             obj["id"].toInt(),
             obj["course"].toString(),

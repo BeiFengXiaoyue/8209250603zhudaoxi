@@ -179,6 +179,8 @@ void VideoMainWindow::setUserData(const QString &username, int classId)
     m_classId = classId;
     if (m_player)
         m_player->setUserData(username, classId);
+    if (m_searchResultPage)
+        m_searchResultPage->setUserData(username, classId);
 }
 
 void VideoMainWindow::playCourse(int courseId)
