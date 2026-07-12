@@ -338,11 +338,16 @@ void StudentContentArea::setUserData(const QString &username, int classId)
 void StudentContentArea::refreshAll()
 {
     if (!m_dataLoaded) return;
+    m_refreshingAll = true;
+    m_refreshPendingCount = 0;
     for (int i = 0; i < m_tabInfos.size(); ++i) {
         if (m_tabInfos[i].pageCount > 0) {
-            m_reloadingTab = i;
+            m_refreshPendingCount++;
             loadTabData(i);
         }
+    }
+    if (m_refreshPendingCount == 0) {
+        m_refreshingAll = false;
     }
 }
 
@@ -614,7 +619,7 @@ void StudentContentArea::loadTabData(int tabIndex)
 
         // 如果所有 tab 都加载完毕，切换到第一个 tab
         //（独立重新加载时不走此路径，避免死循环）
-        bool allLoaded = (m_reloadingTab < 0) && (m_tabInfos.size() == 4);
+        bool allLoaded = m_initialLoad && !m_refreshingAll && (m_reloadingTab < 0) && (m_tabInfos.size() == 4);
         if (allLoaded) {
             for (auto &ti : m_tabInfos) {
                 if (ti.name.isEmpty()) { allLoaded = false; break; }
@@ -624,13 +629,30 @@ void StudentContentArea::loadTabData(int tabIndex)
             switchTab(0);
             m_initialLoad = false;
         } else if (info.pageCount > 0) {
-            // 独立重新加载 → 直接切到其第一页
-            m_currentTab = tabIndex;
-            m_currentSubPage = 0;
-            if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
-            updateNavigation();
-            if (m_navWidget) m_navWidget->show();
-            m_reloadingTab = -1;
+            if (m_refreshingAll) {
+                // 全局刷新模式：每个 tab 各自独立更新，递减待完成计数
+                m_refreshPendingCount--;
+                if (m_refreshPendingCount <= 0) {
+                    m_refreshingAll = false;
+                    m_refreshPendingCount = 0;
+                }
+                // 如果当前可见的就是这个 tab，立即刷新视图
+                if (m_currentTab == tabIndex && !info.pages.isEmpty()) {
+                    m_currentSubPage = 0;
+                    m_stack->setCurrentWidget(info.pages[0]);
+                    updateNavigation();
+                    if (m_navWidget) m_navWidget->show();
+                }
+                qDebug() << "[refreshAll] tab" << tabIndex << "done, remaining:" << m_refreshPendingCount;
+            } else if (m_reloadingTab == tabIndex) {
+                // 独立重新加载（用户点击 Tab）→ 直接切到其第一页
+                m_currentTab = tabIndex;
+                m_currentSubPage = 0;
+                if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
+                updateNavigation();
+                if (m_navWidget) m_navWidget->show();
+                m_reloadingTab = -1;
+            }
         }
     });
 }
@@ -847,8 +869,18 @@ void StudentContentArea::switchTab(int index)
 
     // 点击任意 Tab 且已有数据时重新加载（实时更新）
     if (!m_initialLoad && m_tabInfos[index].pageCount > 0) {
-        m_reloadingTab = index;
-        loadTabData(index);
+        if (m_refreshingAll) {
+            // refreshAll 已在加载所有 tab 的数据，等待回调更新视图即可
+            m_currentTab = index;
+            m_currentSubPage = 0;
+            if (!m_tabInfos[index].pages.isEmpty())
+                m_stack->setCurrentWidget(m_tabInfos[index].pages[0]);
+            updateNavigation();
+            if (m_navWidget) m_navWidget->show();
+        } else {
+            m_reloadingTab = index;
+            loadTabData(index);
+        }
         return;
     }
 

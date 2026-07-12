@@ -62,6 +62,7 @@ VideoMainWindow* StudentMainWindow::ensureVideoWindow()
             m_videoWindow->pauseVideo();
             m_sidebar->setActiveItem(0);
             m_stack->setCurrentIndex(0);
+            m_contentArea->refreshAll();
         });
         connect(m_videoWindow, &VideoMainWindow::navigateToForum, this, [this]() {
             m_videoWindow->pauseVideo();
@@ -88,6 +89,7 @@ void StudentMainWindow::navigateToForum()
         connect(m_forumWindow, &ForumMainWindow::navigateToHome, this, [this]() {
             m_sidebar->setActiveItem(0);
             m_stack->setCurrentIndex(0);
+            m_contentArea->refreshAll();
         });
         connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
             m_sidebar->setActiveItem(1);
@@ -102,6 +104,7 @@ void StudentMainWindow::navigateToForum()
                 connect(m_materialPage, &MaterialUploadPage::navigateToHome, this, [this]() {
                     m_sidebar->setActiveItem(0);
                     m_stack->setCurrentIndex(0);
+                    m_contentArea->refreshAll();
                 });
                 connect(m_materialPage, &MaterialUploadPage::navigateToForum, this, [this]() {
                     m_forumWindow->setUserData(m_username, m_classId);

@@ -89,7 +89,9 @@ private:
     // 数据加载标志
     bool m_dataLoaded = false;
     bool m_initialLoad = true;
+    bool m_refreshingAll = false;
     int m_reloadingTab = -1;  // 正在独立重新加载的 tab，-1 表示无
+    int m_refreshPendingCount = 0;  // refreshAll 中待完成的 tab 数
 };
 
 #endif // CONTENTAREA_H

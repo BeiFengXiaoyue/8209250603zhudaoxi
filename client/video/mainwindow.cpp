@@ -95,26 +95,7 @@ void VideoMainWindow::setupUI()
         m_contentStack->setCurrentIndex(1);
     });
     connect(m_searchResultPage, &SearchResultPage::playVideoRequested, this, [this](int courseId) {
-        // 获取课程数据并加载到播放器
-        QString url = NetworkHandler::baseUrl() + "/api/courses/" + QString::number(courseId);
-        NetworkHandler::instance()->get(url, [this, courseId](bool ok, const QJsonObject &json) {
-            if (!ok) return;
-            QJsonObject data = json["data"].toObject();
-            m_player->loadCourse(
-                data["id"].toInt(),
-                data["course"].toString(),
-                data["teacher"].toString(),
-                data["time"].toString(),
-                data["description"].toString(),
-                data["subject"].toString(),
-                data["function"].toString()
-            );
-            // 通过 HTTP URL 播放服务端视频文件
-            QString fileUrl = NetworkHandler::baseUrl()
-                + "/api/courses/" + QString::number(courseId) + "/file";
-            m_player->setVideoFile(fileUrl);
-        });
-        m_contentStack->setCurrentIndex(0);
+        playCourse(courseId);
     });
 
     // 默认显示搜索页
