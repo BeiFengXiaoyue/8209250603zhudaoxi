@@ -14,6 +14,11 @@ QWidget {
     background-color: #FFFFFF;
 }
 
+/* 容器类强制白色背景 */
+QDialog, QMessageBox, QFrame, QGroupBox, QTabWidget, QWidget#qt_msgbox_label {
+    background-color: #FFFFFF;
+}
+
 QMainWindow {
     min-width: 1024px;
     min-height: 640px;
