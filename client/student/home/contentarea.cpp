@@ -548,7 +548,8 @@ void StudentContentArea::loadTabData(int tabIndex)
         }
 
         // 如果所有 tab 都加载完毕，切换到第一个 tab
-        bool allLoaded = m_tabInfos.size() == 5;
+        //（独立重新加载时不走此路径，避免死循环）
+        bool allLoaded = (m_reloadingTab < 0) && (m_tabInfos.size() == 5);
         if (allLoaded) {
             for (auto &ti : m_tabInfos) {
                 if (ti.name.isEmpty()) { allLoaded = false; break; }
@@ -563,6 +564,7 @@ void StudentContentArea::loadTabData(int tabIndex)
             m_stack->setCurrentIndex(info.startPage);
             updateNavigation();
             if (m_navWidget) m_navWidget->show();
+            m_reloadingTab = -1;
         }
     });
 }
@@ -746,7 +748,8 @@ void StudentContentArea::switchTab(int index)
         return;
 
     // 点击「最近播放」时重新加载数据（即时效果）
-    if (index == 0) {
+    if (index == 0 && m_dataLoaded) {
+        m_reloadingTab = 0;
         loadTabData(0);
         return;
     }
