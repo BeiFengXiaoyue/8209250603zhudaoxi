@@ -1,5 +1,6 @@
 #include "contentarea.h"
 #include "../../common/network_handler.h"
+#include "../../video/cards/videocard.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
@@ -408,6 +409,8 @@ void StudentContentArea::loadTabData(int tabIndex)
                         subtitles.append(item["teacher"].toString() + QString(" · ") +
                                          item["view_time"].toString().left(10));
                         info.courseIds.append(item["video_id"].toInt());
+                        info.teachers.append(item["teacher"].toString());
+                        info.times.append(item["view_time"].toString().left(10));
                         break;
                     case 1: // 最近下载 - download_history
                         titles.append(item["file_name"].toString());
@@ -535,6 +538,54 @@ void StudentContentArea::loadTabData(int tabIndex)
                 pLayout->setContentsMargins(0, 0, 0, 0);
                 pLayout->addWidget(scrollArea);
                 m_stack->addWidget(page);
+            } else if (tabIndex == 0) {
+                // 「最近播放」使用 VideoCard 卡片
+                for (int p = 0; p < pages; ++p) {
+                    int start = p * 6;
+                    int count = qMin(6, totalItems - start);
+
+                    auto *page = new QWidget();
+                    page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
+                    auto *scrollArea = new QScrollArea(page);
+                    scrollArea->setWidgetResizable(true);
+                    scrollArea->setFrameShape(QFrame::NoFrame);
+                    scrollArea->setStyleSheet("QScrollArea { background-color: #F5F7FA; border: none; }"
+                        "QScrollBar:vertical { width:6px; background:transparent; }"
+                        "QScrollBar::handle:vertical { background:#D0D5DD; border-radius:3px; }"
+                        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height:0; }");
+
+                    auto *scrollContent = new QWidget();
+                    scrollContent->setStyleSheet("background-color: #F5F7FA;");
+                    auto *grid = new QGridLayout(scrollContent);
+                    grid->setContentsMargins(20, 20, 20, 20);
+                    grid->setSpacing(20);
+                    grid->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+                    int cols = 3;
+                    for (int i = 0; i < count; ++i) {
+                        int idx = start + i;
+                        auto *card = new VideoCard();
+                        card->setData(
+                            info.courseIds[idx],
+                            info.titles[idx],
+                            info.teachers.isEmpty() ? "" : info.teachers[idx],
+                            info.times.isEmpty() ? "" : info.times[idx],
+                            "", "", "",
+                            NetworkHandler::baseUrl() + "/api/courses/"
+                                + QString::number(info.courseIds[idx]) + "/thumbnail"
+                        );
+                        connect(card, &VideoCard::playRequested, this, [this](int cid) {
+                            emit playVideoRequested(cid);
+                        });
+                        grid->addWidget(card, i / cols, i % cols);
+                    }
+
+                    scrollArea->setWidget(scrollContent);
+                    auto *pLayout = new QVBoxLayout(page);
+                    pLayout->setContentsMargins(0, 0, 0, 0);
+                    pLayout->addWidget(scrollArea);
+                    m_stack->addWidget(page);
+                }
             } else {
                 // 按页添加到 stack
                 for (int p = 0; p < pages; ++p) {
