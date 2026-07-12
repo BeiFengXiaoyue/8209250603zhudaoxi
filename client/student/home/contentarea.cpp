@@ -355,15 +355,14 @@ void StudentContentArea::loadTabData(int tabIndex)
     // 如果该 tab 已有旧数据，清除旧页面（用于重新加载）
     TabInfo &info = m_tabInfos[tabIndex];
     if (info.pageCount > 0) {
-        // 从 stack 中移除旧页面（从后往前删，保持索引正确）
-        for (int i = info.pageCount - 1; i >= 0; --i) {
-            int idx = info.startPage + i;
-            QWidget *w = m_stack->widget(idx);
+        // 从 stack 中移除旧页面
+        for (auto *w : info.pages) {
             if (w) {
                 m_stack->removeWidget(w);
                 w->deleteLater();
             }
         }
+        info.pages.clear();
         info = TabInfo();  // 重置
     }
 
@@ -383,7 +382,6 @@ void StudentContentArea::loadTabData(int tabIndex)
 
         if (data.isEmpty()) {
             // 无数据时添加空页面
-            info.startPage = m_stack->count();
             info.pageCount = 1;
             QString hint;
             switch (tabIndex) {
@@ -393,7 +391,9 @@ void StudentContentArea::loadTabData(int tabIndex)
                 case 3: hint = "暂无浏览历史"; break;
                 case 4: hint = "暂无收藏内容"; break;
             }
-            m_stack->addWidget(createEmptyPage(hint));
+            auto *emptyPage = createEmptyPage(hint);
+            m_stack->addWidget(emptyPage);
+            info.pages.append(emptyPage);
             m_tabInfos[tabIndex] = info;
         } else {
             // 解析数据
@@ -463,7 +463,6 @@ void StudentContentArea::loadTabData(int tabIndex)
             int pages = (totalItems + 5) / 6;
             if (pages < 1) pages = 1;
 
-            info.startPage = m_stack->count();
             info.pageCount = pages;
 
             if (tabIndex == 4) {
@@ -549,9 +548,10 @@ void StudentContentArea::loadTabData(int tabIndex)
 
                 auto *pLayout = new QVBoxLayout(page);
                 pLayout->setContentsMargins(0, 0, 0, 0);
-                pLayout->addWidget(scrollArea);
-                m_stack->addWidget(page);
-            } else if (tabIndex == 0) {
+	                pLayout->addWidget(scrollArea);
+	                m_stack->addWidget(page);
+	                info.pages.append(page);
+	            } else if (tabIndex == 0) {
                 // 「最近播放」使用 VideoCard 卡片（缩小至 0.7x，4列布局）
                 int cols = 4;
                 double scale = 0.7;
@@ -592,15 +592,18 @@ void StudentContentArea::loadTabData(int tabIndex)
                     scroll->setWidget(sc);
                     page->setLayout(new QVBoxLayout);
                     page->layout()->addWidget(scroll);
-                    m_stack->addWidget(page);
-                }
-            } else {
-                // 按页添加到 stack
-                for (int p = 0; p < pages; ++p) {
-                    int start = p * 6;
-                    int count = qMin(6, totalItems - start);
-                    m_stack->addWidget(createPageWidget(titles, subtitles, colors, start, count, info.courseIds));
-                }
+	                    m_stack->addWidget(page);
+	                    info.pages.append(page);
+	                }
+	            } else {
+	                // 按页添加到 stack
+	                for (int p = 0; p < pages; ++p) {
+	                    int start = p * 6;
+	                    int count = qMin(6, totalItems - start);
+	                    auto *w = createPageWidget(titles, subtitles, colors, start, count, info.courseIds);
+	                    m_stack->addWidget(w);
+	                    info.pages.append(w);
+	                }
             }
 
             m_tabInfos[tabIndex] = info;
@@ -621,7 +624,7 @@ void StudentContentArea::loadTabData(int tabIndex)
             // 独立重新加载「最近播放」→ 直接切到其第一页
             m_currentTab = 0;
             m_currentSubPage = 0;
-            m_stack->setCurrentIndex(info.startPage);
+            if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
             updateNavigation();
             if (m_navWidget) m_navWidget->show();
             m_reloadingTab = -1;
@@ -629,7 +632,7 @@ void StudentContentArea::loadTabData(int tabIndex)
             // 独立重新加载「最近下载」
             m_currentTab = 1;
             m_currentSubPage = 0;
-            m_stack->setCurrentIndex(info.startPage);
+            if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
             updateNavigation();
             if (m_navWidget) m_navWidget->show();
             m_reloadingTab = -1;
@@ -700,22 +703,24 @@ void StudentContentArea::setupBottomNav()
 
     connect(m_prevBtn, &QPushButton::clicked, this, [this]() {
         if (m_currentSubPage > 0 && m_currentTab < m_tabInfos.size()) {
-            int fromIdx = m_tabInfos[m_currentTab].startPage + m_currentSubPage;
+            auto &info = m_tabInfos[m_currentTab];
+            QWidget *fromW = info.pages.value(m_currentSubPage);
             m_currentSubPage--;
-            int toIdx = m_tabInfos[m_currentTab].startPage + m_currentSubPage;
-            animatePageSwitch(fromIdx, toIdx, false);
+            QWidget *toW = info.pages.value(m_currentSubPage);
+            if (fromW && toW) animatePageSwitch(fromW, toW, false);
             updateNavigation();
         }
     });
 
     connect(m_nextBtn, &QPushButton::clicked, this, [this]() {
         if (m_currentTab < m_tabInfos.size()) {
-            int maxPage = m_tabInfos[m_currentTab].pageCount - 1;
+            auto &info = m_tabInfos[m_currentTab];
+            int maxPage = info.pageCount - 1;
             if (m_currentSubPage < maxPage) {
-                int fromIdx = m_tabInfos[m_currentTab].startPage + m_currentSubPage;
+                QWidget *fromW = info.pages.value(m_currentSubPage);
                 m_currentSubPage++;
-                int toIdx = m_tabInfos[m_currentTab].startPage + m_currentSubPage;
-                animatePageSwitch(fromIdx, toIdx, true);
+                QWidget *toW = info.pages.value(m_currentSubPage);
+                if (fromW && toW) animatePageSwitch(fromW, toW, true);
                 updateNavigation();
             }
         }
@@ -766,15 +771,14 @@ void StudentContentArea::updateNavigation()
 // ============================================================
 // 带动画的页面切换
 // ============================================================
-void StudentContentArea::animatePageSwitch(int fromIndex, int toIndex, bool forward)
+void StudentContentArea::animatePageSwitch(QWidget *fromWidget, QWidget *toWidget, bool forward)
 {
-    if (fromIndex == toIndex)
+    if (!fromWidget || !toWidget || fromWidget == toWidget)
         return;
 
-    QWidget *fromWidget = m_stack->widget(fromIndex);
-    QWidget *toWidget   = m_stack->widget(toIndex);
-
-    if (!fromWidget || !toWidget)
+    int fromIndex = m_stack->indexOf(fromWidget);
+    int toIndex = m_stack->indexOf(toWidget);
+    if (fromIndex < 0 || toIndex < 0)
         return;
 
     int w = m_stack->width();
@@ -800,8 +804,8 @@ void StudentContentArea::animatePageSwitch(int fromIndex, int toIndex, bool forw
     group->addAnimation(animFrom);
     group->addAnimation(animTo);
 
-    connect(group, &QParallelAnimationGroup::finished, this, [this, toIndex]() {
-        m_stack->setCurrentIndex(toIndex);
+    connect(group, &QParallelAnimationGroup::finished, this, [this, toWidget]() {
+        m_stack->setCurrentWidget(toWidget);
     });
 
     group->start(QAbstractAnimation::DeleteWhenStopped);
@@ -860,7 +864,8 @@ void StudentContentArea::switchTab(int index)
     m_currentSubPage = 0;
 
     // 跳转到该 tab 的第一页
-    m_stack->setCurrentIndex(m_tabInfos[index].startPage);
+    if (!m_tabInfos[index].pages.isEmpty())
+        m_stack->setCurrentWidget(m_tabInfos[index].pages[0]);
     updateNavigation();
 
     // 显示底部导航

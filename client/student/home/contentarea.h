@@ -40,7 +40,7 @@ private:
                               int startIndex, int count,
                               const QList<int> &courseIds = {});
     void updateNavigation();
-    void animatePageSwitch(int fromIndex, int toIndex, bool forward);
+    void animatePageSwitch(QWidget *fromWidget, QWidget *toWidget, bool forward);
 
     /// 加载指定 tab 的数据
     void loadTabData(int tabIndex);
@@ -48,8 +48,8 @@ private:
     // 数据结构：一个 tab 包含若干页
     struct TabInfo {
         QString name;
-        int startPage;   // 在 m_stack 中的起始页索引
-        int pageCount;   // 该 tab 的页数
+        QList<QWidget*> pages;  // 该 tab 的所有页面指针
+        int pageCount = 0;     // 该 tab 的页数
         QStringList titles;
         QStringList subtitles;
         QList<QColor> colors;
