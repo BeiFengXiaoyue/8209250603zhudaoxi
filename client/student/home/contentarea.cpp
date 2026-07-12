@@ -31,6 +31,20 @@ static QColor cardColor(int index)
 }
 
 // ============================================================
+// 辅助函数：统一时间格式
+// "YYYY-MM-DD HH:MM:SS" → "YYYY/MM/DD HH:MM"
+// "YYYY/MM/DD HH:MM"   → 不变
+// "YYYY-MM-DD"         → "YYYY/MM/DD"
+// ============================================================
+static QString fmtTime(const QString &ts)
+{
+    QString date = ts.left(10).replace('-', '/');
+    if (ts.length() >= 16)
+        return date + ts.mid(10, 6);   // 追加 " HH:MM"
+    return date;
+}
+
+// ============================================================
 // ContentArea
 // ============================================================
 StudentContentArea::StudentContentArea(QWidget *parent)
@@ -431,10 +445,10 @@ void StudentContentArea::loadTabData(int tabIndex)
                     case 0: // 最近播放 - view_history
                         titles.append(item["video_title"].toString());
                         subtitles.append(item["teacher"].toString() + QString(" · ") +
-                                         item["view_time"].toString().left(10));
+                                         fmtTime(item["view_time"].toString()));
                         info.courseIds.append(item["video_id"].toInt());
                         info.teachers.append(item["teacher"].toString());
-                        info.times.append(item["view_time"].toString().left(10));
+                        info.times.append(fmtTime(item["view_time"].toString()));
                         info.subjects.append(item["subject"].toString());
                         info.functions.append(item["function"].toString());
                         break;
@@ -443,29 +457,29 @@ void StudentContentArea::loadTabData(int tabIndex)
                         info.titles.append(item["file_name"].toString());
                         info.subjects.append(item["file_type"].toString());
                         info.functions.append(QString::number(item["file_size"].toInt() / 1024) + " KB");
-                        info.times.append(item["download_time"].toString().left(10));
+                        info.times.append(fmtTime(item["download_time"].toString()));
                         break;
                     case 2: { // 最近上传 - courses + resources
                         QString type = item["item_type"].toString();
                         titles.append(item["title"].toString());
                         info.titles.append(item["title"].toString());
                         info.subjects.append(type == "video" ? "视频" : "资源");
-                        info.times.append(item["time"].toString());
+                        info.times.append(fmtTime(item["time"].toString()));
                         info.courseIds.append(type == "video" ? item["id"].toInt() : 0);
                         break;
                     }
                     case 3: { // 我的收藏 - favorites
                         titles.append(item["item_title"].toString());
                         subtitles.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
-                                         QString(" · ") + item["added_time"].toString().left(10));
+                                         QString(" · ") + fmtTime(item["added_time"].toString()));
                         info.titles.append(item["item_title"].toString());
                         info.subtitles.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
-                                              QString(" · ") + item["added_time"].toString().left(10));
+                                              QString(" · ") + fmtTime(item["added_time"].toString()));
                         info.courseIds.append(item["item_id"].toInt());
                         info.subjects.append(item["subject"].toString());
                         info.functions.append(item["function"].toString());
                         info.teachers.append(item["teacher"].toString());
-                        info.times.append(item["course_time"].toString());
+                        info.times.append(fmtTime(item["course_time"].toString()));
                         break;
                     }
                 }
@@ -681,7 +695,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                     table->setItem(row, 1, new QTableWidgetItem(info.subjects[i]));
                     table->setItem(row, 2, new QTableWidgetItem(info.functions[i]));
                     table->setItem(row, 3, new QTableWidgetItem(info.teachers[i]));
-                    table->setItem(row, 4, new QTableWidgetItem(info.times[i].split(" ")[0]));
+                    table->setItem(row, 4, new QTableWidgetItem(fmtTime(info.times[i])));
 
                     int courseId = info.courseIds[i];
                     auto *playBtn = new QPushButton("播放");
