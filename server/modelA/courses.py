@@ -29,7 +29,7 @@ def get_courses():
         return jsonify({"success": False, "message": "缺少班级参数"}), 400
 
     conn = get_db()
-    query = "SELECT id, course, teacher, time, file_path, class, subject, function, description FROM courses WHERE class = ?"
+    query = "SELECT id, course, teacher, time, file_path, class, subject, function, description, thumbnail_path FROM courses WHERE class = ?"
     params = [class_val]
 
     if teacher:
@@ -56,6 +56,7 @@ def get_courses():
             "subject": row["subject"],
             "function": row["function"],
             "description": row["description"] or "",
+            "thumbnail_path": row["thumbnail_path"] or "",
         }
         for row in rows
     ]
@@ -68,7 +69,7 @@ def get_course(course_id):
     """获取单个课程详情"""
     conn = get_db()
     row = conn.execute(
-        """SELECT id, course, teacher, time, file_path, class, subject, function, description
+        """SELECT id, course, teacher, time, file_path, class, subject, function, description, thumbnail_path
            FROM courses WHERE id = ?""",
         (course_id,),
     ).fetchone()
@@ -89,5 +90,6 @@ def get_course(course_id):
             "subject": row["subject"],
             "function": row["function"],
             "description": row["description"] or "",
+            "thumbnail_path": row["thumbnail_path"] or "",
         }
     }), 200

@@ -156,7 +156,7 @@ void SearchResultPage::populateCards(const QJsonArray &data)
             obj["subject"].toString(),
             obj["function"].toString(),
             obj["description"].toString(),
-            ""  // thumbUrl — 后续接入服务端缩略图
+            NetworkHandler::baseUrl() + "/api/courses/" + QString::number(obj["id"].toInt()) + "/thumbnail"
         );
 
         connect(card, &VideoCard::playRequested, this, [this](int courseId) {

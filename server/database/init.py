@@ -51,6 +51,7 @@ def init_db():
         "description TEXT DEFAULT ''",
         "subject TEXT NOT NULL DEFAULT ''",
         "function TEXT NOT NULL DEFAULT ''",
+        "thumbnail_path TEXT DEFAULT ''",
     ]:
         try:
             conn.execute(f"ALTER TABLE courses ADD COLUMN {col}")

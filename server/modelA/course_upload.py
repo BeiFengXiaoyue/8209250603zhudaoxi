@@ -1,10 +1,12 @@
 import os
 import time
 from flask import Blueprint, request, jsonify, send_file
+from .ffm_tools import extract_first_frame
 
 course_upload_bp = Blueprint("course_upload", __name__)
 
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads", "courses")
+THUMB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads", "thumbs")
 
 
 def get_db():
@@ -46,13 +48,22 @@ def upload_course():
     filepath = os.path.join(UPLOAD_DIR, safe_filename)
     file.save(filepath)
 
+    # 生成缩略图（首帧 JPEG）
+    thumbnail_path = ""
+    try:
+        os.makedirs(THUMB_DIR, exist_ok=True)
+        thumb_file = extract_first_frame(str(filepath), output_dir=THUMB_DIR, quality=5)
+        thumbnail_path = os.path.basename(thumb_file)
+    except Exception:
+        pass  # 缩略图生成失败不影响上传
+
     upload_time = time.strftime("%Y/%m/%d %H:%M", time.localtime())
 
     conn = get_db()
     cursor = conn.execute(
-        """INSERT INTO courses (course, teacher, time, file_path, class, description, subject, function)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-        (name, teacher, upload_time, safe_filename, class_val, description, subject, function),
+        """INSERT INTO courses (course, teacher, time, file_path, class, description, subject, function, thumbnail_path)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (name, teacher, upload_time, safe_filename, class_val, description, subject, function, thumbnail_path),
     )
     course_id = cursor.lastrowid
     conn.commit()
@@ -70,6 +81,7 @@ def upload_course():
             "description": description,
             "subject": subject,
             "function": function,
+            "thumbnail_path": thumbnail_path,
         }
     }), 201
 
@@ -129,3 +141,22 @@ def download_course_file(course_id):
 
     download_name = row["course"]
     return send_file(filepath, as_attachment=False, download_name=download_name)
+
+
+@course_upload_bp.route("/courses/<int:course_id>/thumbnail", methods=["GET"])
+def get_course_thumbnail(course_id):
+    """获取课程视频缩略图"""
+    conn = get_db()
+    row = conn.execute(
+        "SELECT thumbnail_path FROM courses WHERE id = ?", (course_id,)
+    ).fetchone()
+    conn.close()
+
+    if not row or not row["thumbnail_path"]:
+        return jsonify({"success": False, "message": "缩略图不存在"}), 404
+
+    thumb_path = os.path.join(THUMB_DIR, row["thumbnail_path"])
+    if not os.path.exists(thumb_path):
+        return jsonify({"success": False, "message": "缩略图文件不存在"}), 404
+
+    return send_file(thumb_path, mimetype="image/jpeg")
