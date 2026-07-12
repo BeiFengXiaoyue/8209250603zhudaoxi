@@ -303,20 +303,8 @@ void VideoCanvas::setupUI()
     ctrlLayout->setSpacing(8);
 
     // 播放/暂停（使用 Qt 内置媒体图标，统一风格）
-    auto whiteIcon = [this](QStyle::StandardPixmap sp) {
-        QPixmap pix = style()->standardIcon(sp).pixmap(20, 20);
-        QPixmap white(pix.size());
-        white.fill(Qt::transparent);
-        QPainter p(&white);
-        p.setCompositionMode(QPainter::CompositionMode_Source);
-        p.setClipRegion(QRegion(pix.createMaskFromColor(Qt::transparent)));
-        p.fillRect(white.rect(), Qt::white);
-        p.end();
-        return QIcon(white);
-    };
     m_playBtn = new QPushButton();
-    m_playBtn->setIcon(whiteIcon(QStyle::SP_MediaPlay));
-    m_playBtn->setIconSize(QSize(20, 20));
+    m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     m_playBtn->setFixedSize(70, 28);
     m_playBtn->setCursor(Qt::PointingHandCursor);
     m_playBtn->setStyleSheet(
@@ -325,12 +313,12 @@ void VideoCanvas::setupUI()
         "QPushButton:hover { background-color: #4A6AB0; }"
     );
     // 根据播放器实际状态同步按钮图标（适配外部 pauseVideo 调用）
-    connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, [this, whiteIcon](QMediaPlayer::PlaybackState state) {
+    connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, [this](QMediaPlayer::PlaybackState state) {
         if (state == QMediaPlayer::PlayingState) {
-            m_playBtn->setIcon(whiteIcon(QStyle::SP_MediaPause));
+            m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
             m_isPlaying = true;
         } else {
-            m_playBtn->setIcon(whiteIcon(QStyle::SP_MediaPlay));
+            m_playBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
             m_isPlaying = false;
         }
     });
