@@ -195,7 +195,7 @@ def get_uploads():
 
     # 查询用户上传的资源
     resources = conn.execute(
-        """SELECT id, course AS title, time, class, 'resource' AS item_type
+        """SELECT id, name AS title, time, class, 'resource' AS item_type
            FROM resources
            WHERE uploader = ?
            ORDER BY time DESC
