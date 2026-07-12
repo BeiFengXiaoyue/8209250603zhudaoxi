@@ -350,6 +350,21 @@ void StudentContentArea::loadTabData(int tabIndex)
     if (tabIndex < 0 || tabIndex >= apiUrls.size())
         return;
 
+    // 如果该 tab 已有旧数据，清除旧页面（用于重新加载）
+    TabInfo &info = m_tabInfos[tabIndex];
+    if (info.pageCount > 0) {
+        // 从 stack 中移除旧页面（从后往前删，保持索引正确）
+        for (int i = info.pageCount - 1; i >= 0; --i) {
+            int idx = info.startPage + i;
+            QWidget *w = m_stack->widget(idx);
+            if (w) {
+                m_stack->removeWidget(w);
+                w->deleteLater();
+            }
+        }
+        info = TabInfo();  // 重置
+    }
+
     QString url = NetworkHandler::baseUrl() + apiUrls[tabIndex] + m_username;
 
     NetworkHandler::instance()->get(url, [this, tabIndex](bool success, const QJsonObject &json) {
@@ -535,12 +550,19 @@ void StudentContentArea::loadTabData(int tabIndex)
         // 如果所有 tab 都加载完毕，切换到第一个 tab
         bool allLoaded = m_tabInfos.size() == 5;
         if (allLoaded) {
-            for (auto &info : m_tabInfos) {
-                if (info.name.isEmpty()) { allLoaded = false; break; }
+            for (auto &ti : m_tabInfos) {
+                if (ti.name.isEmpty()) { allLoaded = false; break; }
             }
         }
         if (allLoaded) {
             switchTab(0);
+        } else if (tabIndex == 0 && info.pageCount > 0) {
+            // 独立重新加载「最近播放」→ 直接切到其第一页
+            m_currentTab = 0;
+            m_currentSubPage = 0;
+            m_stack->setCurrentIndex(info.startPage);
+            updateNavigation();
+            if (m_navWidget) m_navWidget->show();
         }
     });
 }
@@ -722,6 +744,12 @@ void StudentContentArea::switchTab(int index)
 {
     if (index >= m_tabInfos.size())
         return;
+
+    // 点击「最近播放」时重新加载数据（即时效果）
+    if (index == 0) {
+        loadTabData(0);
+        return;
+    }
 
     if (index == m_currentTab && m_dataLoaded)
         return;
