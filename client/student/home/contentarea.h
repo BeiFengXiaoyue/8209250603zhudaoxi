@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QLabel>
+#include <QTableWidget>
 #include <QList>
 #include <QStringList>
 #include <QPropertyAnimation>
@@ -20,6 +21,9 @@ public:
 
     // 切换到指定 tab
     void switchTab(int index);
+
+signals:
+    void playVideoRequested(int courseId);
 
 private:
     void setupUI();
@@ -47,6 +51,12 @@ private:
         QStringList titles;
         QStringList subtitles;
         QList<QColor> colors;
+        // 收藏专用
+        QList<int> courseIds;
+        QStringList subjects;
+        QStringList functions;
+        QStringList teachers;
+        QStringList times;
     };
 
     // Tab 按钮

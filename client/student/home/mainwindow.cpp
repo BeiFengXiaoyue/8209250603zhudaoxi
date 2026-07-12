@@ -177,8 +177,8 @@ QWidget* StudentMainWindow::createHomePage()
         m_stack->setCurrentWidget(m_editWidget);
     });
 
-    // 从左侧收藏列表播放视频
-    connect(m_leftPanel, &StudentLeftPanel::playFavoriteRequested, this, [this](int courseId) {
+    // 从内容区域（我的收藏）播放视频
+    connect(m_contentArea, &StudentContentArea::playVideoRequested, this, [this](int courseId) {
         m_sidebar->setActiveItem(1);
         auto *videoWin = ensureVideoWindow();
         videoWin->playCourse(courseId);

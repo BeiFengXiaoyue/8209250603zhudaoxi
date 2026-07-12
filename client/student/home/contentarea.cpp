@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QFrame>
+#include <QHeaderView>
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
 #include <QParallelAnimationGroup>
@@ -391,11 +392,20 @@ void StudentContentArea::loadTabData(int tabIndex)
                         subtitles.append(item["teacher"].toString() + QString(" · ") +
                                          item["view_time"].toString().left(10));
                         break;
-                    case 4: // 我的收藏 - favorites
+                    case 4: { // 我的收藏 - favorites
                         titles.append(item["item_title"].toString());
                         subtitles.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
                                          QString(" · ") + item["added_time"].toString().left(10));
+                        info.titles.append(item["item_title"].toString());
+                        info.subtitles.append((item["item_type"].toString() == "video" ? QString("视频") : QString("资源")) +
+                                              QString(" · ") + item["added_time"].toString().left(10));
+                        info.courseIds.append(item["item_id"].toInt());
+                        info.subjects.append(item["subject"].toString());
+                        info.functions.append(item["function"].toString());
+                        info.teachers.append(item["teacher"].toString());
+                        info.times.append(item["course_time"].toString());
                         break;
+                    }
                 }
             }
 
@@ -406,11 +416,102 @@ void StudentContentArea::loadTabData(int tabIndex)
             info.startPage = m_stack->count();
             info.pageCount = pages;
 
-            // 按页添加到 stack
-            for (int p = 0; p < pages; ++p) {
-                int start = p * 6;
-                int count = qMin(6, totalItems - start);
-                m_stack->addWidget(createPageWidget(titles, subtitles, colors, start, count));
+            if (tabIndex == 4) {
+                // 我的收藏 → 表格视图
+                auto *page = new QWidget();
+                page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
+
+                auto *scrollArea = new QScrollArea(page);
+                scrollArea->setWidgetResizable(true);
+                scrollArea->setFrameShape(QFrame::NoFrame);
+                scrollArea->setStyleSheet("QScrollArea { background-color: #F5F7FA; border: none; }"
+                    "QScrollBar:vertical { width: 6px; background: transparent; }"
+                    "QScrollBar::handle:vertical { background: #D0D5DD; border-radius: 3px; }"
+                    "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }");
+
+                auto *scrollContent = new QWidget();
+                scrollContent->setStyleSheet("background-color: #F5F7FA;");
+                auto *sLayout = new QVBoxLayout(scrollContent);
+                sLayout->setContentsMargins(20, 20, 20, 20);
+
+                auto *tableCard = new QWidget();
+                tableCard->setStyleSheet("QWidget { background-color: #FFFFFF; border-radius: 16px; }");
+                auto *tcLayout = new QVBoxLayout(tableCard);
+                tcLayout->setContentsMargins(0, 0, 0, 0);
+
+                auto *table = new QTableWidget(0, 6);
+                table->setHorizontalHeaderLabels({"课程名", "科目", "功能", "上传老师", "上传时间", "操作"});
+                table->setSelectionBehavior(QAbstractItemView::SelectRows);
+                table->setSelectionMode(QAbstractItemView::SingleSelection);
+                table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+                table->verticalHeader()->setVisible(false);
+                table->setShowGrid(false);
+                table->setAlternatingRowColors(true);
+                table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+                table->horizontalHeader()->setHighlightSections(false);
+                table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+                table->setStyleSheet(
+                    "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
+                    "font-size:13px; color:#2C3E50; }"
+                    "QTableWidget::item { padding:6px 16px; border-bottom:1px solid #ECF0F1; }"
+                    "QTableWidget::item:selected { background-color:#EBF0FA; color:#2C3E50; }"
+                    "QHeaderView::section { background-color:#F5F7FA; color:#7F8C8D; "
+                    "font-weight:bold; font-size:12px; border:none; text-align:left; "
+                    "border-bottom:2px solid #ECF0F1; padding:8px 16px; }");
+
+                for (int i = 0; i < totalItems; ++i) {
+                    int row = table->rowCount();
+                    table->insertRow(row);
+                    table->setItem(row, 0, new QTableWidgetItem(info.titles[i]));
+                    table->setItem(row, 1, new QTableWidgetItem(info.subjects[i]));
+                    table->setItem(row, 2, new QTableWidgetItem(info.functions[i]));
+                    table->setItem(row, 3, new QTableWidgetItem(info.teachers[i]));
+                    table->setItem(row, 4, new QTableWidgetItem(info.times[i]));
+
+                    int courseId = info.courseIds[i];
+                    auto *playBtn = new QPushButton("播放");
+                    playBtn->setFixedHeight(26);
+                    playBtn->setCursor(Qt::PointingHandCursor);
+                    playBtn->setStyleSheet(
+                        "QPushButton { background-color:#3B5998; color:#FFF; "
+                        "border:none; border-radius:6px; font-size:12px; padding:0 12px; }"
+                        "QPushButton:hover { background-color:#2D4373; }");
+
+                    connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
+                        emit playVideoRequested(courseId);
+                    });
+
+                    auto *container = new QWidget();
+                    auto *clay = new QHBoxLayout(container);
+                    clay->setContentsMargins(4, 0, 4, 0);
+                    clay->addWidget(playBtn);
+                    clay->setAlignment(Qt::AlignCenter);
+                    table->setCellWidget(row, 5, container);
+                    table->setRowHeight(row, 42);
+                }
+
+                auto *shadow = new QGraphicsDropShadowEffect(tableCard);
+                shadow->setBlurRadius(20);
+                shadow->setColor(QColor(0, 0, 0, 30));
+                shadow->setOffset(0, 2);
+                tableCard->setGraphicsEffect(shadow);
+
+                tcLayout->addWidget(table);
+                sLayout->addWidget(tableCard);
+                sLayout->addStretch(1);
+                scrollArea->setWidget(scrollContent);
+
+                auto *pLayout = new QVBoxLayout(page);
+                pLayout->setContentsMargins(0, 0, 0, 0);
+                pLayout->addWidget(scrollArea);
+                m_stack->addWidget(page);
+            } else {
+                // 按页添加到 stack
+                for (int p = 0; p < pages; ++p) {
+                    int start = p * 6;
+                    int count = qMin(6, totalItems - start);
+                    m_stack->addWidget(createPageWidget(titles, subtitles, colors, start, count));
+                }
             }
 
             m_tabInfos.append(info);
