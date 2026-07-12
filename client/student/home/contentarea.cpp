@@ -483,7 +483,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                     });
 
                     table->setCellWidget(row, 5, playBtn);
-                    table->setRowHeight(row, 34);
+                    table->setRowHeight(row, 46);
                 }
 
                 auto *shadow = new QGraphicsDropShadowEffect(tableCard);
