@@ -695,18 +695,20 @@ void CourseUploadWidget::refreshData()
             // 操作列：下载按钮
             int courseId = obj["id"].toInt();
             auto *downloadBtn = new QPushButton("下载");
+            downloadBtn->setCursor(Qt::PointingHandCursor);
             downloadBtn->setStyleSheet(R"(
                 QPushButton {
                     background-color: #0071E3;
                     color: white;
                     border: none;
-                    border-radius: 12px;
-                    padding: 4px 16px;
+                    border-radius: 6px;
                     font-size: 12px;
+                    padding: 0px;
+                    min-height: 0px;
+                    qproperty-fixedHeight: 30;
                 }
                 QPushButton:hover { background-color: #0077ED; }
             )");
-            downloadBtn->setCursor(Qt::PointingHandCursor);
             connect(downloadBtn, &QPushButton::clicked, this, [this, courseId]() {
                 QString fileUrl = NetworkHandler::baseUrl() +
                                   "/api/courses/" + QString::number(courseId) + "/file";
@@ -727,12 +729,8 @@ void CourseUploadWidget::refreshData()
                 });
             });
 
-            auto *btnWidget = new QWidget();
-            auto *btnLayout = new QHBoxLayout(btnWidget);
-            btnLayout->setContentsMargins(4, 4, 4, 4);
-            btnLayout->addWidget(downloadBtn);
-            btnLayout->setAlignment(Qt::AlignCenter);
-            m_courseTable->setCellWidget(row, 4, btnWidget);
+            m_courseTable->setCellWidget(row, 4, downloadBtn);
+            m_courseTable->setRowHeight(row, 46);
         }
     });
 }
