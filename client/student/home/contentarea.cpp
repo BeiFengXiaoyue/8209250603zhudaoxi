@@ -335,6 +335,17 @@ void StudentContentArea::setUserData(const QString &username, int classId)
     loadTabData(3); // 我的收藏
 }
 
+void StudentContentArea::refreshAll()
+{
+    if (!m_dataLoaded) return;
+    for (int i = 0; i < m_tabInfos.size(); ++i) {
+        if (m_tabInfos[i].pageCount > 0) {
+            m_reloadingTab = i;
+            loadTabData(i);
+        }
+    }
+}
+
 // ============================================================
 // 加载指定 tab 的数据
 // ============================================================
@@ -612,17 +623,9 @@ void StudentContentArea::loadTabData(int tabIndex)
         if (allLoaded) {
             switchTab(0);
             m_initialLoad = false;
-        } else if (tabIndex == 0 && info.pageCount > 0) {
-            // 独立重新加载「最近播放」→ 直接切到其第一页
-            m_currentTab = 0;
-            m_currentSubPage = 0;
-            if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
-            updateNavigation();
-            if (m_navWidget) m_navWidget->show();
-            m_reloadingTab = -1;
-        } else if (tabIndex == 1 && info.pageCount > 0) {
-            // 独立重新加载「最近下载」
-            m_currentTab = 1;
+        } else if (info.pageCount > 0) {
+            // 独立重新加载 → 直接切到其第一页
+            m_currentTab = tabIndex;
             m_currentSubPage = 0;
             if (!info.pages.isEmpty()) m_stack->setCurrentWidget(info.pages[0]);
             updateNavigation();
@@ -842,8 +845,8 @@ void StudentContentArea::switchTab(int index)
         }
     }
 
-    // 点击「最近播放」或「最近下载」且已有数据时重新加载（即时效果）
-    if ((index == 0 || index == 1) && !m_initialLoad && m_tabInfos[index].pageCount > 0) {
+    // 点击任意 Tab 且已有数据时重新加载（实时更新）
+    if (!m_initialLoad && m_tabInfos[index].pageCount > 0) {
         m_reloadingTab = index;
         loadTabData(index);
         return;

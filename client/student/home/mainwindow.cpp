@@ -202,7 +202,9 @@ QWidget* StudentMainWindow::createHomePage()
 
         switch (index) {
         case 0: // 个人中心（首页）
+            m_sidebar->setActiveItem(0);
             m_stack->setCurrentIndex(0);
+            m_contentArea->refreshAll();
             break;
 
         case 1: // 视频区

@@ -20,6 +20,9 @@ public:
     /// 设置用户信息并加载数据
     void setUserData(const QString &username, int classId);
 
+    /// 重新加载所有 Tab 数据
+    void refreshAll();
+
     // 切换到指定 tab
     void switchTab(int index);
 
