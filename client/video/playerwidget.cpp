@@ -346,7 +346,7 @@ void VideoCanvas::setupUI()
         QSlider::sub-page:horizontal { background: #3B5998; border-radius: 2px; }
     )");
     connect(m_progressSlider, &QSlider::sliderMoved, this, [this](int pos) {
-        if (m_mediaPlayer->duration() > 0)
+        if (m_mediaPlayer->duration() > 0 && m_mediaPlayer->mediaStatus() >= QMediaPlayer::LoadedMedia)
             m_mediaPlayer->setPosition(pos * m_mediaPlayer->duration() / 100);
     });
     ctrlLayout->addWidget(m_progressSlider, 1);
