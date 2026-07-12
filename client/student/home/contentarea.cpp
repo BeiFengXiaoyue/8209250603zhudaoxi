@@ -573,6 +573,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                         if (cid <= 0) continue;
                         auto *card = new VideoCard();
                         card->setScale(scale);
+                        card->setUserData(m_username, m_classId);
                         grid->addWidget(card, i / cols, i % cols);
                         card->setData(cid, t, te, ti,
                             (idx < info.subjects.size()) ? info.subjects[idx] : "",

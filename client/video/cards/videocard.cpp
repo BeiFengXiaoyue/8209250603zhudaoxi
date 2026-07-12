@@ -26,6 +26,12 @@ void VideoCard::setScale(double factor)
     m_scale = factor;
 }
 
+void VideoCard::setUserData(const QString &username, int classId)
+{
+    m_username = username;
+    m_classId = classId;
+}
+
 void VideoCard::setupUI()
 {
     setObjectName("videoCard");
@@ -209,6 +215,19 @@ void VideoCard::setupUI()
             QString url = NetworkHandler::baseUrl()
                 + "/api/courses/" + QString::number(m_courseId) + "/download";
             QDesktopServices::openUrl(QUrl(url));
+            // 记录下载历史
+            if (!m_username.isEmpty()) {
+                QJsonObject body;
+                body["username"] = m_username;
+                body["file_name"] = m_titleLabel->text();
+                body["file_type"] = "video";
+                body["file_size"] = 0;
+                body["class"] = m_classId;
+                NetworkHandler::instance()->post(
+                    NetworkHandler::baseUrl() + "/api/user/downloads", body,
+                    [](bool, const QJsonObject &) {}
+                );
+            }
         }
     });
 }
