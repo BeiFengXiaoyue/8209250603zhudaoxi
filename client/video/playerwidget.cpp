@@ -347,17 +347,16 @@ void VideoCanvas::setupUI()
         QSlider::handle:horizontal { width: 14px; height: 14px; margin: -5px 0; background: #FFF; border-radius: 7px; }
         QSlider::sub-page:horizontal { background: #3B5998; border-radius: 2px; }
     )");
-    connect(m_progressSlider, &QSlider::sliderMoved, this, [this](int pos) {
+    connect(m_progressSlider, &QSlider::sliderReleased, this, [this]() {
         if (m_mediaPlayer->duration() > 0)
-            m_mediaPlayer->setPosition(pos * m_mediaPlayer->duration() / 10000);
-        else
-            m_progressSlider->setValue(pos);
+            m_mediaPlayer->setPosition(m_progressSlider->value() * m_mediaPlayer->duration() / 10000);
     });
     ctrlLayout->addWidget(m_progressSlider, 1);
 
-    // 进度时间同步
+    // 进度时间同步（拖动中不更新，防冲突）
     connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, [this](qint64 pos) {
         if (m_mediaPlayer->duration() == 0) return;
+        if (m_progressSlider->isSliderDown()) return;
         int pct = static_cast<int>(pos * 10000 / m_mediaPlayer->duration());
         m_progressSlider->setValue(pct);
         // 更新时间显示
