@@ -467,7 +467,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                     table->setItem(row, 1, new QTableWidgetItem(info.subjects[i]));
                     table->setItem(row, 2, new QTableWidgetItem(info.functions[i]));
                     table->setItem(row, 3, new QTableWidgetItem(info.teachers[i]));
-                    table->setItem(row, 4, new QTableWidgetItem(info.times[i].left(10)));
+                    table->setItem(row, 4, new QTableWidgetItem(info.times[i].split(" ")[0]));
 
                     int courseId = info.courseIds[i];
                     auto *playBtn = new QPushButton("播放");

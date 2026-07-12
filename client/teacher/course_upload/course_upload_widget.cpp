@@ -689,8 +689,8 @@ void CourseUploadWidget::refreshData()
                 new QTableWidgetItem(obj["subject"].toString()));
             m_courseTable->setItem(row, 2,
                 new QTableWidgetItem(obj["function"].toString()));
-            m_courseTable->setItem(row, 3,
-                new QTableWidgetItem(obj["time"].toString()));
+	            m_courseTable->setItem(row, 3,
+	                new QTableWidgetItem(obj["time"].toString().split(" ")[0]));
 
             // 操作列：下载按钮
             int courseId = obj["id"].toInt();
