@@ -1,0 +1,84 @@
+/* ============================================================
+   VideoCard — 视频卡片样式
+   ============================================================ */
+
+VideoCard {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+}
+VideoCard:hover {
+    background-color: #F8FAFC;
+}
+
+VideoCard #thumbLabel {
+    background-color: #2C3E50;
+    border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid #E8ECF1;
+}
+
+VideoCard #titleLabel {
+    color: #2C3E50;
+    font-size: 14px;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+}
+
+VideoCard #metaLabel {
+    color: #8E99A4;
+    font-size: 11px;
+    background: transparent;
+    border: none;
+}
+
+VideoCard #tagContainer {
+    background: transparent;
+}
+
+VideoCard QLabel#subjectTag {
+    background-color: #5B8FF9;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 0 8px;
+    min-height: 0px;
+}
+
+VideoCard QLabel#funcTag {
+    background-color: #F5A623;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 0 8px;
+    min-height: 0px;
+}
+
+VideoCard QPushButton#playBtn {
+    background-color: #3B5998;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 12px;
+    min-height: 28px;
+}
+VideoCard QPushButton#playBtn:hover {
+    background-color: #4A6AB0;
+}
+
+VideoCard QPushButton#downloadBtn {
+    background-color: #4A7C59;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 12px;
+    min-height: 28px;
+}
+VideoCard QPushButton#downloadBtn:hover {
+    background-color: #5A9C69;
+}

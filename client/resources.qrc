@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/styles">
         <file alias="common.qss">common/style/common.qss</file>
+        <file alias="videocard.qss">video/cards/videocard.qss</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="csu_logo">auth/csu_logo.png</file>

@@ -6,18 +6,7 @@
 #include <QNetworkReply>
 #include <QDesktopServices>
 #include <QUrl>
-
-static const char *kBlueBtn =
-    "QPushButton { background-color:#3B5998; color:#FFFFFF; border:none; "
-    "border-radius:6px; font-size:12px; font-weight:bold; padding:0 12px; "
-    "min-height:28px; }"
-    "QPushButton:hover { background-color:#4A6AB0; }";
-
-static const char *kGreenBtn =
-    "QPushButton { background-color:#4A7C59; color:#FFFFFF; border:none; "
-    "border-radius:6px; font-size:12px; font-weight:bold; padding:0 12px; "
-    "min-height:28px; }"
-    "QPushButton:hover { background-color:#5A9C69; }";
+#include <QFile>
 
 VideoCard::VideoCard(QWidget *parent)
     : QWidget(parent)
@@ -27,12 +16,16 @@ VideoCard::VideoCard(QWidget *parent)
 
 void VideoCard::setupUI()
 {
-    setFixedSize(220, 300);
+    setObjectName("videoCard");
+    setFixedSize(220, 280);
     setCursor(Qt::PointingHandCursor);
-    setStyleSheet(R"(
-        VideoCard { background-color:#FFFFFF; border-radius:12px; }
-        VideoCard:hover { background-color:#F8FAFC; }
-    )");
+
+    // 加载 QSS
+    QFile qssFile(":/styles/videocard.qss");
+    if (qssFile.open(QIODevice::ReadOnly)) {
+        setStyleSheet(qssFile.readAll());
+        qssFile.close();
+    }
 
     // 阴影
     auto *shadow = new QGraphicsDropShadowEffect(this);
@@ -45,81 +38,73 @@ void VideoCard::setupUI()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    // ---- 缩略图区（4:3 比例） ----
+    // ---- 缩略图区 ----
     m_thumbLabel = new QLabel();
-    m_thumbLabel->setFixedSize(220, 165);
+    m_thumbLabel->setObjectName("thumbLabel");
+    m_thumbLabel->setFixedSize(220, 130);
     m_thumbLabel->setAlignment(Qt::AlignCenter);
-    m_thumbLabel->setStyleSheet(R"(
-        QLabel { background-color:#E8ECF1; border-radius:12px 12px 0 0;
-                 border-bottom:1px solid #E8ECF1; }
-    )");
     setThumbnailPlaceholder();
     layout->addWidget(m_thumbLabel);
 
     // ---- 文字内容区 ----
     auto *content = new QWidget();
-    content->setStyleSheet("background:transparent;");
+    content->setObjectName("cardContent");
     auto *cl = new QVBoxLayout(content);
     cl->setContentsMargins(14, 10, 14, 12);
     cl->setSpacing(6);
 
     // 课程名
     m_titleLabel = new QLabel("课程名称");
+    m_titleLabel->setObjectName("titleLabel");
     m_titleLabel->setWordWrap(true);
     m_titleLabel->setMaximumHeight(42);
-    m_titleLabel->setStyleSheet(
-        "QLabel { color:#2C3E50; font-size:14px; font-weight:bold; "
-        "background:transparent; border:none; }");
     cl->addWidget(m_titleLabel);
 
     // 教师 · 时间
     m_metaLabel = new QLabel("教师 · 时间");
-    m_metaLabel->setStyleSheet(
-        "QLabel { color:#8E99A4; font-size:11px; background:transparent; border:none; }");
+    m_metaLabel->setObjectName("metaLabel");
     cl->addWidget(m_metaLabel);
 
     // 标签行
     m_tagContainer = new QWidget();
-    m_tagContainer->setStyleSheet("background:transparent;");
+    m_tagContainer->setObjectName("tagContainer");
     auto *tagLayout = new QHBoxLayout(m_tagContainer);
     tagLayout->setContentsMargins(0, 0, 0, 0);
     tagLayout->setSpacing(6);
 
-    auto makeTag = [](const QString &text, const QString &color) {
-        auto *tag = new QLabel(text);
-        tag->setFixedHeight(22);
-        tag->setStyleSheet(QString(
-            "QLabel { background-color:%1; color:#FFFFFF; font-size:10px; "
-            "font-weight:bold; border-radius:4px; padding:0 8px; "
-            "min-height:0; }").arg(color));
-        tag->setAlignment(Qt::AlignCenter);
-        return tag;
-    };
-    m_subjectTag = makeTag("科目", "#5B8FF9");
-    m_funcTag = makeTag("功能", "#F5A623");
+    m_subjectTag = new QLabel("科目");
+    m_subjectTag->setObjectName("subjectTag");
+    m_subjectTag->setFixedHeight(22);
+    m_subjectTag->setAlignment(Qt::AlignCenter);
     tagLayout->addWidget(m_subjectTag);
+
+    m_funcTag = new QLabel("功能");
+    m_funcTag->setObjectName("funcTag");
+    m_funcTag->setFixedHeight(22);
+    m_funcTag->setAlignment(Qt::AlignCenter);
     tagLayout->addWidget(m_funcTag);
+
     tagLayout->addStretch(1);
     cl->addWidget(m_tagContainer);
 
-    // 间距占位
+    // 间距
     cl->addStretch(1);
 
     // 按钮行
     auto *btnRow = new QWidget();
-    btnRow->setStyleSheet("background:transparent;");
+    btnRow->setObjectName("btnRow");
     auto *btnLayout = new QHBoxLayout(btnRow);
     btnLayout->setContentsMargins(0, 0, 0, 0);
     btnLayout->setSpacing(8);
 
     m_playBtn = new QPushButton("▶ 播放");
+    m_playBtn->setObjectName("playBtn");
     m_playBtn->setCursor(Qt::PointingHandCursor);
-    m_playBtn->setStyleSheet(kBlueBtn);
     btnLayout->addWidget(m_playBtn);
 
     m_downloadBtn = new QPushButton("↓ 下载");
+    m_downloadBtn->setObjectName("downloadBtn");
     m_downloadBtn->setCursor(Qt::PointingHandCursor);
-    m_downloadBtn->setStyleSheet(kGreenBtn);
     btnLayout->addWidget(m_downloadBtn);
 
     cl->addWidget(btnRow);
@@ -171,41 +156,31 @@ void VideoCard::setData(int courseId, const QString &title,
 
 void VideoCard::setThumbnail(const QPixmap &pixmap)
 {
-    QPixmap scaled = pixmap.scaled(220, 165, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    // 裁剪到中心区域
+    QPixmap scaled = pixmap.scaled(220, 130, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     int x = (scaled.width() - 220) / 2;
-    int y = (scaled.height() - 165) / 2;
-    QPixmap cropped = scaled.copy(qMax(0, x), qMax(0, y), 220, 165);
+    int y = (scaled.height() - 130) / 2;
+    QPixmap cropped = scaled.copy(qMax(0, x), qMax(0, y), 220, 130);
     m_thumbLabel->setPixmap(cropped);
     m_thumbLabel->setScaledContents(false);
     m_thumbLabel->setAlignment(Qt::AlignCenter);
-    // 去掉背景色
-    m_thumbLabel->setStyleSheet(
-        "QLabel { background-color:#1A1A2E; border-radius:12px 12px 0 0;"
-        "border-bottom:1px solid #E8ECF1; }");
 }
 
 void VideoCard::setThumbnailPlaceholder()
 {
-    // 绘制一个带播放图标的占位图
-    QPixmap placeholder(220, 165);
+    QPixmap placeholder(220, 130);
     placeholder.fill(QColor("#2C3E50"));
     QPainter p(&placeholder);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // 居中播放三角形
     p.setPen(Qt::NoPen);
     p.setBrush(QColor(255, 255, 255, 60));
-    p.drawEllipse(QPoint(110, 82), 28, 28);
+    p.drawEllipse(QPoint(110, 65), 24, 24);
     p.setBrush(QColor(255, 255, 255, 180));
     QPolygonF triangle;
-    triangle << QPointF(100, 70) << QPointF(100, 94) << QPointF(124, 82);
+    triangle << QPointF(102, 56) << QPointF(102, 74) << QPointF(120, 65);
     p.drawPolygon(triangle);
     p.end();
 
     m_thumbLabel->setPixmap(placeholder);
     m_thumbLabel->setScaledContents(true);
-    m_thumbLabel->setStyleSheet(
-        "QLabel { background-color:#2C3E50; border-radius:12px 12px 0 0;"
-        "border-bottom:1px solid #E8ECF1; }");
 }
