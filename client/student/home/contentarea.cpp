@@ -11,6 +11,7 @@
 #include <QParallelAnimationGroup>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QPushButton>
 #include <QDebug>
 
 // ============================================================
@@ -131,15 +132,19 @@ void StudentContentArea::setupTabBar()
 // 创建卡片
 // ============================================================
 QWidget* StudentContentArea::createCard(const QString &title, const QString &subtitle,
-                                 const QColor &color)
+                                 const QColor &color, std::function<void()> onClick)
 {
-    auto *card = new QWidget();
+    auto *card = new QPushButton();
     card->setFixedSize(190, 150);
     card->setCursor(Qt::PointingHandCursor);
     card->setStyleSheet(R"(
-        QWidget {
+        QPushButton {
             background-color: #FFFFFF;
             border-radius: 12px;
+            border: none;
+        }
+        QPushButton:hover {
+            background-color: #F8FAFC;
         }
     )");
 
@@ -197,6 +202,12 @@ QWidget* StudentContentArea::createCard(const QString &title, const QString &sub
 
     layout->addWidget(textArea, 1);
 
+    if (onClick) {
+        connect(static_cast<QPushButton*>(card), &QPushButton::clicked, this, [onClick]() {
+            onClick();
+        });
+    }
+
     return card;
 }
 
@@ -225,7 +236,8 @@ QWidget* StudentContentArea::createEmptyPage(const QString &hint)
 QWidget* StudentContentArea::createPageWidget(const QStringList &titles,
                                        const QStringList &subtitles,
                                        const QList<QColor> &colors,
-                                       int startIndex, int count)
+                                       int startIndex, int count,
+                                       const QList<int> &courseIds)
 {
     auto *page = new QWidget();
     page->setStyleSheet("QWidget { background-color: #F5F7FA; }");
@@ -249,7 +261,12 @@ QWidget* StudentContentArea::createPageWidget(const QStringList &titles,
     int cols = 3;
     for (int i = 0; i < count && (startIndex + i) < titles.size(); ++i) {
         int idx = startIndex + i;
-        QWidget *card = createCard(titles[idx], subtitles[idx], colors[idx]);
+        std::function<void()> onClick = nullptr;
+        if (idx < courseIds.size() && courseIds[idx] > 0) {
+            int cid = courseIds[idx];
+            onClick = [this, cid]() { emit playVideoRequested(cid); };
+        }
+        QWidget *card = createCard(titles[idx], subtitles[idx], colors[idx], onClick);
         int row = i / cols;
         int col = i % cols;
         grid->addWidget(card, row, col);
@@ -305,8 +322,9 @@ void StudentContentArea::setUserData(const QString &username, int classId)
     m_classId = classId;
     m_dataLoaded = true;
 
-    // 清空旧的 tab 信息
+    // 清空旧的 tab 信息（预分配5个空位，按 tabIndex 写入，避免异步回调顺序错乱）
     m_tabInfos.clear();
+    m_tabInfos.resize(5);
 
     // 并行加载5个 tab 的数据
     loadTabData(0); // 最近播放
@@ -359,7 +377,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                 case 4: hint = "暂无收藏内容"; break;
             }
             m_stack->addWidget(createEmptyPage(hint));
-            m_tabInfos.append(info);
+            m_tabInfos[tabIndex] = info;
         } else {
             // 解析数据
             QStringList titles, subtitles;
@@ -374,6 +392,7 @@ void StudentContentArea::loadTabData(int tabIndex)
                         titles.append(item["video_title"].toString());
                         subtitles.append(item["teacher"].toString() + QString(" · ") +
                                          item["view_time"].toString().left(10));
+                        info.courseIds.append(item["video_id"].toInt());
                         break;
                     case 1: // 最近下载 - download_history
                         titles.append(item["file_name"].toString());
@@ -506,15 +525,21 @@ void StudentContentArea::loadTabData(int tabIndex)
                 for (int p = 0; p < pages; ++p) {
                     int start = p * 6;
                     int count = qMin(6, totalItems - start);
-                    m_stack->addWidget(createPageWidget(titles, subtitles, colors, start, count));
+                    m_stack->addWidget(createPageWidget(titles, subtitles, colors, start, count, info.courseIds));
                 }
             }
 
-            m_tabInfos.append(info);
+            m_tabInfos[tabIndex] = info;
         }
 
         // 如果所有 tab 都加载完毕，切换到第一个 tab
-        if (m_tabInfos.size() == 5) {
+        bool allLoaded = m_tabInfos.size() == 5;
+        if (allLoaded) {
+            for (auto &info : m_tabInfos) {
+                if (info.name.isEmpty()) { allLoaded = false; break; }
+            }
+        }
+        if (allLoaded) {
             switchTab(0);
         }
     });

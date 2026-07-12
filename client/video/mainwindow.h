@@ -39,6 +39,9 @@ private:
     SearchPage     *m_searchPage    = nullptr;
     SearchResultPage *m_searchResultPage = nullptr;
     ForumSidebarBase *m_sidebar       = nullptr;
+
+    QString m_username;
+    int m_classId = 0;
 };
 
 #endif // VIDEOMAINWINDOW_H

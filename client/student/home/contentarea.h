@@ -9,6 +9,7 @@
 #include <QList>
 #include <QStringList>
 #include <QPropertyAnimation>
+#include <functional>
 
 class StudentContentArea : public QWidget
 {
@@ -31,12 +32,13 @@ private:
     void setupContentPages();
     void setupBottomNav();
     QWidget* createCard(const QString &title, const QString &subtitle,
-                        const QColor &color);
+                        const QColor &color, std::function<void()> onClick = nullptr);
     QWidget* createEmptyPage(const QString &hint);
     QWidget* createPageWidget(const QStringList &titles,
                               const QStringList &subtitles,
                               const QList<QColor> &colors,
-                              int startIndex, int count);
+                              int startIndex, int count,
+                              const QList<int> &courseIds = {});
     void updateNavigation();
     void animatePageSwitch(int fromIndex, int toIndex, bool forward);
 

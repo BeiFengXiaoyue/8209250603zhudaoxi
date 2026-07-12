@@ -175,6 +175,8 @@ void VideoMainWindow::setSidebarActive(int index)
 
 void VideoMainWindow::setUserData(const QString &username, int classId)
 {
+    m_username = username;
+    m_classId = classId;
     if (m_player)
         m_player->setUserData(username, classId);
 }
@@ -197,6 +199,20 @@ void VideoMainWindow::playCourse(int courseId)
         QString fileUrl = NetworkHandler::baseUrl()
             + "/api/courses/" + QString::number(courseId) + "/file";
         m_player->setVideoFile(fileUrl);
+
+        // 记录播放历史
+        if (!m_username.isEmpty()) {
+            QJsonObject body;
+            body["username"] = m_username;
+            body["video_id"] = courseId;
+            body["video_title"] = data["course"].toString();
+            body["teacher"] = data["teacher"].toString();
+            body["class"] = m_classId;
+            NetworkHandler::instance()->post(
+                NetworkHandler::baseUrl() + "/api/user/history", body,
+                [](bool, const QJsonObject &) {}
+            );
+        }
     });
     m_contentStack->setCurrentIndex(0);
 }
