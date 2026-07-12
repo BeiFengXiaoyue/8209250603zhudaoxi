@@ -607,8 +607,8 @@ void StudentContentArea::loadTabData(int tabIndex)
             }
         }
         if (allLoaded) {
-            m_initialLoad = false;
             switchTab(0);
+            m_initialLoad = false;
         } else if (tabIndex == 0 && info.pageCount > 0) {
             // 独立重新加载「最近播放」→ 直接切到其第一页
             m_currentTab = 0;
