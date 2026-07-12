@@ -6,11 +6,14 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QTableWidget>
+#include <QScrollArea>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QGridLayout>
 
-/// 视频下载/结果页 — 搜索栏 + 表格列表（课程名/科目/功能/老师/时间/操作）
+class VideoCard;
+
+/// 视频搜索结果页 — 卡片网格展示
 class SearchResultPage : public QWidget
 {
     Q_OBJECT
@@ -25,12 +28,12 @@ signals:
 
 private:
     void setupUI();
-    void populateTable(const QJsonArray &data);
-    static QString formatFileSize(qint64 bytes);
+    void populateCards(const QJsonArray &data);
 
     QLineEdit   *m_searchEdit    = nullptr;
     QLabel      *m_countLabel    = nullptr;
-    QTableWidget *m_table        = nullptr;
+    QWidget     *m_cardGrid      = nullptr;
+    QGridLayout *m_gridLayout    = nullptr;
 };
 
 #endif // SEARCHRESULTPAGE_H

@@ -1,8 +1,9 @@
 #include "searchresultpage.h"
+#include "cards/videocard.h"
 #include "../common/network_handler.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QHeaderView>
+#include <QScrollArea>
 #include <QGraphicsDropShadowEffect>
 #include <QDesktopServices>
 #include <QUrl>
@@ -11,35 +12,19 @@
 #include <QIcon>
 
 // ============================================================
-// 样式常量（与 MaterialUploadPage 一致）
+// 样式常量
 // ============================================================
-static const char *kPrimaryBtn =
-    "QPushButton { background-color:#3B5998; color:#FFFFFF; border:none; "
-    "border-radius:6px; font-size:12px; font-weight:bold; padding:0 10px; "
-    "min-height:0; margin-bottom:0; }"
-    "QPushButton:hover { background-color:#4A6AB0; }"
-    "QPushButton:pressed { background-color:#2C4780; }";
-
-static const char *kGreenBtn =
-    "QPushButton { background-color:#4A7C59; color:#FFFFFF; border:none; "
-    "border-radius:6px; font-size:12px; font-weight:bold; padding:0 10px; "
-    "min-height:0; margin-bottom:0; }"
-    "QPushButton:hover { background-color:#5A9C69; }";
-
 static const char *kInputNormal =
     "QLineEdit { background-color:#F5F7FA; color:#2C3E50; "
     "border:1px solid #E0E4E8; border-radius:16px; padding:0 14px; font-size:13px; "
     "min-height:0; margin-bottom:0; }"
     "QLineEdit:focus { background-color:#FFFFFF; border-color:#3B5998; }";
 
-static void applyShadow(QWidget *w, int blur = 15, int alpha = 25)
-{
-    auto *s = new QGraphicsDropShadowEffect(w);
-    s->setBlurRadius(blur);
-    s->setColor(QColor(0, 0, 0, alpha));
-    s->setOffset(0, 2);
-    w->setGraphicsEffect(s);
-}
+static const char *kTopSearch =
+    "QLineEdit { background-color:#F5F7FA; color:#2C3E50; "
+    "border:1px solid #E0E4E8; border-radius:17px; padding:0 14px; font-size:13px; "
+    "min-height:0; margin-bottom:0; }"
+    "QLineEdit:focus { border-color:#3B5998; background-color:#FFFFFF; }";
 
 // ============================================================
 // SearchResultPage
@@ -58,7 +43,7 @@ void SearchResultPage::setupUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // ---- 顶栏：< 返回 + 搜索框（右上角） ----
+    // ---- 顶栏：< 返回 + 搜索框 ----
     auto *topBar = new QWidget();
     topBar->setFixedHeight(52);
     topBar->setStyleSheet(
@@ -81,17 +66,12 @@ void SearchResultPage::setupUI()
 
     topLayout->addStretch(1);
 
-    // 搜索框
     m_searchEdit = new QLineEdit();
-    m_searchEdit->setPlaceholderText("搜索视频...");
+    m_searchEdit->setPlaceholderText("搜索课程...");
     m_searchEdit->setFixedWidth(220);
     m_searchEdit->setFixedHeight(34);
     m_searchEdit->setClearButtonEnabled(true);
-    m_searchEdit->setStyleSheet(
-        "QLineEdit { background-color:#F5F7FA; color:#2C3E50; "
-        "border:1px solid #E0E4E8; border-radius:17px; padding:0 14px; font-size:13px; "
-        "min-height:0; margin-bottom:0; }"
-        "QLineEdit:focus { border-color:#3B5998; background-color:#FFFFFF; }");
+    m_searchEdit->setStyleSheet(kTopSearch);
     topLayout->addWidget(m_searchEdit);
 
     connect(m_searchEdit, &QLineEdit::returnPressed, this, [this]() {
@@ -100,64 +80,47 @@ void SearchResultPage::setupUI()
 
     mainLayout->addWidget(topBar);
 
-    // ---- 内容区（统计 + 表格）----
-    auto *contentWidget = new QWidget();
-    contentWidget->setStyleSheet("background-color:#F5F7FA;");
-    auto *contentLayout = new QVBoxLayout(contentWidget);
-    contentLayout->setContentsMargins(30, 16, 30, 20);
-    contentLayout->setSpacing(12);
-
-    // 统计行
+    // ---- 结果统计 ----
     m_countLabel = new QLabel("请输入关键词搜索视频");
-    m_countLabel->setStyleSheet("color:#7F8C8D; font-size:14px; background:transparent;");
-    contentLayout->addWidget(m_countLabel);
+    m_countLabel->setFixedHeight(40);
+    m_countLabel->setStyleSheet(
+        "QLabel { color:#8E99A4; font-size:13px; padding:0 24px; "
+        "background:transparent; border:none; }");
+    mainLayout->addWidget(m_countLabel);
 
-    // ---- 表格卡片 ----
-    auto *tableCard = new QWidget();
-    tableCard->setStyleSheet("QWidget { background-color:#FFFFFF; border-radius:16px; }");
-    applyShadow(tableCard);
+    // ---- 卡片网格（包裹在 QScrollArea 中） ----
+    auto *scrollArea = new QScrollArea();
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setStyleSheet(
+        "QScrollArea { background-color:#F5F7FA; border:none; }"
+        "QScrollBar:vertical { width:6px; background:transparent; }"
+        "QScrollBar::handle:vertical { background:#C0C8D0; border-radius:3px; }"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height:0; }");
 
-    auto *tcLayout = new QVBoxLayout(tableCard);
-    tcLayout->setContentsMargins(0, 0, 0, 0);
+    m_cardGrid = new QWidget();
+    m_cardGrid->setStyleSheet("background:transparent;");
+    m_gridLayout = new QGridLayout(m_cardGrid);
+    m_gridLayout->setContentsMargins(24, 16, 24, 24);
+    m_gridLayout->setSpacing(20);
+    m_gridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_table = new QTableWidget(0, 6);
-    m_table->setHorizontalHeaderLabels({"课程名", "科目", "功能", "上传老师", "上传时间", "操作"});
-    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_table->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_table->verticalHeader()->setVisible(false);
-    m_table->setShowGrid(false);
-    m_table->setAlternatingRowColors(true);
-    m_table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    m_table->horizontalHeader()->setHighlightSections(false);
-    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_table->setStyleSheet(
-        "QTableWidget { background-color:#FFFFFF; border:none; border-radius:12px; "
-        "font-size:13px; color:#2C3E50; }"
-        "QTableWidget::item { padding:6px 16px; border-bottom:1px solid #ECF0F1; }"
-        "QTableWidget::item:selected { background-color:#EBF0FA; color:#2C3E50; }"
-        "QHeaderView::section { background-color:#F5F7FA; color:#7F8C8D; "
-        "font-weight:bold; font-size:12px; border:none; text-align:left; "
-        "border-bottom:2px solid #ECF0F1; padding:8px 16px; }");
-    tcLayout->addWidget(m_table);
-
-    contentLayout->addWidget(tableCard, 1);
-
-    mainLayout->addWidget(contentWidget, 1);
-
-    // 连接
-    connect(m_searchEdit, &QLineEdit::returnPressed, this, [this]() {
-        search(m_searchEdit->text().trimmed(), {});
-    });
+    scrollArea->setWidget(m_cardGrid);
+    mainLayout->addWidget(scrollArea, 1);
 }
 
-// ============================================================
-// 搜索
-// ============================================================
 void SearchResultPage::search(const QString &keyword, const QStringList &tags)
 {
     m_searchEdit->setText(keyword);
     m_countLabel->setText("搜索中...");
+
+    // 清空旧卡片
+    QLayoutItem *item;
+    while ((item = m_gridLayout->takeAt(0)) != nullptr) {
+        if (item->widget()) item->widget()->deleteLater();
+        delete item;
+    }
 
     QString url = NetworkHandler::baseUrl() + "/api/courses?class=1";
     if (!keyword.isEmpty())
@@ -172,76 +135,47 @@ void SearchResultPage::search(const QString &keyword, const QStringList &tags)
         }
         QJsonArray data = json["data"].toArray();
         m_countLabel->setText(QString("共找到 %1 条结果").arg(data.size()));
-        populateTable(data);
+        populateCards(data);
     });
 }
 
-// ============================================================
-// 填充表格
-// ============================================================
-void SearchResultPage::populateTable(const QJsonArray &data)
+void SearchResultPage::populateCards(const QJsonArray &data)
 {
-    m_table->setRowCount(data.size());
+    int cols = qMax(1, (m_cardGrid->width() - 24) / 240);
+    if (cols < 1) cols = 1;
 
     for (int i = 0; i < data.size(); ++i) {
-        QJsonObject item = data[i].toObject();
-        int courseId = item["id"].toInt();
+        QJsonObject obj = data[i].toObject();
 
-        // 课程名
-        auto *nameItem = new QTableWidgetItem(item["course"].toString());
-        m_table->setItem(i, 0, nameItem);
+        auto *card = new VideoCard();
+        card->setData(
+            obj["id"].toInt(),
+            obj["course"].toString(),
+            obj["teacher"].toString(),
+            obj["time"].toString(),
+            obj["subject"].toString(),
+            obj["function"].toString(),
+            obj["description"].toString(),
+            ""  // thumbUrl — 后续接入服务端缩略图
+        );
 
-        // 科目
-        auto *subjItem = new QTableWidgetItem(item["subject"].toString());
-        m_table->setItem(i, 1, subjItem);
-
-        // 功能
-        auto *funcItem = new QTableWidgetItem(item["function"].toString());
-        m_table->setItem(i, 2, funcItem);
-
-        // 老师
-        auto *teacherItem = new QTableWidgetItem(item["teacher"].toString());
-        m_table->setItem(i, 3, teacherItem);
-
-        // 时间
-        auto *timeItem = new QTableWidgetItem(item["time"].toString());
-        m_table->setItem(i, 4, timeItem);
-
-        // 操作（播放 + 下载）
-        auto *actionWidget = new QWidget();
-        auto *actionLayout = new QHBoxLayout(actionWidget);
-        actionLayout->setContentsMargins(4, 0, 4, 0);
-        actionLayout->setSpacing(4);
-
-        auto *playBtn = new QPushButton("播放");
-        playBtn->setFixedHeight(26);
-        playBtn->setCursor(Qt::PointingHandCursor);
-        playBtn->setStyleSheet(kPrimaryBtn);
-        connect(playBtn, &QPushButton::clicked, this, [this, courseId]() {
+        connect(card, &VideoCard::playRequested, this, [this](int courseId) {
             emit playVideoRequested(courseId);
         });
-        actionLayout->addWidget(playBtn);
 
-        auto *dlBtn = new QPushButton("下载");
-        dlBtn->setFixedHeight(26);
-        dlBtn->setCursor(Qt::PointingHandCursor);
-        dlBtn->setStyleSheet(kGreenBtn);
-        dlBtn->setStyleSheet(kGreenBtn);
-        connect(dlBtn, &QPushButton::clicked, this, [courseId]() {
-            QString url = NetworkHandler::baseUrl()
-                + "/api/courses/" + QString::number(courseId) + "/download";
-            QDesktopServices::openUrl(QUrl(url));
-        });
-        actionLayout->addWidget(dlBtn);
-
-        m_table->setCellWidget(i, 5, actionWidget);
-        m_table->setRowHeight(i, 42);
+        int row = i / cols;
+        int col = i % cols;
+        m_gridLayout->addWidget(card, row, col);
     }
-}
 
-QString SearchResultPage::formatFileSize(qint64 bytes)
-{
-    if (bytes < 1024) return QString::number(bytes) + " B";
-    if (bytes < 1024 * 1024) return QString::number(bytes / 1024.0, 'f', 1) + " KB";
-    return QString::number(bytes / (1024.0 * 1024.0), 'f', 1) + " MB";
+    // 填充空白占位
+    int remainder = data.size() % cols;
+    if (remainder > 0) {
+        for (int i = remainder; i < cols; ++i) {
+            auto *spacer = new QWidget();
+            spacer->setFixedWidth(220);
+            spacer->setStyleSheet("background:transparent;");
+            m_gridLayout->addWidget(spacer, data.size() / cols, i);
+        }
+    }
 }

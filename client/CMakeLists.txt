@@ -54,6 +54,8 @@ file(GLOB_RECURSE PROJECT_SOURCES
 list(FILTER PROJECT_SOURCES EXCLUDE REGEX "${CMAKE_BINARY_DIR}/.*")
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} resources.qrc)
+# 手动添加 Q_OBJECT 头文件确保 MOC 处理子目录中的头文件
+set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/video/cards/videocard.h APPEND PROPERTY SKIP_AUTOMOC OFF)
 set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 
 # 如果存在 QSS 文件则复制到构建输出目录
