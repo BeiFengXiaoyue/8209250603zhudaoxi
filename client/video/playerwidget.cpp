@@ -337,7 +337,9 @@ void VideoCanvas::setupUI()
     // 进度条
     m_progressSlider = new QSlider(Qt::Horizontal);
     m_progressSlider->setFixedHeight(4);
-    m_progressSlider->setRange(0, 100);
+    m_progressSlider->setRange(0, 10000);
+    m_progressSlider->setSingleStep(1);
+    m_progressSlider->setPageStep(1);
     m_progressSlider->setValue(0);
     m_progressSlider->setStyleSheet(R"(
         QSlider { background: transparent; }
@@ -347,19 +349,16 @@ void VideoCanvas::setupUI()
     )");
     connect(m_progressSlider, &QSlider::sliderMoved, this, [this](int pos) {
         if (m_mediaPlayer->duration() > 0)
-            m_mediaPlayer->setPosition(pos * m_mediaPlayer->duration() / 100);
+            m_mediaPlayer->setPosition(pos * m_mediaPlayer->duration() / 10000);
+        else
+            m_progressSlider->setValue(pos);
     });
-    // 媒体未加载时禁用进度条
-    connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, [this](qint64 dur) {
-        m_progressSlider->setEnabled(dur > 0);
-    });
-    m_progressSlider->setEnabled(false);
     ctrlLayout->addWidget(m_progressSlider, 1);
 
     // 进度时间同步
     connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, [this](qint64 pos) {
         if (m_mediaPlayer->duration() == 0) return;
-        int pct = static_cast<int>(pos * 100 / m_mediaPlayer->duration());
+        int pct = static_cast<int>(pos * 10000 / m_mediaPlayer->duration());
         m_progressSlider->setValue(pct);
         // 更新时间显示
         auto fmt = [](qint64 ms) {
