@@ -346,9 +346,14 @@ void VideoCanvas::setupUI()
         QSlider::sub-page:horizontal { background: #3B5998; border-radius: 2px; }
     )");
     connect(m_progressSlider, &QSlider::sliderMoved, this, [this](int pos) {
-        if (m_mediaPlayer->duration() > 0 && m_mediaPlayer->mediaStatus() >= QMediaPlayer::LoadedMedia)
+        if (m_mediaPlayer->duration() > 0)
             m_mediaPlayer->setPosition(pos * m_mediaPlayer->duration() / 100);
     });
+    // 媒体未加载时禁用进度条
+    connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, [this](qint64 dur) {
+        m_progressSlider->setEnabled(dur > 0);
+    });
+    m_progressSlider->setEnabled(false);
     ctrlLayout->addWidget(m_progressSlider, 1);
 
     // 进度时间同步
