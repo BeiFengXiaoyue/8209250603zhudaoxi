@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QGraphicsDropShadowEffect>
 #include <QPainter>
+#include <QPainterPath>
 #include <QNetworkReply>
 #include <QDesktopServices>
 #include <QUrl>
@@ -17,15 +18,69 @@ VideoCard::VideoCard(QWidget *parent)
 void VideoCard::setupUI()
 {
     setObjectName("videoCard");
-    setFixedSize(220, 280);
+    setFixedSize(220, 260);
     setCursor(Qt::PointingHandCursor);
 
-    // 加载 QSS
-    QFile qssFile(":/styles/videocard.qss");
-    if (qssFile.open(QIODevice::ReadOnly)) {
-        setStyleSheet(qssFile.readAll());
-        qssFile.close();
-    }
+    // 卡片自身样式（不用 :hover 伪类，避免 Qt 样式表解析失败）
+    setStyleSheet(R"(
+        VideoCard {
+            background-color: #FFFFFF;
+            border-radius: 20px;
+        }
+        VideoCard #thumbLabel {
+            background-color: #2C3E50;
+            border-radius: 20px 20px 0 0;
+        }
+        VideoCard #titleLabel {
+            color: #2C3E50;
+            font-size: 14px;
+            font-weight: bold;
+            background: transparent;
+            border: none;
+        }
+        VideoCard #metaLabel {
+            color: #8E99A4;
+            font-size: 11px;
+            background: transparent;
+            border: none;
+        }
+        VideoCard QLabel#subjectTag {
+            background-color: #5B8FF9;
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 0 8px;
+        }
+        VideoCard QLabel#funcTag {
+            background-color: #F5A623;
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 0 8px;
+        }
+        VideoCard QPushButton#playBtn {
+            background-color: #3B5998;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 12px;
+            min-height: 28px;
+        }
+        VideoCard QPushButton#downloadBtn {
+            background-color: #4A7C59;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 0 12px;
+            min-height: 28px;
+        }
+    )");
 
     // 阴影
     auto *shadow = new QGraphicsDropShadowEffect(this);
@@ -160,7 +215,19 @@ void VideoCard::setThumbnail(const QPixmap &pixmap)
     int x = (scaled.width() - 220) / 2;
     int y = (scaled.height() - 130) / 2;
     QPixmap cropped = scaled.copy(qMax(0, x), qMax(0, y), 220, 130);
-    m_thumbLabel->setPixmap(cropped);
+
+    // 圆角裁剪
+    QPixmap rounded(cropped.size());
+    rounded.fill(Qt::transparent);
+    QPainter p(&rounded);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addRoundedRect(rounded.rect(), 20, 20);
+    p.setClipPath(path);
+    p.drawPixmap(0, 0, cropped);
+    p.end();
+
+    m_thumbLabel->setPixmap(rounded);
     m_thumbLabel->setScaledContents(false);
     m_thumbLabel->setAlignment(Qt::AlignCenter);
 }
@@ -168,10 +235,16 @@ void VideoCard::setThumbnail(const QPixmap &pixmap)
 void VideoCard::setThumbnailPlaceholder()
 {
     QPixmap placeholder(220, 130);
-    placeholder.fill(QColor("#2C3E50"));
+    placeholder.fill(Qt::transparent);
     QPainter p(&placeholder);
     p.setRenderHint(QPainter::Antialiasing);
 
+    // 圆角底色
+    QPainterPath path;
+    path.addRoundedRect(0, 0, 220, 130, 20, 20);
+    p.fillPath(path, QColor("#2C3E50"));
+
+    // 居中播放三角形
     p.setPen(Qt::NoPen);
     p.setBrush(QColor(255, 255, 255, 60));
     p.drawEllipse(QPoint(110, 65), 24, 24);
