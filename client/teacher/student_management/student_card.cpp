@@ -199,12 +199,8 @@ void StudentCard::mousePressEvent(QMouseEvent *event)
             msgBox.button(QMessageBox::Yes)->setText("确认删除");
             msgBox.button(QMessageBox::No)->setText("取消");
             msgBox.setStyleSheet(R"(
-                QMessageBox {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    font-size: 13px;
-                }
-                QMessageBox QLabel { color: #2C3E50; }
+                QMessageBox { background-color: #FFFFFF; }
+                QMessageBox QLabel { color: #2C3E50; background: transparent; }
                 QMessageBox QPushButton {
                     color: #444444;
                     background-color: #F5F7FA;
@@ -233,12 +229,8 @@ void StudentCard::mousePressEvent(QMouseEvent *event)
             msgBox.button(QMessageBox::Yes)->setText("确认重置");
             msgBox.button(QMessageBox::No)->setText("取消");
             msgBox.setStyleSheet(R"(
-                QMessageBox {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    font-size: 13px;
-                }
-                QMessageBox QLabel { color: #2C3E50; }
+                QMessageBox { background-color: #FFFFFF; }
+                QMessageBox QLabel { color: #2C3E50; background: transparent; }
                 QMessageBox QPushButton {
                     color: #444444;
                     background-color: #F5F7FA;
