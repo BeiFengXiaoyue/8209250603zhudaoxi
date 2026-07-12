@@ -1,5 +1,6 @@
 #include "contentarea.h"
 #include "../../common/network_handler.h"
+#include "../../video/cards/videocard.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
@@ -410,6 +411,8 @@ void StudentContentArea::loadTabData(int tabIndex)
                         info.courseIds.append(item["video_id"].toInt());
                         info.teachers.append(item["teacher"].toString());
                         info.times.append(item["view_time"].toString().left(10));
+                        info.subjects.append(item["subject"].toString());
+                        info.functions.append(item["function"].toString());
                         break;
                     case 1: // 最近下载 - download_history
                         titles.append(item["file_name"].toString());
@@ -537,6 +540,44 @@ void StudentContentArea::loadTabData(int tabIndex)
                 pLayout->setContentsMargins(0, 0, 0, 0);
                 pLayout->addWidget(scrollArea);
                 m_stack->addWidget(page);
+            } else if (tabIndex == 0) {
+                // 「最近播放」测试 VideoCard
+                for (int p = 0; p < pages; ++p) {
+                    int start = p * 6;
+                    int count = qMin(6, totalItems - start);
+                    auto *page = new QWidget();
+                    page->setStyleSheet("background:#F5F7FA;");
+                    auto *scroll = new QScrollArea(page);
+                    scroll->setWidgetResizable(true);
+                    scroll->setFrameShape(QFrame::NoFrame);
+                    auto *sc = new QWidget();
+                    auto *grid = new QGridLayout(sc);
+                    grid->setSpacing(20);
+                    for (int i = 0; i < count; ++i) {
+                        int idx = start + i;
+                        // 安全检查：防止数组越界
+                        int cid = (idx < info.courseIds.size()) ? info.courseIds[idx] : 0;
+                        QString t = (idx < info.titles.size()) ? info.titles[idx] : "";
+                        QString te = (idx < info.teachers.size()) ? info.teachers[idx] : "";
+                        QString ti = (idx < info.times.size()) ? info.times[idx] : "";
+                        if (cid <= 0) continue;
+                        auto *card = new VideoCard();
+                        grid->addWidget(card, i / 3, i % 3);
+                        card->setData(cid, t, te, ti,
+                            (idx < info.subjects.size()) ? info.subjects[idx] : "",
+                            (idx < info.functions.size()) ? info.functions[idx] : "",
+                            "",
+                            NetworkHandler::baseUrl() + "/api/courses/"
+                                + QString::number(cid) + "/thumbnail");
+                        connect(card, &VideoCard::playRequested, this, [this](int cid) {
+                            emit playVideoRequested(cid);
+                        });
+                    }
+                    scroll->setWidget(sc);
+                    page->setLayout(new QVBoxLayout);
+                    page->layout()->addWidget(scroll);
+                    m_stack->addWidget(page);
+                }
             } else {
                 // 按页添加到 stack
                 for (int p = 0; p < pages; ++p) {
