@@ -161,9 +161,10 @@ void VideoCard::setupUI()
     m_metaLabel->setObjectName("metaLabel");
     cl->addWidget(m_metaLabel);
 
-    // 标签行
-    m_tagContainer = new QWidget();
-    m_tagContainer->setObjectName("tagContainer");
+	    // 标签行（固定高度，无标签时留空使按钮对齐）
+	    m_tagContainer = new QWidget();
+	    m_tagContainer->setObjectName("tagContainer");
+	    m_tagContainer->setFixedHeight(tagH);
     auto *tagLayout = new QHBoxLayout(m_tagContainer);
     tagLayout->setContentsMargins(0, 0, 0, 0);
     tagLayout->setSpacing(sp);
