@@ -20,6 +20,7 @@ public:
     void setSidebarActive(int index);
     void setUserData(const QString &username, int classId);
     void playCourse(int courseId);
+    void pauseVideo();
 
 signals:
     void navigateToHome();

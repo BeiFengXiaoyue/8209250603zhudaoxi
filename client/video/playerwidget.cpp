@@ -230,8 +230,6 @@ void VideoCanvas::setFile(const QString &filePath)
         m_mediaPlayer->setSource(QUrl(filePath));
     else
         m_mediaPlayer->setSource(QUrl::fromLocalFile(filePath));
-    m_playBtn->setText("⏸");
-    m_isPlaying = true;
     m_mediaPlayer->play();
 }
 
@@ -312,16 +310,22 @@ void VideoCanvas::setupUI()
         "border: none; border-radius: 4px; font-size: 13px; padding: 0 8px; }"
         "QPushButton:hover { background-color: #4A6AB0; }"
     );
+    // 根据播放器实际状态同步按钮图标（适配外部 pauseVideo 调用）
+    connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, [this](QMediaPlayer::PlaybackState state) {
+        if (state == QMediaPlayer::PlayingState) {
+            m_playBtn->setText("⏸");
+            m_isPlaying = true;
+        } else {
+            m_playBtn->setText("▶");
+            m_isPlaying = false;
+        }
+    });
     connect(m_playBtn, &QPushButton::clicked, this, [this]() {
         if (!m_mediaPlayer->source().isValid()) return;
-        if (m_isPlaying) {
+        if (m_mediaPlayer->playbackState() == QMediaPlayer::PlayingState)
             m_mediaPlayer->pause();
-            m_playBtn->setText("▶");
-        } else {
+        else
             m_mediaPlayer->play();
-            m_playBtn->setText("⏸");
-        }
-        m_isPlaying = !m_isPlaying;
     });
     ctrlLayout->addWidget(m_playBtn);
 

@@ -59,15 +59,18 @@ VideoMainWindow* StudentMainWindow::ensureVideoWindow()
         m_videoWindow->setUserData(m_username, m_classId);
         m_stack->addWidget(m_videoWindow);
         connect(m_videoWindow, &VideoMainWindow::navigateToHome, this, [this]() {
+            m_videoWindow->pauseVideo();
             m_sidebar->setActiveItem(0);
             m_stack->setCurrentIndex(0);
         });
         connect(m_videoWindow, &VideoMainWindow::navigateToForum, this, [this]() {
+            m_videoWindow->pauseVideo();
             m_sidebar->setActiveItem(2);
             // 触发论坛导航
             navigateToForum();
         });
         connect(m_videoWindow, &VideoMainWindow::navigateToMaterials, this, [this]() {
+            m_videoWindow->pauseVideo();
             m_sidebar->setActiveItem(3);
             navigateToMaterials();
         });
@@ -188,8 +191,9 @@ QWidget* StudentMainWindow::createHomePage()
 
     // Sidebar 导航：首页(0) | 视频区(1) | 论坛(2) | 资料上传(3)
     connect(m_sidebar, &StudentSidebar::itemClicked, this, [this](int index, const QString &) {
-        // 如果当前在视频区，点击任何 sidebar 项都先切回主页
+        // 如果当前在视频区，点击任何 sidebar 项都先暂停视频再切走
         if (m_videoWindow && m_stack->currentWidget() == m_videoWindow) {
+            m_videoWindow->pauseVideo();
             m_stack->setCurrentIndex(0);
             m_sidebar->setActiveItem(index);
             // 如果是视频区本身，停在主页即可

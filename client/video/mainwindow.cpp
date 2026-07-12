@@ -12,6 +12,7 @@
 #include <QScrollArea>
 #include <QLineEdit>
 #include <QFrame>
+#include <QMediaPlayer>
 
 VideoMainWindow::VideoMainWindow(QWidget *parent)
     : QWidget(parent)
@@ -198,4 +199,10 @@ void VideoMainWindow::playCourse(int courseId)
         m_player->setVideoFile(fileUrl);
     });
     m_contentStack->setCurrentIndex(0);
+}
+
+void VideoMainWindow::pauseVideo()
+{
+    if (m_player && m_player->canvas() && m_player->canvas()->mediaPlayer())
+        m_player->canvas()->mediaPlayer()->pause();
 }
