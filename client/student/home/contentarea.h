@@ -85,6 +85,7 @@ private:
 
     // 数据加载标志
     bool m_dataLoaded = false;
+    bool m_initialLoad = true;
     int m_reloadingTab = -1;  // 正在独立重新加载的 tab，-1 表示无
 };
 

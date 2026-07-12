@@ -607,6 +607,7 @@ void StudentContentArea::loadTabData(int tabIndex)
             }
         }
         if (allLoaded) {
+            m_initialLoad = false;
             switchTab(0);
         } else if (tabIndex == 0 && info.pageCount > 0) {
             // 独立重新加载「最近播放」→ 直接切到其第一页
@@ -798,19 +799,14 @@ void StudentContentArea::switchTab(int index)
     if (index >= m_tabInfos.size())
         return;
 
-    // 点击「最近播放」时重新加载数据（即时效果）
-    // 仅当由用户点击触发（非程序自动切换）时重新加载
-    if (index == 0 && m_dataLoaded && m_reloadingTab < 0) {
-        // 检查是否真的是用户点击（sender 是 tab button）
-        auto *btn = qobject_cast<QPushButton*>(sender());
-        if (btn) {
-            m_reloadingTab = 0;
-            loadTabData(0);
-            return;
-        }
+    // 点击「最近播放」且已有数据时重新加载（即时效果）
+    if (index == 0 && !m_initialLoad && m_tabInfos[0].pageCount > 0) {
+        m_reloadingTab = 0;
+        loadTabData(0);
+        return;
     }
 
-    if (index == m_currentTab && m_dataLoaded)
+    if (index == m_currentTab && !m_initialLoad)
         return;
 
     // 更新按钮样式
