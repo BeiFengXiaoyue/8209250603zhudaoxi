@@ -467,18 +467,20 @@ QWidget* CourseUploadWidget::createUploadPage()
     m_courseTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     m_courseTable->setColumnWidth(4, 60);
     m_courseTable->setAlternatingRowColors(true);
-    m_courseTable->setStyleSheet(R"(
-        QTableWidget {
-            border: none;
-            border-radius: 15px;
-            background-color: #FFFFFF;
-            alternate-background-color: #F8F9FA;
-            font-size: 13px;
-        }
-        QTableWidget::item {
-            padding: 8px 12px;
-            border-bottom: 1px solid #F0F0F0;
-        }
+	    m_courseTable->setStyleSheet(R"(
+	        QTableWidget {
+	            border: none;
+	            border-radius: 15px;
+	            background-color: #FFFFFF;
+	            alternate-background-color: #F8F9FA;
+	            font-size: 13px;
+	            selection-color: #1D1D1F;
+	            selection-background-color: #E8F0FE;
+	        }
+	        QTableWidget::item {
+	            padding: 8px 12px;
+	            border-bottom: 1px solid #F0F0F0;
+	        }
         QHeaderView::section {
             background-color: #F5F7FA;
             color: #888888;
