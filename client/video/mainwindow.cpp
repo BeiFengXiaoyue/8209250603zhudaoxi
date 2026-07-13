@@ -106,9 +106,6 @@ void VideoMainWindow::setupUI()
         m_topBar->setSearchVisible(index == 0);
     });
 
-    connect(m_topBar->debugBtn(), &QPushButton::clicked, this, [this]() {
-        m_contentStack->setCurrentIndex(0);
-    });
 
     connect(m_searchPage, &SearchPage::backClicked, this, [this]() {
         m_contentStack->setCurrentIndex(0);

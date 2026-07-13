@@ -32,29 +32,6 @@ void VideoTopBar::setupUI()
     mainLayout->setContentsMargins(16, 0, 24, 0);
     mainLayout->setSpacing(0);
 
-    // Debug 按钮
-    m_debugBtn = new QPushButton("🐛 Debug");
-    m_debugBtn->setCursor(Qt::PointingHandCursor);
-    m_debugBtn->setFixedSize(90, 30);
-    m_debugBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #F0F4F8;
-            color: #5A6A7A;
-            border: 1px solid #D0D8E0;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 0 12px;
-        }
-        QPushButton:hover {
-            background-color: #E4E8EE;
-            color: #3B5998;
-            border-color: #3B5998;
-        }
-    )");
-    mainLayout->addWidget(m_debugBtn);
-    mainLayout->addSpacing(12);
-
     // 品牌名
     auto *brandLabel = new QLabel("VideoPlayer");
     brandLabel->setStyleSheet(R"(
