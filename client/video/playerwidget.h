@@ -46,10 +46,10 @@ public:
     void setAnimationsPaused(bool paused);
     void loadDanmaku(int videoId);
     void startPolling();
+    void clearActive();
 
 private:
     void spawnLabel(const QString &text);
-    void clearActive();
     void reposition();
 
     QList<DanmakuItem> m_items;
