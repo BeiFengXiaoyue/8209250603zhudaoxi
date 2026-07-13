@@ -998,17 +998,12 @@ void PlayerWidget::setupUI()
         m_danmakuOverlay->addItem(id, pt, text);
     });
 
-    // 弹幕开关 → 控制叠加层显示/隐藏
+    // 弹幕开关 → 仅切换可见性（弹幕在后台保持运动）
     connect(m_danmakuBar->checkbox(), &QCheckBox::toggled, this, [this](bool checked) {
-        if (checked) {
+        if (checked)
             m_danmakuOverlay->show();
-            m_danmakuOverlay->setAnimationsPaused(false);
-            m_danmakuOverlay->startPolling();
-        } else {
-            m_danmakuOverlay->clearActive();
+        else
             m_danmakuOverlay->hide();
-            m_danmakuOverlay->setAnimationsPaused(true);
-        }
     });
 
     // 弹幕历史面板（初始隐藏）
