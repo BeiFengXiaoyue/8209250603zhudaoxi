@@ -606,7 +606,7 @@ void CourseUploadWidget::onUpload()
             auto *dialog = new QDialog(this);
             dialog->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             dialog->setFixedSize(300, 220);
-            dialog->setStyleSheet("QDialog { background-color: #FFFFFF; border-radius: 20px; }");
+            dialog->setStyleSheet("QDialog { background-color: #FFFFFF; }");
 
             auto *dlgLayout = new QVBoxLayout(dialog);
             dlgLayout->setContentsMargins(30, 30, 30, 30);

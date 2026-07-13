@@ -842,7 +842,7 @@ void MaterialWidget::onUpload()
         auto *dlg = new QDialog(this);
         dlg->setWindowTitle("上传成功");
         dlg->setFixedSize(400, 220);
-        dlg->setStyleSheet("QDialog { background-color:#FFFFFF; border-radius:16px; }");
+        dlg->setStyleSheet("QDialog { background-color:#FFFFFF; }");
         dlg->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
 
         auto *shadow = new QGraphicsDropShadowEffect(dlg);
