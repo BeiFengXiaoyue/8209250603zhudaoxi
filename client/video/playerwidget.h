@@ -47,11 +47,13 @@ public:
     void loadDanmaku(int videoId);
     void startPolling();
     void clearActive();
+    void setUserHidden(bool hidden) { m_userHidden = hidden; }
 
 private:
     void spawnLabel(const QString &text);
     void reposition();
 
+    bool m_userHidden = false;
     QList<DanmakuItem> m_items;
     int m_videoId = 0;
     int m_lastPollId = 0;

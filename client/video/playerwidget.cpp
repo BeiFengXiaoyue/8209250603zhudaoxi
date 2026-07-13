@@ -45,7 +45,7 @@ bool DanmakuOverlay::eventFilter(QObject *obj, QEvent *event)
     if (obj == parent()) {
         if (event->type() == QEvent::WindowDeactivate)
             hide();
-        else if (event->type() == QEvent::WindowActivate && m_videoWidget && m_videoWidget->isVisible())
+        else if (event->type() == QEvent::WindowActivate && m_videoWidget && m_videoWidget->isVisible() && !m_userHidden)
             show();
     }
     return QWidget::eventFilter(obj, event);
@@ -60,7 +60,7 @@ void DanmakuOverlay::reposition()
     QPoint globalPos = m_videoWidget->mapToGlobal(QPoint(0, 0));
     QSize sz = m_videoWidget->size();
     setGeometry(globalPos.x(), globalPos.y(), sz.width(), sz.height());
-    if (!isVisible()) show();
+    if (!isVisible() && !m_userHidden) show();
 }
 
 void DanmakuOverlay::loadDanmaku(int videoId)
@@ -1000,6 +1000,7 @@ void PlayerWidget::setupUI()
 
     // 弹幕开关 → 仅切换可见性（弹幕在后台保持运动）
     connect(m_danmakuBar->checkbox(), &QCheckBox::toggled, this, [this](bool checked) {
+        m_danmakuOverlay->setUserHidden(!checked);
         if (checked)
             m_danmakuOverlay->show();
         else
