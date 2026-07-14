@@ -4,6 +4,7 @@
 client/build/
 client_build/
 build/
+bin/
 *.exe
 *.obj
 *.o
@@ -48,6 +49,7 @@ server/uploads/courses/*.mp4
 server/uploads/courses/*.avi
 server/uploads/courses/*.mov
 server/uploads/courses/*.mkv
+server/uploads/thumbs/
 
 # ============================
 # 虚拟环境

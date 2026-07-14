@@ -144,7 +144,7 @@ def init_db():
     conn.execute("CREATE INDEX IF NOT EXISTS idx_fav_user ON favorites(username, class)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_fav_item ON favorites(item_type, item_id)")
 
-    # 点赞记录表
+    # 数据库（I）——点赞记录表
     conn.execute(
         """CREATE TABLE IF NOT EXISTS question_likes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
