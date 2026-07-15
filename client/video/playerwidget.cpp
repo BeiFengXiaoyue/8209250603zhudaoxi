@@ -416,6 +416,13 @@ void VideoCanvas::setupUI()
         "QPushButton:hover { background-color: rgba(255,255,255,0.15); }"
     );
     ctrlLayout->addWidget(m_fullscreenBtn);
+    connect(m_fullscreenBtn, &QPushButton::clicked, this, [this]() {
+        auto *w = window();
+        if (w->isFullScreen())
+            w->showNormal();
+        else
+            w->showFullScreen();
+    });
     ctrlLayout->addSpacing(4);
 }
 
