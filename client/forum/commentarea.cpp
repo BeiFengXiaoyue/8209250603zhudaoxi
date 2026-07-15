@@ -653,7 +653,7 @@ void CommentArea::setupHeader()
     connect(m_hotTag, &QPushButton::clicked, this, [this]() {
         if (!m_isHotSort) {
             m_isHotSort = true;
-            sortByHot();
+            loadQuestions();
             m_hotTag->setStyleSheet(R"(
                 QPushButton {
                     background-color: transparent;
@@ -711,7 +711,7 @@ void CommentArea::setupHeader()
     connect(m_newTag, &QPushButton::clicked, this, [this]() {
         if (m_isHotSort) {
             m_isHotSort = false;
-            sortByNew();
+            loadQuestions();
             m_newTag->setStyleSheet(R"(
                 QPushButton {
                     background-color: transparent;
@@ -947,27 +947,6 @@ void CommentArea::submitContent()
             loadQuestions();
         }
     );
-}
-
-// ============================================================
-// 排序
-// ============================================================
-void CommentArea::sortByHot()
-{
-    std::sort(m_allComments.begin(), m_allComments.end(),
-              [](const CommentData &a, const CommentData &b) {
-                  return a.likeCount > b.likeCount;
-              });
-    rebuildCommentList();
-}
-
-void CommentArea::sortByNew()
-{
-    std::sort(m_allComments.begin(), m_allComments.end(),
-              [](const CommentData &a, const CommentData &b) {
-                  return a.sortWeight > b.sortWeight;
-              });
-    rebuildCommentList();
 }
 
 // ============================================================
