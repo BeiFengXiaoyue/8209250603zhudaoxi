@@ -653,7 +653,7 @@ void CommentArea::setupHeader()
     connect(m_hotTag, &QPushButton::clicked, this, [this]() {
         if (!m_isHotSort) {
             m_isHotSort = true;
-            loadQuestions();
+            sortByHot();
             m_hotTag->setStyleSheet(R"(
                 QPushButton {
                     background-color: transparent;
@@ -711,7 +711,7 @@ void CommentArea::setupHeader()
     connect(m_newTag, &QPushButton::clicked, this, [this]() {
         if (m_isHotSort) {
             m_isHotSort = false;
-            loadQuestions();
+            sortByNew();
             m_newTag->setStyleSheet(R"(
                 QPushButton {
                     background-color: transparent;
@@ -947,6 +947,21 @@ void CommentArea::submitContent()
             loadQuestions();
         }
     );
+}
+
+// ============================================================
+// 排序 — 重新从服务端拉取（按指定排序方式）
+// ============================================================
+void CommentArea::sortByHot()
+{
+    m_isHotSort = true;
+    loadQuestions();   // 重新请求 sort=hot
+}
+
+void CommentArea::sortByNew()
+{
+    m_isHotSort = false;
+    loadQuestions();   // 重新请求 sort=new
 }
 
 // ============================================================

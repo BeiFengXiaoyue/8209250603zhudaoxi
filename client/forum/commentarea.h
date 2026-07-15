@@ -128,6 +128,8 @@ private:
     void setupInputArea();
     void loadQuestions();
     void rebuildCommentList();
+    void sortByHot();
+    void sortByNew();
     void submitContent();
     bool eventFilter(QObject *obj, QEvent *event) override;
 
