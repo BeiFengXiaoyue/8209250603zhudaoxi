@@ -950,24 +950,18 @@ void CommentArea::submitContent()
 }
 
 // ============================================================
-// 排序
+// 排序 — 重新从服务端拉取（按指定排序方式）
 // ============================================================
 void CommentArea::sortByHot()
 {
-    std::sort(m_allComments.begin(), m_allComments.end(),
-              [](const CommentData &a, const CommentData &b) {
-                  return a.likeCount > b.likeCount;
-              });
-    rebuildCommentList();
+    m_isHotSort = true;
+    loadQuestions();   // 重新请求 sort=hot
 }
 
 void CommentArea::sortByNew()
 {
-    std::sort(m_allComments.begin(), m_allComments.end(),
-              [](const CommentData &a, const CommentData &b) {
-                  return a.sortWeight > b.sortWeight;
-              });
-    rebuildCommentList();
+    m_isHotSort = false;
+    loadQuestions();   // 重新请求 sort=new
 }
 
 // ============================================================

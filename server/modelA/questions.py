@@ -134,7 +134,7 @@ def publish_question():
     ).fetchone()[0]
     new_post_id = (max_post or 0) + 1
 
-    now = time.strftime("%Y/%m/%d")
+    now = time.strftime("%Y/%m/%d %H:%M")
     conn.execute(
         """INSERT INTO questions (uploader, post_id, parent_id, class, time, course, content)
            VALUES (?, ?, ?, ?, ?, ?, ?)""",

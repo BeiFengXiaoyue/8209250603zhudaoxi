@@ -13,6 +13,7 @@
 #include <QLineEdit>
 #include <QFrame>
 #include <QMediaPlayer>
+#include <QEvent>
 
 VideoMainWindow::VideoMainWindow(QWidget *parent)
     : QWidget(parent)
@@ -96,6 +97,18 @@ void VideoMainWindow::setupUI()
     });
     connect(m_searchResultPage, &SearchResultPage::playVideoRequested, this, [this](int courseId) {
         playCourse(courseId);
+    });
+
+    // 全屏切换
+    connect(m_player, &PlayerWidget::toggleFullscreen, this, [this]() {
+        m_isFullscreen = !m_isFullscreen;
+        m_sidebar->setVisible(!m_isFullscreen);
+        m_topBar->setVisible(!m_isFullscreen);
+        m_player->setFullscreenUI(m_isFullscreen);
+        if (m_isFullscreen)
+            window()->showFullScreen();
+        else
+            window()->showNormal();
     });
 
     // 默认显示搜索页
@@ -201,4 +214,17 @@ void VideoMainWindow::pauseVideo()
 {
     if (m_player && m_player->canvas() && m_player->canvas()->mediaPlayer())
         m_player->canvas()->mediaPlayer()->pause();
+}
+
+void VideoMainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::WindowStateChange) {
+        if (!window()->isFullScreen() && m_isFullscreen) {
+            m_isFullscreen = false;
+            m_sidebar->setVisible(true);
+            m_topBar->setVisible(true);
+            m_player->setFullscreenUI(false);
+        }
+    }
+    QWidget::changeEvent(event);
 }

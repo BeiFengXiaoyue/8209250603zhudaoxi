@@ -261,9 +261,15 @@ public:
                     const QString &subject, const QString &func);
     void setVideoFile(const QString &filePath);
     void setUserData(const QString &username, int classId);
+    void setFullscreenUI(bool fullscreen);
     bool eventFilter(QObject *obj, QEvent *event) override;
 
     VideoCanvas*        canvas()      const { return m_canvas; }
+
+signals:
+    void toggleFullscreen();
+
+public:
     DanmakuInputBar*    danmakuBar()  const { return m_danmakuBar; }
     VideoInfoPanel*     infoPanel()   const { return m_infoPanel; }
     DanmakuHistoryPanel* historyPanel() const { return m_historyPanel; }

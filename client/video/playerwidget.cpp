@@ -1007,6 +1007,11 @@ void PlayerWidget::setupUI()
             m_danmakuOverlay->hide();
     });
 
+    // 全屏按钮 → 发射信号由 VideoMainWindow 处理
+    connect(m_canvas->fullscreenBtn(), &QPushButton::clicked, this, [this]() {
+        emit toggleFullscreen();
+    });
+
     // 弹幕历史面板（初始隐藏）
     m_historyPanel = new DanmakuHistoryPanel(this);
     m_historyPanel->hide();
@@ -1120,4 +1125,9 @@ void PlayerWidget::setUserData(const QString &username, int classId)
     m_classId = classId;
     if (m_danmakuBar)
         m_danmakuBar->setUserData(username, classId);
+}
+
+void PlayerWidget::setFullscreenUI(bool fullscreen)
+{
+    m_infoPanel->setVisible(!fullscreen);
 }

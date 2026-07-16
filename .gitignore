@@ -10,33 +10,44 @@ bin/
 *.o
 *.a
 *.lib
+*.dll
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
 CMakeFiles/
+CMakeCache.txt
 cmake_install.cmake
 Makefile
+CMakeUserPresets.json
 compile_commands.json
 MyQtApp_autogen/
+
+# ============================
+# Qt 特定
+# ============================
+*.qm
+*.moc
 
 # ============================
 # Python
 # ============================
 __pycache__/
+*/__pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.egg-info/
 dist/
-build/
 
 # ============================
-# 数据库
+# 数据库（本地数据，不提交）
 # ============================
-server/database/*.db
-server/database/*.db-journal
-server/database/*.db-wal
-server/database/*.db-shm
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
 
 # ============================
 # 上传文件
@@ -59,19 +70,25 @@ venv/
 env/
 
 # ============================
-# IDE / 编辑器
+# IDE / 编辑器 / 工具缓存
 # ============================
 .vscode/
 .idea/
+.cache/
 *.swp
 *.swo
 *~
+*.user
+*.suo
 .DS_Store
 Thumbs.db
 
 # ============================
-# 辅助/临时脚本
+# 临时文件
 # ============================
+*.bkp
+.zcode/
+*.log
 _*.py
 _*.vbs
 _test.txt
@@ -82,9 +99,3 @@ spec.doc
 # 远程仓库克隆
 # ============================
 repo_remote/
-
-# ============================
-# 其他
-# ============================
-.zcode/
-*.log

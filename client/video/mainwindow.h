@@ -28,6 +28,9 @@ signals:
     void navigateToMaterials();
 
 protected:
+    void changeEvent(QEvent *event) override;
+
+protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
@@ -39,6 +42,8 @@ private:
     SearchPage     *m_searchPage    = nullptr;
     SearchResultPage *m_searchResultPage = nullptr;
     ForumSidebarBase *m_sidebar       = nullptr;
+
+    bool m_isFullscreen = false;
 
     QString m_username;
     int m_classId = 0;
