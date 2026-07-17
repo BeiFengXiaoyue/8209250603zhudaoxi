@@ -49,7 +49,9 @@ void TeacherMainWindow::setupUI()
 
 void TeacherMainWindow::ensureMaterialPage()
 {
-    if (m_materialPage) return;
+    if (m_materialPage) {
+        return;
+    }
 
     auto *matSidebar = new TeacherForumSidebar();
     m_materialPage = new MaterialUploadPage(m_username, m_classId, matSidebar, 4);
@@ -101,7 +103,9 @@ void TeacherMainWindow::ensureMaterialPage()
                             });
                             connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
-                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                 m_stack->setCurrentWidget(m_managePage);
                             });
                             connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -122,7 +126,9 @@ void TeacherMainWindow::ensureMaterialPage()
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -165,7 +171,9 @@ void TeacherMainWindow::ensureMaterialPage()
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
-                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                 m_stack->setCurrentWidget(m_managePage);
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -226,7 +234,9 @@ void TeacherMainWindow::ensureMaterialPage()
                                     });
                                     connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -247,7 +257,9 @@ void TeacherMainWindow::ensureMaterialPage()
                                             });
                                             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                                 m_sidebar->setActiveItem(3);
-                                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                                 m_stack->setCurrentWidget(m_managePage);
                                             });
                                             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -290,7 +302,9 @@ void TeacherMainWindow::ensureMaterialPage()
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -373,7 +387,9 @@ void TeacherMainWindow::ensureMaterialPage()
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
-                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                 m_stack->setCurrentWidget(m_managePage);
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -495,8 +511,12 @@ QWidget* TeacherMainWindow::createHomePage()
             });
             connect(m_editWidget, &ProfileEditWidget::avatarUpdated, this, [this]() {
                 m_leftPanel->loadAvatar();
-                if (m_forumWindow) m_forumWindow->refreshAvatars();
-                if (m_materialPage) m_materialPage->refreshAvatars();
+                if (m_forumWindow) {
+                    m_forumWindow->refreshAvatars();
+                }
+                if (m_materialPage) {
+                    m_materialPage->refreshAvatars();
+                }
             });
         }
         m_stack->setCurrentWidget(m_editWidget);
@@ -554,7 +574,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -595,7 +617,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                         });
                                         connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                             m_sidebar->setActiveItem(3);
-                                            if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                            if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                             m_stack->setCurrentWidget(m_managePage);
                                         });
                                         connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -616,7 +640,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                                 });
                                                 connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                                     m_sidebar->setActiveItem(3);
-                                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                                     m_stack->setCurrentWidget(m_managePage);
                                                 });
                                                 connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -660,7 +686,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                         });
                                         connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                             m_sidebar->setActiveItem(3);
-                                            if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                            if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                             m_stack->setCurrentWidget(m_managePage);
                                         });
                                         connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -697,7 +725,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                     m_sidebar->setActiveItem(3);
-                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                     m_stack->setCurrentWidget(m_managePage);
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -743,7 +773,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                 });
                                 connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                     m_sidebar->setActiveItem(3);
-                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                     m_stack->setCurrentWidget(m_managePage);
                                 });
                                 connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -764,7 +796,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                         });
                                         connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                             m_sidebar->setActiveItem(3);
-                                            if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                            if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                             m_stack->setCurrentWidget(m_managePage);
                                         });
                                         connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -807,7 +841,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                     m_sidebar->setActiveItem(3);
-                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                     m_stack->setCurrentWidget(m_managePage);
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -880,7 +916,9 @@ QWidget* TeacherMainWindow::createHomePage()
                             });
                             connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
-                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                 m_stack->setCurrentWidget(m_managePage);
                             });
                             connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -901,7 +939,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -973,7 +1013,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                     });
                                     connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -994,7 +1036,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                             });
                                             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                                 m_sidebar->setActiveItem(3);
-                                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                                 m_stack->setCurrentWidget(m_managePage);
                                             });
                                             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -1037,7 +1081,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                         m_sidebar->setActiveItem(3);
-                                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                        if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                         m_stack->setCurrentWidget(m_managePage);
                                     });
                                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -1115,7 +1161,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                     m_sidebar->setActiveItem(3);
-                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                     m_stack->setCurrentWidget(m_managePage);
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -1152,7 +1200,9 @@ QWidget* TeacherMainWindow::createHomePage()
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                     m_sidebar->setActiveItem(3);
-                                    if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                    if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                     m_stack->setCurrentWidget(m_managePage);
                                 });
                                 connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -1195,7 +1245,9 @@ QWidget* TeacherMainWindow::createHomePage()
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                                 m_sidebar->setActiveItem(3);
-                                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                                if (m_managePage) {
+                                    m_managePage->setSidebarActiveItem(3);
+                                }
                                 m_stack->setCurrentWidget(m_managePage);
                             });
                             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {

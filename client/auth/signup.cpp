@@ -243,7 +243,7 @@ void SignUpPage::show()
 
 void SignUpPage::refresh()
 {
-    // TODO: 刷新页面
+    // refresh() 保留接口，刷新逻辑由各子页面各自的 loadData 处理
 }
 
 // === 槽函数 ===
