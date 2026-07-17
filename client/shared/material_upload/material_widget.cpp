@@ -1043,7 +1043,9 @@ void MaterialWidget::populateTable()
 // ============================================================
 void MaterialWidget::onViewMaterial(int row)
 {
-    if (row < 0 || row >= m_materials.size()) return;
+    if (row < 0 || row >= m_materials.size()) {
+        return;
+    }
     const auto &m = m_materials[row];
     QString url = NetworkHandler::baseUrl() + "/api/files/" + QString::number(m.id);
     QDesktopServices::openUrl(QUrl(url));
@@ -1054,7 +1056,9 @@ void MaterialWidget::onViewMaterial(int row)
 // ============================================================
 void MaterialWidget::onDownloadMaterial(int row)
 {
-    if (row < 0 || row >= m_materials.size()) return;
+    if (row < 0 || row >= m_materials.size()) {
+        return;
+    }
     const auto &m = m_materials[row];
 
     QString savePath = QFileDialog::getSaveFileName(
@@ -1062,7 +1066,9 @@ void MaterialWidget::onDownloadMaterial(int row)
         m.name + "." + m.fileFormat.toLower(),
         QString("%1 文件 (*.%2);;所有文件 (*)").arg(m.fileFormat, m.fileFormat.toLower()));
 
-    if (savePath.isEmpty()) return;
+    if (savePath.isEmpty()) {
+        return;
+    }
 
     // 提前拷贝所需字段，避免 lambda 中引用失效
     QString fileName = m.name + "." + m.fileFormat.toLower();

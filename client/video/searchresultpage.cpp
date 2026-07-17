@@ -148,7 +148,9 @@ void SearchResultPage::search(const QString &keyword, const QStringList &tags)
 void SearchResultPage::populateCards(const QJsonArray &data)
 {
     int cols = qMax(1, (m_cardGrid->width() - 24) / 240);
-    if (cols < 1) cols = 1;
+    if (cols < 1) {
+        cols = 1;
+    }
 
     for (int i = 0; i < data.size(); ++i) {
         QJsonObject obj = data[i].toObject();

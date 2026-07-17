@@ -366,7 +366,9 @@ void TeacherMainWindow::ensureMaterialPage()
                     });
                     connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                         m_sidebar->setActiveItem(3);
-                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                        if (m_managePage) {
+                            m_managePage->setSidebarActiveItem(3);
+                        }
                         m_stack->setCurrentWidget(m_managePage);
                     });
                     connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
@@ -432,7 +434,9 @@ void TeacherMainWindow::ensureMaterialPage()
                     });
                     connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                         m_sidebar->setActiveItem(3);
-                        if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                        if (m_managePage) {
+                            m_managePage->setSidebarActiveItem(3);
+                        }
                         m_stack->setCurrentWidget(m_managePage);
                     });
                     connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -470,7 +474,9 @@ void TeacherMainWindow::ensureMaterialPage()
             });
             connect(m_coursePage, &CourseUploadPage::navigateToStudentManage, this, [this]() {
                 m_sidebar->setActiveItem(3);
-                if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                if (m_managePage) {
+                    m_managePage->setSidebarActiveItem(3);
+                }
                 m_stack->setCurrentWidget(m_managePage);
             });
             connect(m_coursePage, &CourseUploadPage::navigateToMaterials, this, [this]() {
@@ -1179,7 +1185,9 @@ QWidget* TeacherMainWindow::createHomePage()
                         });
                         connect(m_forumWindow, &ForumMainWindow::navigateToStudentManage, this, [this]() {
                             m_sidebar->setActiveItem(3);
-                            if (m_managePage) m_managePage->setSidebarActiveItem(3);
+                            if (m_managePage) {
+                                m_managePage->setSidebarActiveItem(3);
+                            }
                             m_stack->setCurrentWidget(m_managePage);
                         });
                         connect(m_forumWindow, &ForumMainWindow::navigateToVideo, this, [this]() {
