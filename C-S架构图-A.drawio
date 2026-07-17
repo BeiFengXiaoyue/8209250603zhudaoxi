@@ -1,0 +1,187 @@
+<mxfile host="Electron">
+  <diagram name="C/S 架构图（A部分）" id="cs-arch-a">
+    <mxGraphModel dx="1413" dy="974" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ==================== 标题 ==================== -->
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=24;fontStyle=1;fontColor=#333;" value="C/S 架构图（A 部分）" vertex="1">
+          <mxGeometry height="40" width="400" x="800" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=13;fontColor=#888;" value="登录注册 · 学生/教师端主页 · 内容区4Tab · 视频卡片 · FFmpeg 封面生成" vertex="1">
+          <mxGeometry height="30" width="550" x="725" y="50" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== 客户端区域容器（蓝色） ==================== -->
+        <mxCell id="clientContainer" parent="1" style="swimlane;whiteSpace=wrap;html=1;fontStyle=1;align=center;verticalAlign=top;fillColor=#E8F0FE;strokeColor=#5B8FF9;fontSize=14;startSize=30;rounded=1;" value="客户端（Qt 6 C++17 Desktop App）" vertex="1">
+          <mxGeometry height="1200" width="680" x="40" y="100" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== 服务端区域容器（绿色） ==================== -->
+        <mxCell id="serverContainer" parent="1" style="swimlane;whiteSpace=wrap;html=1;fontStyle=1;align=center;verticalAlign=top;fillColor=#E2EFDA;strokeColor=#4A7C59;fontSize=14;startSize=30;rounded=1;" value="服务端（Python Flask RESTful API）" vertex="1">
+          <mxGeometry height="1200" width="600" x="1280" y="100" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                  客 户 端 组 件                                -->
+        <!-- ============================================================ -->
+
+        <!-- 1. 入口层 -->
+        <mxCell id="c0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5B8FF9;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;入口 &amp; 页面路由&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;main.cpp&lt;br&gt;QStackedWidget (4 pages)&lt;br&gt;┣ [0] SignInPage&lt;br&gt;┣ [1] SignUpPage&lt;br&gt;┣ [2] StudentMainWindow&lt;br&gt;┗ [3] TeacherMainWindow&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="280" x="80" y="140" as="geometry" />
+        </mxCell>
+
+        <!-- 2. 登录注册模块 -->
+        <mxCell id="c1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#F5A623;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;🔐 登录注册模块&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;&lt;b&gt;SignInPage&lt;/b&gt;&lt;br&gt;├ 卡片式居中布局（420px）&lt;br&gt;├ 密码可见切换（眼睛图标）&lt;br&gt;├ 反馈提示（成功绿/失败红）&lt;br&gt;└ SHA-256 哈希后 POST 传输&lt;br&gt;&lt;br&gt;&lt;b&gt;SignUpPage&lt;/b&gt;&lt;br&gt;├ 用户名校验: ^\w{3,20}$&lt;br&gt;├ 密码校验: 大小写+数字+特殊符&lt;br&gt;├ 班级号 + 身份选择（学生/教师）&lt;br&gt;└ 注册成功 → 1.5s 自动跳转登录&lt;/font&gt;" vertex="1">
+          <mxGeometry height="210" width="280" x="80" y="280" as="geometry" />
+        </mxCell>
+
+        <!-- 3. 学生端主页 -->
+        <mxCell id="c2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;👨‍🎓 学生端主页 StudentMainWindow&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;三栏布局: LeftPanel · ContentArea · Sidebar（蓝色主题）&lt;br&gt;├ QStackedWidget 懒加载: 编辑资料/视频区/论坛/资料上传&lt;br&gt;├ &lt;b&gt;LeftPanel&lt;/b&gt;: 圆形头像 + 用户信息 + 编辑资料入口&lt;br&gt;├ &lt;b&gt;Sidebar&lt;/b&gt;: 4项导航（个人中心/视频区/论坛/资料上传）+ 聚焦联动&lt;br&gt;└ &lt;b&gt;ContentArea👇&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="130" width="300" x="60" y="530" as="geometry" />
+        </mxCell>
+
+        <!-- 3b. ContentArea 内容区 4 Tab -->
+        <mxCell id="c2_content" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;overflow=hidden;fontColor=#333;dashed=1;" value="&lt;b&gt;📋 StudentContentArea — 4个 Tab&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;9&quot;&gt;┌──────────────────────────────────────┐&lt;br&gt;│ 🎬 最近播放 &amp;nbsp;│ 📥 最近下载 &amp;nbsp;│ 📤 最近上传 &amp;nbsp;│ ⭐ 我的收藏 │&lt;br&gt;└──────────────────────────────────────┘&lt;br&gt;&lt;br&gt;&lt;b&gt;① 最近播放&lt;/b&gt; — GET /api/user/history?days=7&lt;br&gt;&amp;nbsp;&amp;nbsp;├ VideoCard 网格布局（4列×0.7x缩放）&lt;br&gt;&amp;nbsp;&amp;nbsp;└ video_id 去重，点击 ▶ 触发播放&lt;br&gt;&lt;br&gt;&lt;b&gt;② 最近下载&lt;/b&gt; — GET /api/user/downloads&lt;br&gt;&amp;nbsp;&amp;nbsp;├ QTableWidget（文件名/类型/大小/下载时间）&lt;br&gt;&amp;nbsp;&amp;nbsp;└ 交替行颜色，圆角卡片包裹表格&lt;br&gt;&lt;br&gt;&lt;b&gt;③ 最近上传&lt;/b&gt; — GET /api/user/uploads&lt;br&gt;&amp;nbsp;&amp;nbsp;├ 合并 courses（视频）+ resources（资料）&lt;br&gt;&amp;nbsp;&amp;nbsp;└ QTableWidget + 播放按钮（视频类型可播放）&lt;br&gt;&lt;br&gt;&lt;b&gt;④ 我的收藏&lt;/b&gt; — GET /api/user/favorites&lt;br&gt;&amp;nbsp;&amp;nbsp;├ VideoCard 网格布局（4列×0.7x缩放）&lt;br&gt;&amp;nbsp;&amp;nbsp;└ 左JOIN courses 表获取科目/功能/教师/时间&lt;br&gt;&lt;br&gt;&lt;b&gt;分页导航&lt;/b&gt;: ◀ 圆点指示器 ▶ 带动画翻页&lt;br&gt;&lt;b&gt;空数据提示&lt;/b&gt;: 每个 Tab 独立空状态文案&lt;/font&gt;" vertex="1">
+          <mxGeometry height="320" width="310" x="55" y="670" as="geometry" />
+        </mxCell>
+
+        <!-- 4. 教师端主页 -->
+        <mxCell id="c3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;👨‍🏫 教师端主页 TeacherMainWindow&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;三栏布局: LeftPanel · ContentArea · Sidebar（绿色主题）&lt;br&gt;├ QStackedWidget 懒加载: 编辑资料/课程上传/论坛/学生管理/资料上传&lt;br&gt;├ &lt;b&gt;LeftPanel&lt;/b&gt;: 绿色头像 + 欢迎语 + 编辑资料入口&lt;br&gt;├ &lt;b&gt;ContentArea&lt;/b&gt;: 最近上传概览 + 学生管理入口&lt;br&gt;└ &lt;b&gt;Sidebar&lt;/b&gt;: 5项导航（首页/课程上传/论坛/学生管理/资料上传）&lt;/font&gt;" vertex="1">
+          <mxGeometry height="130" width="300" x="390" y="530" as="geometry" />
+        </mxCell>
+
+        <!-- 5. 视频卡片 -->
+        <mxCell id="c4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#D81B60;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;🎴 视频卡片组件 VideoCard&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;├ 尺寸 220×260（缩放系数自适应）&lt;br&gt;├ 圆角阴影卡片 + QSS 动态计算&lt;br&gt;├ 缩略图区：圆角裁剪 QPainterPath&lt;br&gt;├ 信息区：课程名 · 教师·时间 · 标签（科目蓝/功能橙）&lt;br&gt;├ ▶ 播放按钮 + ↓ 下载按钮&lt;br&gt;├ 缩略图异步加载 QNetworkAccessManager&lt;br&gt;├ 无封面占位图（深底色 + 播放三角图标）&lt;br&gt;└ 下载时异步记录 POST /api/user/downloads&lt;/font&gt;" vertex="1">
+          <mxGeometry height="190" width="280" x="180" y="1030" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                  服 务 端 组 件                                -->
+        <!-- ============================================================ -->
+
+        <!-- 6. Flask 路由层 -->
+        <mxCell id="s0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A7C59;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;🌐 Flask 路由层 (Blueprint)&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;┌─ &lt;b&gt;认证路由 (auth_bp / login_bp)&lt;/b&gt; ─────┐&lt;br&gt;│ POST /api/auth/register &amp;nbsp;┃ 用户注册&lt;br&gt;│ POST /api/auth/login &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 用户登录&lt;br&gt;└────────────────────────────────────┘&lt;br&gt;┌─ &lt;b&gt;课程路由 (course_upload_bp)&lt;/b&gt; ──────┐&lt;br&gt;│ POST /api/courses/upload &amp;nbsp;┃ 课程上传&lt;br&gt;│ GET /api/courses/list &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 课程列表&lt;br&gt;│ GET /api/courses/&amp;lt;id&amp;gt;/file ┃ 获取视频文件&lt;br&gt;│ GET /api/courses/&amp;lt;id&amp;gt;/thumbnail ┃ 获取缩略图&lt;br&gt;└────────────────────────────────────┘&lt;br&gt;┌─ &lt;b&gt;用户数据路由 (user_bp)&lt;/b&gt; ───────────┐&lt;br&gt;│ GET /api/user/history &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 最近播放&lt;br&gt;│ POST /api/user/history &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 记录浏览&lt;br&gt;│ GET /api/user/downloads &amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 下载记录&lt;br&gt;│ POST /api/user/downloads &amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 记录下载&lt;br&gt;│ GET /api/user/uploads &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 用户上传&lt;br&gt;│ GET /api/user/favorites &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 收藏列表&lt;br&gt;│ POST /api/user/favorites &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;┃ 添加收藏&lt;br&gt;│ DELETE /api/user/favorites/&amp;lt;id&amp;gt; ┃ 取消收藏&lt;br&gt;└────────────────────────────────────┘&lt;/font&gt;" vertex="1">
+          <mxGeometry height="290" width="310" x="1280" y="140" as="geometry" />
+        </mxCell>
+
+        <!-- 7. 业务逻辑层 -->
+        <mxCell id="s1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#F5A623;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;⚙️ 业务逻辑层&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;&lt;b&gt;register.py&lt;/b&gt;&lt;br&gt;├ 校验 username/password/class/role&lt;br&gt;├ 检查用户名是否已存在（409冲突）&lt;br&gt;└ SHA-256 哈希存储到 users 表&lt;br&gt;&lt;br&gt;&lt;b&gt;login.py&lt;/b&gt;&lt;br&gt;├ 校验用户名是否存在（401）&lt;br&gt;├ SHA-256 比对密码&lt;br&gt;├ &lt;b&gt;连续5次失败锁定30分钟&lt;/b&gt;（403 + 剩余时间）&lt;br&gt;└ 成功重置 fail_count → 返回 role/class/user_id&lt;br&gt;&lt;br&gt;&lt;b&gt;course_upload.py&lt;/b&gt;&lt;br&gt;├ 保存视频文件 {timestamp}_{filename}&lt;br&gt;├ 调用 FFmpeg 生成首帧缩略图&lt;br&gt;└ 插入 courses 表（含封面路径、文件大小）&lt;br&gt;&lt;br&gt;&lt;b&gt;user_data.py&lt;/b&gt;&lt;br&gt;├ 浏览历史: 按时间倒序 LIMIT 50/100&lt;br&gt;├ 下载记录: file_name/type/size/time&lt;br&gt;├ 上传列表: 合并 video + resource 按时间排序&lt;br&gt;└ 收藏夹: 左 JOIN courses 表 + 防重复收藏（409）&lt;/font&gt;" vertex="1">
+          <mxGeometry height="350" width="310" x="1280" y="460" as="geometry" />
+        </mxCell>
+
+        <!-- 8. FFmpeg 工具 -->
+        <mxCell id="s2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#D81B60;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;🎬 FFmpeg 视频处理&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;&lt;b&gt;ffm_tools.py&lt;/b&gt;&lt;br&gt;┌──────────────────────────────┐&lt;br&gt;│ &lt;b&gt;extract_first_frame()&lt;/b&gt; &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;│&lt;br&gt;│ ├ 参数: video_path, quality&lt;br&gt;│ ├ cmd: &lt;i&gt;ffmpeg -ss 0 -vframes 1 -q:v 2&lt;/i&gt;&lt;br&gt;│ ├ 输出: {video_stem}.jpg&lt;br&gt;│ ├ 超时保护: 60秒 timeout&lt;br&gt;│ └ 异常处理: FileNotFound/RuntimeError&lt;br&gt;└──────────────────────────────┘&lt;/font&gt;" vertex="1">
+          <mxGeometry height="160" width="260" x="1300" y="850" as="geometry" />
+        </mxCell>
+
+        <!-- 9. 文件存储 -->
+        <mxCell id="s3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#888;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;📁 文件存储&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;uploads/courses/ &amp;nbsp;— 视频文件 .mp4&lt;br&gt;uploads/thumbs/ &amp;nbsp;— 缩略图 .jpg&lt;br&gt;uploads/avatars/ &amp;nbsp;— 用户头像&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="260" x="1300" y="1050" as="geometry" />
+        </mxCell>
+
+        <!-- 10. 数据库 -->
+        <mxCell id="s4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#5C6BC0;fontSize=11;overflow=hidden;fontColor=#333;" value="&lt;b&gt;🗄️ 数据库（SQLite）&lt;/b&gt;&lt;hr&gt;&lt;font color=&quot;#666&quot; size=&quot;10&quot;&gt;&lt;b&gt;users&lt;/b&gt; 表：用户信息 + 登录锁定&lt;br&gt;├ user_id, username, keyword(SHA256)&lt;br&gt;├ class, role, fail_count, lock_until&lt;br&gt;└ avatar_path&lt;br&gt;&lt;br&gt;&lt;b&gt;courses&lt;/b&gt; 表：课程视频信息&lt;br&gt;├ id, course, teacher, time&lt;br&gt;├ file_path, class, description&lt;br&gt;├ subject, function, thumbnail_path&lt;br&gt;└ file_size&lt;br&gt;&lt;br&gt;&lt;b&gt;view_history&lt;/b&gt; 表：浏览历史&lt;br&gt;&lt;b&gt;download_history&lt;/b&gt; 表：下载记录&lt;br&gt;&lt;b&gt;favorites&lt;/b&gt; 表：收藏夹&lt;/font&gt;" vertex="1">
+          <mxGeometry height="260" width="280" x="1470" y="1030" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                  通 信 层（中间区域）                          -->
+        <!-- ============================================================ -->
+
+        <!-- HTTP 通信框 -->
+        <mxCell id="comm" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#9C27B0;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;fontColor=#6A1B9A;" value="🌍 HTTP RESTful API&lt;br&gt;&lt;font size=&quot;10&quot;&gt;JSON 格式 · localhost:5000&lt;/font&gt;" vertex="1">
+          <mxGeometry height="60" width="160" x="790" y="650" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                  连 线                                        -->
+        <!-- ============================================================ -->
+
+        <!-- 客户端内部连线 -->
+        <mxCell id="edge_c0_c1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5B8FF9;strokeWidth=1.5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="250" as="sourcePoint" />
+            <mxPoint x="220" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_c1_c2" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5B8FF9;strokeWidth=1.5;exitX=0.2;exitY=1;entryX=0.2;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="490" as="sourcePoint" />
+            <mxPoint x="120" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_c1_c3" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5B8FF9;strokeWidth=1.5;exitX=0.8;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="490" as="sourcePoint" />
+            <mxPoint x="540" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ContentArea 属于 StudentMainWindow 的子组件 -->
+        <mxCell id="edge_c2_c2c" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=1.5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="660" as="sourcePoint" />
+            <mxPoint x="210" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ContentArea → VideoCard (我的收藏/最近播放中使用VideoCard) -->
+        <mxCell id="edge_c2c_c4" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D81B60;strokeWidth=1.5;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="990" as="sourcePoint" />
+            <mxPoint x="320" y="1030" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 客户端 → 服务端 HTTP 连线 -->
+        <mxCell id="edge_c_s" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9C27B0;strokeWidth=2;dashed=0;endArrow=classic;endFill=1;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="650" as="sourcePoint" />
+            <mxPoint x="1280" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 服务端内部连线 -->
+        <mxCell id="edge_s0_s1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4A7C59;strokeWidth=1.5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1435" y="430" as="sourcePoint" />
+            <mxPoint x="1435" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_s1_s2" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4A7C59;strokeWidth=1.5;exitX=0.3;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1370" y="810" as="sourcePoint" />
+            <mxPoint x="1430" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_s1_s3" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4A7C59;strokeWidth=1.5;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1435" y="810" as="sourcePoint" />
+            <mxPoint x="1430" y="1050" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge_s1_s4" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4A7C59;strokeWidth=1.5;exitX=0.8;exitY=1;entryX=0.5;entryY=0;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1570" y="810" as="sourcePoint" />
+            <mxPoint x="1610" y="1030" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                  图 例                                        -->
+        <!-- ============================================================ -->
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#CCC;fontSize=10;overflow=hidden;" value="&lt;b&gt;图例&lt;/b&gt;&lt;hr&gt;&lt;table width=&quot;100%&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;🟦&lt;/b&gt; 客户端组件&lt;/td&gt;&lt;td&gt;&lt;b&gt;🟩&lt;/b&gt; 服务端组件&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;🟨&lt;/b&gt; 登录注册/业务逻辑&lt;/td&gt;&lt;td&gt;&lt;b&gt;🟪&lt;/b&gt; HTTP 通信&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;🩷&lt;/b&gt; 视频/FFmpeg&lt;/td&gt;&lt;td&gt;&lt;b&gt;➡️&lt;/b&gt; 数据流向&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="90" width="240" x="40" y="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

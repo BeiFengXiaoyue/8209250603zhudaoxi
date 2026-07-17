@@ -136,7 +136,9 @@ void DanmakuOverlay::addItem(int id, int playTime, const QString &text)
     d.play_time = playTime;
     d.content = text;
     m_items.append(d);
-    if (id > m_lastPollId) m_lastPollId = id;
+    if (id > m_lastPollId) {
+        m_lastPollId = id;
+    }
 }
 
 void DanmakuOverlay::clearActive()
@@ -181,7 +183,9 @@ void DanmakuOverlay::onPositionChanged(qint64 ms)
 
 void DanmakuOverlay::spawnLabel(const QString &text)
 {
-    if (m_activeCount >= MAX_VISIBLE) return;
+    if (m_activeCount >= MAX_VISIBLE) {
+        return;
+    }
 
     auto *label = new QLabel(text, this);
     static const QColor colors[] = {
@@ -193,7 +197,9 @@ void DanmakuOverlay::spawnLabel(const QString &text)
                          .arg(colors[ci].name()));
     label->adjustSize();
     int y = QRandomGenerator::global()->bounded(10, height() - label->height() - 10);
-    if (y < 10) y = 10;
+    if (y < 10) {
+        y = 10;
+    }
     label->move(width(), y);
     label->show();
     m_activeCount++;
@@ -242,7 +248,9 @@ VideoCanvas::VideoCanvas(QWidget *parent)
 
 void VideoCanvas::setFile(const QString &filePath)
 {
-    if (!m_mediaPlayer) return;
+    if (!m_mediaPlayer) {
+        return;
+    }
     m_statusText = "加载中...";
     if (filePath.startsWith("http://") || filePath.startsWith("https://"))
         m_mediaPlayer->setSource(QUrl(filePath));
@@ -264,10 +272,12 @@ void VideoCanvas::paintEvent(QPaintEvent *event)
 void VideoCanvas::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    if (m_videoWidget)
+    if (m_videoWidget) {
         m_videoWidget->setGeometry(0, 0, width(), height() - 50);
-    if (m_bottomControls)
+    }
+    if (m_bottomControls) {
         m_bottomControls->setGeometry(0, height() - 50, width(), 50);
+    }
 }
 
 void VideoCanvas::setupUI()
@@ -340,7 +350,9 @@ void VideoCanvas::setupUI()
         }
     });
     connect(m_playBtn, &QPushButton::clicked, this, [this]() {
-        if (!m_mediaPlayer->source().isValid()) return;
+        if (!m_mediaPlayer->source().isValid()) {
+            return;
+        }
         if (m_mediaPlayer->playbackState() == QMediaPlayer::PlayingState)
             m_mediaPlayer->pause();
         else
@@ -375,8 +387,12 @@ void VideoCanvas::setupUI()
 
     // 进度时间同步（拖动中不更新，防冲突）
     connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, [this](qint64 pos) {
-        if (m_mediaPlayer->duration() == 0) return;
-        if (m_progressSlider->isSliderDown()) return;
+        if (m_mediaPlayer->duration() == 0) {
+            return;
+        }
+        if (m_progressSlider->isSliderDown()) {
+            return;
+        }
         int pct = static_cast<int>(pos * 10000 / m_mediaPlayer->duration());
         m_progressSlider->setValue(pct);
         // 更新时间显示
@@ -563,7 +579,9 @@ void DanmakuInputBar::setupUI()
     // 发送按钮 → API
     connect(m_sendBtn, &QPushButton::clicked, this, [this]() {
         QString text = m_input->text().trimmed();
-        if (text.isEmpty()) return;
+        if (text.isEmpty()) {
+            return;
+        }
 
         int playTime = m_currentPosition / 1000;
 
@@ -607,7 +625,9 @@ void DanmakuHistoryPanel::clearDanmaku()
 
 void DanmakuHistoryPanel::loadFromServer()
 {
-    if (m_videoId <= 0) return;
+    if (m_videoId <= 0) {
+        return;
+    }
     clearDanmaku();
 
     QString url = NetworkHandler::baseUrl() + "/api/danmaku/init?video_id=" + QString::number(m_videoId);
@@ -853,12 +873,16 @@ void VideoInfoPanel::setFunction(const QString &func)
 void VideoInfoPanel::refreshTags()
 {
     QLayout *layout = m_tagsContainer->layout();
-    if (!layout) return;
+    if (!layout) {
+        return;
+    }
 
     // 清除旧标签
     while (layout->count() > 0) {
         QLayoutItem *item = layout->takeAt(0);
-        if (item->widget()) item->widget()->deleteLater();
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        }
         delete item;
     }
 
@@ -1072,10 +1096,12 @@ void PlayerWidget::loadCourse(int courseId,
     m_infoPanel->setDescription(desc);
     m_infoPanel->setSubject(subject);
     m_infoPanel->setFunction(func);
-    if (m_danmakuBar)
+    if (m_danmakuBar) {
         m_danmakuBar->setVideoId(courseId);
-    if (m_danmakuOverlay)
+    }
+    if (m_danmakuOverlay) {
         m_danmakuOverlay->loadDanmaku(courseId);
+    }
 
     // 检查当前视频是否已收藏
     auto *favBtn = m_infoPanel->favBtn();
@@ -1104,7 +1130,9 @@ void PlayerWidget::loadCourse(int courseId,
     // 收藏按钮 → API
     disconnect(favBtn, &FavoriteButton::favoritedChanged, nullptr, nullptr);
     connect(favBtn, &FavoriteButton::favoritedChanged, this, [this, courseId, courseName](bool fav) {
-        if (m_username.isEmpty()) return;
+        if (m_username.isEmpty()) {
+            return;
+        }
         auto *btn = m_infoPanel->favBtn();
         if (fav) {
             QJsonObject body;
@@ -1123,7 +1151,9 @@ void PlayerWidget::loadCourse(int courseId,
             );
         } else {
             int favId = btn->property("favId").toInt();
-            if (favId <= 0) return;
+            if (favId <= 0) {
+                return;
+            }
             NetworkHandler::instance()->del(
                 NetworkHandler::baseUrl() +
                     "/api/user/favorites/" + QString::number(favId) +
@@ -1144,8 +1174,9 @@ void PlayerWidget::setUserData(const QString &username, int classId)
 {
     m_username = username;
     m_classId = classId;
-    if (m_danmakuBar)
+    if (m_danmakuBar) {
         m_danmakuBar->setUserData(username, classId);
+    }
 }
 
 void PlayerWidget::setFullscreenUI(bool fullscreen)

@@ -17,7 +17,7 @@ StudentAvatarWidget::StudentAvatarWidget(const QString &initials, const QColor &
                            QWidget *parent)
     : QLabel(parent), m_initials(initials), m_bgColor(bgColor)
 {
-    setFixedSize(kAvatarSize, kAvatarSize);
+    setFixedSize(kAvatarSize, kAvatarSize);  // 头像尺寸 100×100px
     setAlignment(Qt::AlignCenter);
 }
 
@@ -36,24 +36,24 @@ void StudentAvatarWidget::paintEvent(QPaintEvent *event)
 
     // 绘制圆形背景
     QPainterPath path;
-    path.addEllipse(rect().adjusted(2, 2, -2, -2));
+    path.addEllipse(rect().adjusted(2, 2, -2, -2));  // 2px 内缩留出边框空间
     painter.setClipPath(path);
 
     if (!m_pixmap.isNull()) {
         // 缩放并居中绘制图片
         QPixmap scaled = m_pixmap.scaled(size(), Qt::KeepAspectRatioByExpanding,
                                          Qt::SmoothTransformation);
-        int x = (width() - scaled.width()) / 2;
-        int y = (height() - scaled.height()) / 2;
+        int x = (width() - scaled.width()) / 2;    // 水平居中
+        int y = (height() - scaled.height()) / 2;   // 垂直居中
         painter.drawPixmap(x, y, scaled);
     } else {
         // 纯色背景 + 首字母
         painter.setBrush(m_bgColor);
         painter.setPen(Qt::NoPen);
-        painter.drawEllipse(rect().adjusted(2, 2, -2, -2));
+        painter.drawEllipse(rect().adjusted(2, 2, -2, -2));  // 2px 内缩
 
         QFont font = painter.font();
-        font.setPixelSize(38);
+        font.setPixelSize(38);        // 头像首字母字号 38px
         font.setBold(true);
         painter.setFont(font);
         painter.setPen(Qt::white);
@@ -63,8 +63,8 @@ void StudentAvatarWidget::paintEvent(QPaintEvent *event)
     // 绘制圆形边框
     painter.setClipRect(rect());
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen(QColor("#E0E4E8"), 2));
-    painter.drawEllipse(rect().adjusted(2, 2, -2, -2));
+    painter.setPen(QPen(QColor("#E0E4E8"), 2));  // 2px 浅灰圆形边框
+    painter.drawEllipse(rect().adjusted(2, 2, -2, -2));  // 2px 内缩
 }
 
 // ============================================================
@@ -78,24 +78,24 @@ StudentLeftPanel::StudentLeftPanel(QWidget *parent)
 
 void StudentLeftPanel::setupUI()
 {
-    setFixedWidth(260);
+    setFixedWidth(260);  // 左侧面板宽度 260px
     setStyleSheet(R"(
         LeftPanel {
             background-color: #FFFFFF;
-            border-radius: 15px;
+            border-radius: 15px;   /* 面板大圆角 15px */
         }
     )");
 
-    // 阴影效果
+    // 阴影效果：模糊半径20px, 黑色12%不透明度, Y偏移2px
     auto *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setBlurRadius(20);
-    shadow->setColor(QColor(0, 0, 0, 30));
-    shadow->setOffset(0, 2);
+    shadow->setBlurRadius(20);            // 阴影模糊半径 20px
+    shadow->setColor(QColor(0, 0, 0, 30));  // 黑色, 约12%不透明度
+    shadow->setOffset(0, 2);              // 阴影向下偏移 2px
     setGraphicsEffect(shadow);
 
     auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(20, 30, 20, 25);
-    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(20, 30, 20, 25);  // 面板内边距: 左20 上30 右20 下25
+    mainLayout->setSpacing(0);             // 子控件之间无间距
 
     // ---- 头像区域 ----
     auto *avatarContainer = new QWidget();
@@ -113,9 +113,9 @@ void StudentLeftPanel::setupUI()
     greetingLabel->setStyleSheet(R"(
         QLabel {
             color: #999999;
-            font-size: 13px;
-            margin-top: 12px;
-            margin-bottom: 20px;
+            font-size: 13px;       /* 13px 浅灰欢迎文字 */
+            margin-top: 12px;      /* 上边距 12px */
+            margin-bottom: 20px;   /* 下边距 20px */
         }
     )");
     mainLayout->addWidget(greetingLabel);
@@ -129,27 +129,27 @@ void StudentLeftPanel::setupUI()
     // ---- 个人资料区域 ----
     auto *infoWidget = new QWidget();
     auto *infoLayout = new QVBoxLayout(infoWidget);
-    infoLayout->setContentsMargins(5, 20, 5, 10);
-    infoLayout->setSpacing(14);
+    infoLayout->setContentsMargins(5, 20, 5, 10);  // 信息区内边距
+    infoLayout->setSpacing(14);          // 信息行间距 14px
 
     auto createInfoRow = [](const QString &label, QLabel *valueLabel) -> QWidget* {
         auto *row = new QWidget();
         auto *layout = new QVBoxLayout(row);
         layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(2);
+        layout->setSpacing(2);            // 标签与值间距 2px
 
         auto *labelWidget = new QLabel(label);
         labelWidget->setStyleSheet(R"(
             QLabel {
                 color: #AAAAAA;
-                font-size: 11px;
+                font-size: 11px;       /* 标签文字 11px 浅灰 */
             }
         )");
 
         valueLabel->setStyleSheet(R"(
             QLabel {
                 color: #444444;
-                font-size: 14px;
+                font-size: 14px;       /* 值文字 14px 深灰 */
             }
         )");
 
@@ -174,13 +174,13 @@ void StudentLeftPanel::setupUI()
     // ---- 编辑资料按钮 ----
     m_editBtn = new QPushButton("✏ 编辑资料");
     m_editBtn->setCursor(Qt::PointingHandCursor);
-    m_editBtn->setFixedHeight(38);
+    m_editBtn->setFixedHeight(38);         // 编辑按钮高度 38px
     m_editBtn->setStyleSheet(R"(
         QPushButton {
             background-color: #F5F7FA;
             color: #5B7DB1;
             border: 1px solid #E0E4E8;
-            border-radius: 8px;
+            border-radius: 8px;     /* 按钮圆角 8px */
             font-size: 13px;
             font-weight: bold;
         }
