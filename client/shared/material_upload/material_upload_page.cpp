@@ -65,8 +65,9 @@ void MaterialUploadPage::setupUI()
 
 void MaterialUploadPage::setSidebarActiveItem(int index)
 {
-    if (m_sidebar)
+    if (m_sidebar) {
         m_sidebar->setActiveItem(index);
+    }
 }
 
 void MaterialUploadPage::refreshAvatars()

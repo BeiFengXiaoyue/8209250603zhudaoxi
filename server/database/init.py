@@ -1,5 +1,9 @@
 import sqlite3
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "now.db")
@@ -57,7 +61,7 @@ def init_db():
         try:
             conn.execute(f"ALTER TABLE courses ADD COLUMN {col}")
         except Exception:
-            pass
+            logger.warning("列已存在，跳过: %s", col.split()[0])
 
     # 数据库（C）——资源表
     conn.execute(
@@ -176,4 +180,4 @@ def migrate():
 
 if __name__ == "__main__":
     init_db()
-    print(f"数据库已初始化: {DB_PATH}")
+    logger.info("数据库已初始化: %s", DB_PATH)

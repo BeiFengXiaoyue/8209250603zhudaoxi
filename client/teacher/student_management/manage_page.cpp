@@ -121,8 +121,9 @@ void StudentManagePage::setupUI()
 
 void StudentManagePage::setSidebarActiveItem(int index)
 {
-    if (m_sidebar)
+    if (m_sidebar) {
         m_sidebar->setActiveItem(index);
+    }
 }
 
 void StudentManagePage::fetchStudents()
@@ -131,7 +132,9 @@ void StudentManagePage::fetchStudents()
         + "/api/teacher/students?class_id=" + QString::number(m_classId);
 
     NetworkHandler::instance()->get(url, [this](bool success, const QJsonObject &data) {
-        if (!success) return;
+        if (!success) {
+            return;
+        }
 
         QStringList names;
         QJsonArray arr = data.value("data").toArray();

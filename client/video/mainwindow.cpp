@@ -79,12 +79,13 @@ void VideoMainWindow::setupUI()
 
     // 侧边栏导航
     connect(m_sidebar, &ForumSidebarBase::itemClicked, this, [this](int index, const QString &) {
-        if (index == 0)
+        if (index == 0) {
             emit navigateToHome();
-        else if (index == 2)
+        } else if (index == 2) {
             emit navigateToForum();
-        else if (index == 3)
+        } else if (index == 3) {
             emit navigateToMaterials();
+        }
     });
 
     // ---- 搜索页导航 ----
@@ -160,8 +161,9 @@ bool VideoMainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void VideoMainWindow::setSidebarActive(int index)
 {
-    if (m_sidebar)
+    if (m_sidebar) {
         m_sidebar->setActiveItem(index);
+    }
 }
 
 void VideoMainWindow::setUserData(const QString &username, int classId)
@@ -178,7 +180,9 @@ void VideoMainWindow::playCourse(int courseId)
 {
     QString url = NetworkHandler::baseUrl() + "/api/courses/" + QString::number(courseId);
     NetworkHandler::instance()->get(url, [this, courseId](bool ok, const QJsonObject &json) {
-        if (!ok) return;
+        if (!ok) {
+            return;
+        }
         QJsonObject data = json["data"].toObject();
         m_player->loadCourse(
             data["id"].toInt(),
@@ -212,8 +216,9 @@ void VideoMainWindow::playCourse(int courseId)
 
 void VideoMainWindow::pauseVideo()
 {
-    if (m_player && m_player->canvas() && m_player->canvas()->mediaPlayer())
+    if (m_player && m_player->canvas() && m_player->canvas()->mediaPlayer()) {
         m_player->canvas()->mediaPlayer()->pause();
+    }
 }
 
 void VideoMainWindow::changeEvent(QEvent *event)

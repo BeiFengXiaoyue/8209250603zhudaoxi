@@ -183,8 +183,8 @@ void StudentCard::mousePressEvent(QMouseEvent *event)
         dlgShadow->setOffset(0, 4);
         dlg.setGraphicsEffect(dlgShadow);
 
-        connect(deleteBtn, &QPushButton::clicked, &dlg, [&]() { dlg.done(1); });
-        connect(resetBtn, &QPushButton::clicked, &dlg, [&]() { dlg.done(2); });
+        connect(deleteBtn, &QPushButton::clicked, &dlg, [&dlg]() { dlg.done(1); });
+        connect(resetBtn, &QPushButton::clicked, &dlg, [&dlg]() { dlg.done(2); });
 
         int result = dlg.exec();
 

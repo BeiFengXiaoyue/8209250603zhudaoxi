@@ -47,7 +47,9 @@ void SmallAvatar::setAvatarPixmap(const QPixmap &pixmap)
 
 void SmallAvatar::loadFromServer(const QString &username)
 {
-    if (username.isEmpty()) return;
+    if (username.isEmpty()) {
+        return;
+    }
     // ?t=timestamp 防止 QNetworkAccessManager 缓存旧头像
     QString url = NetworkHandler::baseUrl() + "/api/user/avatar/" + username
                   + "?t=" + QString::number(QDateTime::currentMSecsSinceEpoch());
@@ -55,7 +57,9 @@ void SmallAvatar::loadFromServer(const QString &username)
     auto *reply = NetworkHandler::instance()->manager()->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
-        if (reply->error() != QNetworkReply::NoError) return;
+        if (reply->error() != QNetworkReply::NoError) {
+            return;
+        }
         QByteArray data = reply->readAll();
         QPixmap pixmap;
         if (pixmap.loadFromData(data)) {
@@ -190,7 +194,9 @@ void CommentCard::setupUI()
         }
     )");
     connect(m_likeBtn, &QPushButton::clicked, this, [this]() {
-        if (m_currentUsername.isEmpty()) return;
+        if (m_currentUsername.isEmpty()) {
+            return;
+        }
 
         QJsonObject body;
         body["post_id"] = m_data.postId;
@@ -200,7 +206,9 @@ void CommentCard::setupUI()
             NetworkHandler::baseUrl() + "/api/questions/like",
             body,
             [this](bool ok, const QJsonObject &json) {
-                if (!ok || !json["success"].toBool()) return;
+                if (!ok || !json["success"].toBool()) {
+                    return;
+                }
                 m_liked = json["liked"].toBool();
                 m_data.likeCount = json["like_count"].toInt();
                 updateLikeDisplay();
@@ -361,7 +369,9 @@ void CommentCard::appendReplyWidget(const ReplyData &reply)
 
     // 回复点赞
     connect(replyLikeBtn, &QPushButton::clicked, this, [this, reply, replyLikeBtn]() {
-        if (reply.postId <= 0 || m_currentUsername.isEmpty()) return;
+        if (reply.postId <= 0 || m_currentUsername.isEmpty()) {
+            return;
+        }
         QJsonObject body;
         body["post_id"] = reply.postId;
         body["username"] = m_currentUsername;
@@ -406,7 +416,9 @@ void CommentCard::appendReplyWidget(const ReplyData &reply)
 
 void CommentCard::refreshExpandButton()
 {
-    if (!m_expandBtn) return;
+    if (!m_expandBtn) {
+        return;
+    }
     int total = m_data.replies.size();
     if (m_repliesExpanded) {
         m_expandBtn->setText(QString("▲ 收起 %1 条回复").arg(total));
@@ -503,7 +515,9 @@ void CommentArea::loadQuestions()
         + (m_isHotSort ? "hot" : "new");
 
     NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
-        if (!ok) return;
+        if (!ok) {
+            return;
+        }
         QJsonArray data = json["data"].toArray();
 
         for (int i = 0; i < data.size(); ++i) {
@@ -920,7 +934,9 @@ void CommentArea::setupInputArea()
 void CommentArea::submitContent()
 {
     QString text = m_inputEdit->toPlainText().trimmed();
-    if (text.isEmpty()) return;
+    if (text.isEmpty()) {
+        return;
+    }
 
     QJsonObject body;
     body["uploader"] = m_username;
@@ -939,7 +955,9 @@ void CommentArea::submitContent()
         body,
         [this](bool ok, const QJsonObject &json) {
             (void)json;
-            if (!ok) return;
+            if (!ok) {
+                return;
+            }
             m_inputEdit->setPlaceholderText("写下你的评论...");
             m_replyTargetIndex = -1;
             m_replyTargetName.clear();

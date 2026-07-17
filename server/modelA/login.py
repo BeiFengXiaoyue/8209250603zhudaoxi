@@ -21,7 +21,6 @@ def get_db():
 
 def verify_password(stored: str, password: str) -> bool:
     """验证密码（直接 SHA-256 比对）"""
-    import hashlib
     return stored == hashlib.sha256(password.encode()).hexdigest()
 
 

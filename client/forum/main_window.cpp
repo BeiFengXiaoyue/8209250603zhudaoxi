@@ -22,14 +22,16 @@ void ForumMainWindow::setUserData(const QString &username, int classId)
 
 void ForumMainWindow::setSidebarActiveItem(int index)
 {
-    if (m_sidebar)
+    if (m_sidebar) {
         m_sidebar->setActiveItem(index);
+    }
 }
 
 void ForumMainWindow::refreshAvatars()
 {
-    if (m_commentArea)
+    if (m_commentArea) {
         m_commentArea->refreshAvatars();
+    }
 }
 
 void ForumMainWindow::setupUI()

@@ -228,12 +228,12 @@ QString SignUpPage::getName()
 
 void SignUpPage::setStyleSheet()
 {
-    // TODO: 设置样式
+    // 样式已由全局 QSS 和 setupUI 中的局部样式处理
 }
 
 void SignUpPage::init()
 {
-    // TODO: 初始化页面数据
+    // 页面数据在构造函数 setupUI 中完成初始化
 }
 
 void SignUpPage::show()

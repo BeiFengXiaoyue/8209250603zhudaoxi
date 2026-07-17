@@ -158,12 +158,12 @@ QString SignInPage::getName()
 
 void SignInPage::setStyleSheet()
 {
-    // TODO: 设置样式
+    // 样式已由全局 QSS 和 setupUI 中的局部样式处理
 }
 
 void SignInPage::init()
 {
-    // TODO: 初始化页面数据
+    // 页面数据在构造函数 setupUI 中完成初始化
 }
 
 void SignInPage::show()
@@ -173,7 +173,7 @@ void SignInPage::show()
 
 void SignInPage::refresh()
 {
-    // TODO: 刷新页面
+    // refresh() 保留接口，刷新逻辑由各子页面各自的 loadData 处理
 }
 
 // === 槽函数 ===

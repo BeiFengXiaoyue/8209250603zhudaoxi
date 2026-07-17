@@ -351,7 +351,9 @@ void StudentContentArea::setUserData(const QString &username, int classId)
 
 void StudentContentArea::refreshAll()
 {
-    if (!m_dataLoaded) return;
+    if (!m_dataLoaded) {
+        return;
+    }
     m_refreshingAll = true;
     m_refreshPendingCount = 0;
     for (int i = 0; i < m_tabInfos.size(); ++i) {
@@ -377,8 +379,9 @@ void StudentContentArea::loadTabData(int tabIndex)
         "/api/user/favorites?username=",
     };
 
-    if (tabIndex < 0 || tabIndex >= apiUrls.size())
+    if (tabIndex < 0 || tabIndex >= apiUrls.size()) {
         return;
+    }
 
     // 如果该 tab 已有旧数据，清除旧页面（用于重新加载）
     TabInfo &info = m_tabInfos[tabIndex];

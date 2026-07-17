@@ -317,7 +317,9 @@ void ProfileEditWidget::onUploadAvatar()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "选择头像图片", QString(),
         "图片文件 (*.png *.jpg *.jpeg *.bmp *.gif)");
-    if (filePath.isEmpty()) return;
+    if (filePath.isEmpty()) {
+        return;
+    }
 
     QPixmap pixmap(filePath);
     if (pixmap.isNull()) {
@@ -525,14 +527,18 @@ void ProfileEditWidget::resetForm()
 }
 void ProfileEditWidget::loadAvatar()
 {
-    if (m_username.isEmpty()) return;
+    if (m_username.isEmpty()) {
+        return;
+    }
     QUrl url(NetworkHandler::baseUrl() + "/api/user/avatar/" + m_username);
     QNetworkRequest request(url);
     auto *mgr = NetworkHandler::instance()->manager();
     QNetworkReply *reply = mgr->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
-        if (reply->error() != QNetworkReply::NoError) return;
+        if (reply->error() != QNetworkReply::NoError) {
+            return;
+        }
         QByteArray data = reply->readAll();
         QPixmap pixmap;
         if (pixmap.loadFromData(data)) {

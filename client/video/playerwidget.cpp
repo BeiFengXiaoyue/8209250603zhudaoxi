@@ -43,10 +43,11 @@ DanmakuOverlay::DanmakuOverlay(QWidget *parent)
 bool DanmakuOverlay::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == parent()) {
-        if (event->type() == QEvent::WindowDeactivate)
+        if (event->type() == QEvent::WindowDeactivate) {
             hide();
-        else if (event->type() == QEvent::WindowActivate && m_videoWidget && m_videoWidget->isVisible() && !m_userHidden)
+        } else if (event->type() == QEvent::WindowActivate && m_videoWidget && m_videoWidget->isVisible() && !m_userHidden) {
             show();
+        }
     }
     return QWidget::eventFilter(obj, event);
 }
@@ -54,13 +55,17 @@ bool DanmakuOverlay::eventFilter(QObject *obj, QEvent *event)
 void DanmakuOverlay::reposition()
 {
     if (!m_videoWidget || !m_videoWidget->isVisible()) {
-        if (isVisible()) hide();
+        if (isVisible()) {
+            hide();
+        }
         return;
     }
     QPoint globalPos = m_videoWidget->mapToGlobal(QPoint(0, 0));
     QSize sz = m_videoWidget->size();
     setGeometry(globalPos.x(), globalPos.y(), sz.width(), sz.height());
-    if (!isVisible() && !m_userHidden) show();
+    if (!isVisible() && !m_userHidden) {
+        show();
+    }
 }
 
 void DanmakuOverlay::loadDanmaku(int videoId)
@@ -68,11 +73,15 @@ void DanmakuOverlay::loadDanmaku(int videoId)
     m_videoId = videoId;
     m_items.clear();
     m_lastPollId = 0;
-    if (m_videoId <= 0) return;
+    if (m_videoId <= 0) {
+        return;
+    }
 
     QString url = NetworkHandler::baseUrl() + "/api/danmaku/init?video_id=" + QString::number(m_videoId);
     NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
-        if (!ok) return;
+        if (!ok) {
+            return;
+        }
         QJsonArray data = json["data"].toArray();
         for (const auto &val : data) {
             QJsonObject item = val.toObject();
@@ -81,7 +90,9 @@ void DanmakuOverlay::loadDanmaku(int videoId)
             d.play_time = item["play_time"].toInt();
             d.content = item["content"].toString();
             m_items.append(d);
-            if (d.id > m_lastPollId) m_lastPollId = d.id;
+            if (d.id > m_lastPollId) {
+                m_lastPollId = d.id;
+            }
         }
     });
 }
@@ -91,11 +102,15 @@ void DanmakuOverlay::startPolling()
     if (!m_pollTimer) {
         m_pollTimer = new QTimer(this);
         connect(m_pollTimer, &QTimer::timeout, this, [this]() {
-            if (m_videoId <= 0) return;
+            if (m_videoId <= 0) {
+                return;
+            }
             QString url = NetworkHandler::baseUrl() + "/api/danmaku/poll?video_id="
                 + QString::number(m_videoId) + "&last_id=" + QString::number(m_lastPollId);
             NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
-                if (!ok) return;
+                if (!ok) {
+            return;
+        }
                 QJsonArray data = json["data"].toArray();
                 for (const auto &val : data) {
                     QJsonObject item = val.toObject();
@@ -104,7 +119,9 @@ void DanmakuOverlay::startPolling()
                     d.play_time = item["play_time"].toInt();
                     d.content = item["content"].toString();
                     m_items.append(d);
-                    if (d.id > m_lastPollId) m_lastPollId = d.id;
+                    if (d.id > m_lastPollId) {
+                m_lastPollId = d.id;
+            }
                 }
             });
         });
@@ -595,7 +612,9 @@ void DanmakuHistoryPanel::loadFromServer()
 
     QString url = NetworkHandler::baseUrl() + "/api/danmaku/init?video_id=" + QString::number(m_videoId);
     NetworkHandler::instance()->get(url, [this](bool ok, const QJsonObject &json) {
-        if (!ok) return;
+        if (!ok) {
+            return;
+        }
         QJsonArray data = json["data"].toArray();
         for (const auto &val : data) {
             QJsonObject item = val.toObject();
@@ -1066,7 +1085,9 @@ void PlayerWidget::loadCourse(int courseId,
         QString url = NetworkHandler::baseUrl()
             + "/api/user/favorites?username=" + m_username;
         NetworkHandler::instance()->get(url, [this, courseId, favBtn](bool ok, const QJsonObject &json) {
-            if (!ok) return;
+            if (!ok) {
+            return;
+        }
             QJsonArray arr = json["data"].toArray();
             for (const auto &val : arr) {
                 QJsonObject item = val.toObject();

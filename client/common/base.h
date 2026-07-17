@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BASE_H
+#define BASE_H
+
 #include <QWidget>
 #include <QString>
 class Base: public QWidget
@@ -10,6 +12,8 @@ public:
     virtual void init()=0;
     virtual void show()=0;
     virtual void refresh()=0;
-    Base(QWidget *parent=nullptr);
+    explicit Base(QWidget *parent=nullptr);
     ~Base()=default;
 };
+
+#endif // BASE_H

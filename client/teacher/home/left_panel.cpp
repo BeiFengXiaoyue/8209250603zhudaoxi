@@ -194,7 +194,9 @@ void TeacherLeftPanel::setUserData(const QString &username, const QString &userC
 
 void TeacherLeftPanel::loadAvatar()
 {
-    if (m_username.isEmpty()) return;
+    if (m_username.isEmpty()) {
+        return;
+    }
 
     QString url = NetworkHandler::baseUrl() + "/api/user/avatar/" + m_username;
     QNetworkRequest request{QUrl(url)};
@@ -202,7 +204,9 @@ void TeacherLeftPanel::loadAvatar()
     QNetworkReply *reply = mgr->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
-        if (reply->error() != QNetworkReply::NoError) return;
+        if (reply->error() != QNetworkReply::NoError) {
+            return;
+        }
         QByteArray data = reply->readAll();
         QPixmap pixmap;
         if (pixmap.loadFromData(data)) {

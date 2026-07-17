@@ -188,8 +188,9 @@ StudentSidebar::StudentSidebar(QWidget *parent)
 
 void StudentSidebar::setActiveItem(int index)
 {
-    if (index < 0 || index >= m_navButtons.size())
+    if (index < 0 || index >= m_navButtons.size()) {
         return;
+    }
 
     for (int i = 0; i < m_navButtons.size(); ++i) {
         m_navButtons[i]->setActive(i == index);

@@ -37,18 +37,18 @@ int main(int argc, char *argv[])
     stackedWidget.addWidget(teacherHomePage);   // index 3
 
     // 登录页 -> 注册页 切换
-    QObject::connect(signInPage, &SignInPage::switchToSignUp, [&]() {
+    QObject::connect(signInPage, &SignInPage::switchToSignUp, [&stackedWidget, signUpPage]() {
         stackedWidget.setCurrentWidget(signUpPage);
     });
 
     // 注册页 -> 登录页 切换
-    QObject::connect(signUpPage, &SignUpPage::switchToSignIn, [&]() {
+    QObject::connect(signUpPage, &SignUpPage::switchToSignIn, [&stackedWidget, signInPage]() {
         stackedWidget.setCurrentWidget(signInPage);
     });
 
     // 登录成功 -> 按角色分流
     QObject::connect(signInPage, &SignInPage::loginSuccess,
-        [&](const QString &username, const QString &role,
+        [&stackedWidget, teacherHomePage, studentHomePage](const QString &username, const QString &role,
             int classId, int userId) {
         stackedWidget.resize(1200, 720);
 

@@ -183,7 +183,9 @@ int CourseFlowLayout::doLayout(const QRect &rect, bool testOnly) const
 
 int CourseFlowLayout::smartSpacing() const
 {
-    if (m_hSpace >= 0) return m_hSpace;
+    if (m_hSpace >= 0) {
+        return m_hSpace;
+    }
     return 8;
 }
 
@@ -505,7 +507,9 @@ void CourseUploadWidget::onSelectFile()
         this, "选择视频文件", QString(),
         "视频文件 (*.mp4 *.avi *.mov *.mkv *.wmv *.flv *.webm);;所有文件 (*)");
 
-    if (filePath.isEmpty()) return;
+    if (filePath.isEmpty()) {
+        return;
+    }
 
     m_selectedFilePath = filePath;
     QFileInfo info(filePath);

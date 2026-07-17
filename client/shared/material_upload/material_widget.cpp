@@ -96,13 +96,17 @@ void FlowLayout::addItem(QLayoutItem *item)
 
 int FlowLayout::horizontalSpacing() const
 {
-    if (m_hSpace >= 0) return m_hSpace;
+    if (m_hSpace >= 0) {
+        return m_hSpace;
+    }
     return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
 }
 
 int FlowLayout::verticalSpacing() const
 {
-    if (m_vSpace >= 0) return m_vSpace;
+    if (m_vSpace >= 0) {
+        return m_vSpace;
+    }
     return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
 }
 
@@ -191,7 +195,9 @@ int FlowLayout::doLayout(const QRect &rect, bool testOnly) const
 int FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
     QObject *parent = this->parent();
-    if (!parent) return -1;
+    if (!parent) {
+        return -1;
+    }
     if (parent->isWidgetType()) {
         auto *pw = static_cast<QWidget *>(parent);
         return pw->style()->pixelMetric(pm, nullptr, pw);
@@ -747,7 +753,9 @@ void MaterialWidget::onSelectFile()
         "支持的文件 (*.pdf *.doc *.docx *.ppt *.pptx *.xls *.xlsx "
         "*.txt *.zip *.rar *.mp4 *.avi *.mov *.mkv *.wmv);;所有文件 (*)");
 
-    if (path.isEmpty()) return;
+    if (path.isEmpty()) {
+        return;
+    }
 
     m_selectedFilePath = path;
     QFileInfo fi(path);
@@ -800,7 +808,7 @@ void MaterialWidget::onUpload()
     file->setParent(multiPart);
     multiPart->append(filePart);
 
-    auto addField = [&](const QString &key, const QString &val) {
+    auto addField = [&multiPart](const QString &key, const QString &val) {
         QHttpPart textPart;
         textPart.setHeader(QNetworkRequest::ContentDispositionHeader,
             QString("form-data; name=\"%1\"").arg(key));

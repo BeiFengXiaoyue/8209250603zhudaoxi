@@ -1,5 +1,6 @@
 #include "content_area.h"
 #include "../../common/network_handler.h"
+#include "../../common/constants.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
@@ -245,7 +246,9 @@ QWidget* TeacherContentArea::createBottomNav()
 
 void TeacherContentArea::updateNavigation()
 {
-    if (m_currentTab >= m_tabInfos.size()) return;
+    if (m_currentTab >= m_tabInfos.size()) {
+        return;
+    }
     const auto &info = m_tabInfos[m_currentTab];
     m_prevBtn->setEnabled(m_currentSubPage > 0); m_nextBtn->setEnabled(m_currentSubPage < info.pageCount-1);
     QLayout *dl = m_dotsContainer->layout();
@@ -258,25 +261,46 @@ void TeacherContentArea::updateNavigation()
     }
 }
 
-void TeacherContentArea::animatePageSwitch(int fi, int ti, bool fwd)
+void TeacherContentArea::animatePageSwitch(int fromIndex, int toIndex, bool forward)
 {
-    if (fi==ti) return;
-    QWidget *fw = m_stack->widget(fi), *tw = m_stack->widget(ti);
-    if (!fw||!tw) return;
+    if (fromIndex == toIndex) {
+        return;
+    }
+    QWidget *fw = m_stack->widget(fromIndex), *tw = m_stack->widget(toIndex);
+    if (!fw || !tw) {
+        return;
+    }
     int w = m_stack->width();
-    tw->setGeometry((fwd?w:-w),0,w,m_stack->height()); tw->show(); tw->raise();
+    tw->setGeometry((forward ? w : -w), 0, w, m_stack->height());
+    tw->show();
+    tw->raise();
     auto *g = new QParallelAnimationGroup();
-    auto *a1 = new QPropertyAnimation(fw,"pos"); a1->setDuration(350); a1->setStartValue(QPoint(0,0)); a1->setEndValue(QPoint((fwd?-w:w),0)); a1->setEasingCurve(QEasingCurve::OutCubic);
-    auto *a2 = new QPropertyAnimation(tw,"pos"); a2->setDuration(350); a2->setStartValue(QPoint((fwd?w:-w),0)); a2->setEndValue(QPoint(0,0)); a2->setEasingCurve(QEasingCurve::OutCubic);
-    g->addAnimation(a1); g->addAnimation(a2);
-    connect(g, &QParallelAnimationGroup::finished, this, [this,ti](){ m_stack->setCurrentIndex(ti); });
+    auto *a1 = new QPropertyAnimation(fw, "pos");
+    a1->setDuration(kAnimNormal);
+    a1->setStartValue(QPoint(0, 0));
+    a1->setEndValue(QPoint((forward ? -w : w), 0));
+    a1->setEasingCurve(QEasingCurve::OutCubic);
+    auto *a2 = new QPropertyAnimation(tw, "pos");
+    a2->setDuration(kAnimNormal);
+    a2->setStartValue(QPoint((forward ? w : -w), 0));
+    a2->setEndValue(QPoint(0, 0));
+    a2->setEasingCurve(QEasingCurve::OutCubic);
+    g->addAnimation(a1);
+    g->addAnimation(a2);
+    connect(g, &QParallelAnimationGroup::finished, this, [this, toIndex]() {
+        m_stack->setCurrentIndex(toIndex);
+    });
     g->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void TeacherContentArea::switchTab(int index)
 {
-    if (index >= m_tabInfos.size()) return;
-    if (index == m_currentTab && m_dataLoaded) return;
+    if (index >= m_tabInfos.size()) {
+        return;
+    }
+    if (index == m_currentTab && m_dataLoaded) {
+        return;
+    }
     m_currentTab = index; m_currentSubPage = 0;
     m_stack->setCurrentIndex(m_tabInfos[index].startPage);
     updateNavigation();

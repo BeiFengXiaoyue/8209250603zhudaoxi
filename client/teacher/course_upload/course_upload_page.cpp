@@ -59,8 +59,9 @@ void CourseUploadPage::setupUI()
 
 void CourseUploadPage::setSidebarActiveItem(int index)
 {
-    if (m_sidebar)
+    if (m_sidebar) {
         m_sidebar->setActiveItem(index);
+    }
 }
 
 void CourseUploadPage::refreshAvatars()

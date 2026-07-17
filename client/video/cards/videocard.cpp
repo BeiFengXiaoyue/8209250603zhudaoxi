@@ -16,7 +16,9 @@ VideoCard::VideoCard(QWidget *parent)
 
 void VideoCard::init()
 {
-    if (m_initialized) return;
+    if (m_initialized) {
+        return;
+    }
     m_initialized = true;
     setupUI();
 }
@@ -209,7 +211,9 @@ void VideoCard::setupUI()
 
     // ---- 信号 ----
     connect(m_playBtn, &QPushButton::clicked, this, [this]() {
-        if (m_courseId > 0) emit playRequested(m_courseId);
+        if (m_courseId > 0) {
+            emit playRequested(m_courseId);
+        }
     });
     connect(m_downloadBtn, &QPushButton::clicked, this, [this]() {
         if (m_courseId > 0) {
@@ -239,7 +243,9 @@ void VideoCard::setData(int courseId, const QString &title,
                         const QString &desc, const QString &thumbUrl,
                         int fileSize)
 {
-    if (!m_initialized) init();
+    if (!m_initialized) {
+        init();
+    }
     m_courseId = courseId;
     m_fileSize = fileSize;
     m_titleLabel->setText(title);

@@ -1,5 +1,6 @@
 #include "leftpanel.h"
 #include "../../common/network_handler.h"
+#include "../../common/constants.h"
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QPainterPath>
@@ -16,7 +17,7 @@ StudentAvatarWidget::StudentAvatarWidget(const QString &initials, const QColor &
                            QWidget *parent)
     : QLabel(parent), m_initials(initials), m_bgColor(bgColor)
 {
-    setFixedSize(100, 100);
+    setFixedSize(kAvatarSize, kAvatarSize);
     setAlignment(Qt::AlignCenter);
 }
 
@@ -213,7 +214,9 @@ void StudentLeftPanel::setUserData(const QString &username, const QString &userC
 
 void StudentLeftPanel::loadAvatar()
 {
-    if (m_username.isEmpty()) return;
+    if (m_username.isEmpty()) {
+        return;
+    }
 
     QString url = NetworkHandler::baseUrl() + "/api/user/avatar/" + m_username;
     QNetworkRequest request{QUrl(url)};
@@ -221,7 +224,9 @@ void StudentLeftPanel::loadAvatar()
     QNetworkReply *reply = mgr->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
-        if (reply->error() != QNetworkReply::NoError) return;
+        if (reply->error() != QNetworkReply::NoError) {
+            return;
+        }
         QByteArray data = reply->readAll();
         QPixmap pixmap;
         if (pixmap.loadFromData(data)) {

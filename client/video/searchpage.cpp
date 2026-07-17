@@ -27,8 +27,9 @@ void SearchPage::addFilterTag(const QString &tag)
         clearFilterTags();
         return;
     }
-    if (m_selectedTags.contains(tag))
+    if (m_selectedTags.contains(tag)) {
         return;
+    }
 
     m_selectedTags.append(tag);
     m_filterPlaceholder->setVisible(false);
@@ -42,8 +43,9 @@ void SearchPage::addFilterTag(const QString &tag)
 // ============================================================
 void SearchPage::removeFilterTag(const QString &tag)
 {
-    if (!m_selectedTags.contains(tag))
+    if (!m_selectedTags.contains(tag)) {
         return;
+    }
     m_selectedTags.removeAll(tag);
 
     for (int i = 0; i < m_filterLayout->count(); ++i) {

@@ -134,8 +134,11 @@ void ForumNavButton::drawIcon(QPainter &painter, const QRect &rect)
             double angle = -M_PI / 2 + i * 4 * M_PI / 5;
             double x = cx + 8 * qCos(angle);
             double y = cy + 8 * qSin(angle);
-            if (i == 0) star.moveTo(x, y);
-            else star.lineTo(x, y);
+            if (i == 0) {
+                star.moveTo(x, y);
+            } else {
+                star.lineTo(x, y);
+            }
         }
         star.closeSubpath();
         painter.setBrush(color);
@@ -185,8 +188,9 @@ ForumSidebarBase::ForumSidebarBase(QWidget *parent)
 
 void ForumSidebarBase::setActiveItem(int index)
 {
-    if (index < 0 || index >= m_navButtons.size())
+    if (index < 0 || index >= m_navButtons.size()) {
         return;
+    }
 
     for (int i = 0; i < m_navButtons.size(); ++i) {
         m_navButtons[i]->setActive(i == index);

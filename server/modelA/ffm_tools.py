@@ -77,12 +77,12 @@ def extract_first_frame(
             text=True,
             timeout=60,
         )
-    except subprocess.TimeoutExpired:
-        raise RuntimeError(f"FFmpeg 处理超时（60 秒）: {video_path}")
-    except FileNotFoundError:
+    except subprocess.TimeoutExpired as e:
+        raise RuntimeError(f"FFmpeg 处理超时（60 秒）: {video_path}") from e
+    except FileNotFoundError as e:
         raise RuntimeError(
             "未找到 ffmpeg，请确保它已安装并已添加到系统环境变量 PATH 中。"
-        )
+        ) from e
 
     if result.returncode != 0:
         raise RuntimeError(
